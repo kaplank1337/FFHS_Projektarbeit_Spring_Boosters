@@ -1,0 +1,17 @@
+spring.application.name: spring_boosters
+spring:
+    datasource:
+        url: jdbc:postgresql://localhost:5432/postgres
+        username: postgres
+        password: postgres
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        hibernate:
+            ddl-auto: validate
+        properties:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+    level:
+        org.hibernate.SQL: debug
+        org.hibernate.orm.jdbc.bind: trace
