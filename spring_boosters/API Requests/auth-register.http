@@ -1,0 +1,60 @@
+### User Registration - Valid Request
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+### User Registration - Test Validation Errors (Short Username)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "jd",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1990-05-15",
+  "password": "123"
+}
+
+### User Registration - Test Missing Fields
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "jane.smith",
+  "firstName": "",
+  "lastName": "Smith",
+  "password": "password123"
+}
+
+### User Registration - Another Valid User
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "alice.johnson",
+  "firstName": "Alice",
+  "lastName": "Johnson",
+  "birthDate": "1985-12-03",
+  "password": "mySecretPassword"
+}
+
+### User Registration - Test Duplicate Username (Run after first request)
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "Johnny",
+  "lastName": "Doe",
+  "birthDate": "1992-08-20",
+  "password": "anotherPassword"
+}
+
+###

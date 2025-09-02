@@ -1,5 +1,4 @@
-Datenbank Container bauen und starten:
+Datenbank Container bauen und starten (WICHTIG! Wird auf PORT 5434 gestartet, da 5432 schon durch Docker Desktop belegt ist):
  - Via CLI in das Pfad navivigieren, in dem das Dockerfile liegt
- - "docker build -t spring-booster-postgres:17" ausführen
- - Anschliessend um den Container zu starten "docker run --name spring-booster-db -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=spring_booster_db -v spring_booster_pgdata:/var/lib/postgresql/data -d spring-booster-postgres:17
-   "
+ - "docker build -t spring-boosters-db ." (Vom Dockerfile Pfad aus) ausführen
+ - Anschliessend um den Container zu starten "docker run -d -p 5434:5432 --name spring-booster-db"
