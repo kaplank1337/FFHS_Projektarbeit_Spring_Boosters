@@ -24,6 +24,10 @@ spring:
             password: admin
             roles: ADMIN
 
+jwt:
+    secret: mySecretJWTKey123456789SpringBootersFFHS2025
+    expiration: 86400000
+
 logging:
     level:
         org.hibernate.SQL: debug

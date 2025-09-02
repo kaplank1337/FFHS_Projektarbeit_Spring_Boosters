@@ -31,9 +31,7 @@ public class UserMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBirthDate(),
-                user.getRole(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
+                user.getRole()
         );
     }
 }
