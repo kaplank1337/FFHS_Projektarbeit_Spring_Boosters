@@ -1,5 +1,6 @@
 package ch.ffhs.spring_boosters.controller.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -23,10 +24,12 @@ public class VaccineTypeActiveSubstance {
     // Relationships
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vaccine_type_id", insertable = false, updatable = false)
+    @JsonBackReference
     private VaccineType vaccineType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "active_substance_id", insertable = false, updatable = false)
+    @JsonBackReference
     private ActiveSubstance activeSubstance;
 
     // Constructors

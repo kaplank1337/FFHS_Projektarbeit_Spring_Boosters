@@ -1,5 +1,6 @@
 package ch.ffhs.spring_boosters.controller.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,12 +35,15 @@ public class VaccineType {
 
     // Relationships
     @OneToMany(mappedBy = "vaccineType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<VaccineTypeActiveSubstance> vaccineTypeActiveSubstances;
 
     @OneToMany(mappedBy = "vaccineType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ImmunizationPlan> immunizationPlans;
 
     @OneToMany(mappedBy = "vaccineType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ImmunizationRecord> immunizationRecords;
 
     // Constructors
@@ -50,7 +54,7 @@ public class VaccineType {
         this.code = code;
     }
 
-    // Getters and Setters
+
     public UUID getId() {
         return id;
     }

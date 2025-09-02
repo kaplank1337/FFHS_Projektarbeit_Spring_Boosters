@@ -1,0 +1,82 @@
+### 1. Create test user for VaccineTypeController testing
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "VaccineTypeControllerTest",
+  "firstName": "Vaccine",
+  "lastName": "Tester",
+  "birthDate": "1990-06-20",
+  "password": "vaccineTest123"
+}
+
+### 2. Login with test user to get JWT token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "VaccineTypeControllerTest",
+  "password": "vaccineTest123"
+}
+
+> {%
+    // Extract JWT token from login response
+    if (response.status === 200) {
+        client.global.set("vaccine_jwt_token", response.body.token);
+        client.log("JWT Token extracted for VaccineType tests: " + response.body.token.substring(0, 20) + "...");
+    } else {
+        client.log("Login failed: " + response.body.message);
+    }
+%}
+
+### 3. Test VaccineType endpoint with valid JWT token - Get all vaccine types
+GET http://localhost:8080/api/v1/vaccine-types
+Authorization: Bearer {{vaccine_jwt_token}}
+
+### 3a. Test VaccineType endpoint with valid JWT token - Get vaccine type by ID (use actual ID from step 3)
+GET http://localhost:8080/api/v1/vaccine-types/4693301c-5bfe-4118-902b-acfef6f87abd
+Authorization: Bearer {{vaccine_jwt_token}}
+
+### 3b. Test VaccineType endpoint with valid JWT token - Get vaccine type by non-existent ID
+GET http://localhost:8080/api/v1/vaccine-types/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{vaccine_jwt_token}}
+
+### 4. Test VaccineType endpoint with invalid/fake JWT token - Get all
+GET http://localhost:8080/api/v1/vaccine-types
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkZha2UgVG9rZW4iLCJpYXQiOjE1MTYyMzkwMjJ9.invalid_signature
+
+### 4a. Test VaccineType endpoint with invalid/fake JWT token - Get by ID
+GET http://localhost:8080/api/v1/vaccine-types/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkZha2UgVG9rZW4iLCJpYXQiOjE1MTYyMzkwMjJ9.invalid_signature
+
+### 5. Test VaccineType endpoint without authentication header - Get all
+GET http://localhost:8080/api/v1/vaccine-types
+
+### 5a. Test VaccineType endpoint without authentication header - Get by ID
+GET http://localhost:8080/api/v1/vaccine-types/550e8400-e29b-41d4-a716-446655440000
+
+### 6. Test VaccineType endpoint with malformed token - Get all
+GET http://localhost:8080/api/v1/vaccine-types
+Authorization: Bearer invalid_token_format
+
+### 6a. Test VaccineType endpoint with malformed token - Get by ID
+GET http://localhost:8080/api/v1/vaccine-types/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer invalid_token_format
+
+### 7. Test VaccineType endpoint with expired token (simulation) - Get all
+GET http://localhost:8080/api/v1/vaccine-types
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJleHBpcmVkX3Rva2VuIiwibmFtZSI6IkV4cGlyZWQgVG9rZW4iLCJleHAiOjE1MTYyMzkwMjJ9.expired_signature
+
+### 7a. Test VaccineType endpoint with expired token (simulation) - Get by ID
+GET http://localhost:8080/api/v1/vaccine-types/550e8400-e29b-41d4-a716-446655440000
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJleHBpcmVkX3Rva2VuIiwibmFtZSI6IkV4cGlyZWQgVG9rZW4iLCJleHAiOjE1MTYyMzkwMjJ9.expired_signature
+
+### 8. Verify user still exists after tests
+GET http://localhost:8080/api/auth/me
+Authorization: Bearer {{vaccine_jwt_token}}
+
+### 9. Cleanup - Delete test user
+DELETE http://localhost:8080/api/auth
+Authorization: Bearer {{vaccine_jwt_token}}
+
+###
