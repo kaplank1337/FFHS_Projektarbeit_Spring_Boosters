@@ -31,13 +31,13 @@ class DatabaseIntegrationTest {
         // Clean up and create test data
         userRepository.deleteAll();
 
-        testUser = new User(
-                "testuser",
-                "hashedpassword",
-                "John",
-                "Doe",
-                LocalDate.of(1990, 5, 15)
-        );
+        testUser = User.builder()
+                .username("testuser")
+                .passwordHash("hashedpassword")
+                .firstName("John")
+                .lastName("Doe")
+                .birthDate(LocalDate.of(1990, 5, 15))
+                .build();
         testUser = userRepository.save(testUser);
     }
 
@@ -76,13 +76,13 @@ class DatabaseIntegrationTest {
         // Given first user exists
 
         // When trying to save another user with same username
-        User duplicateUser = new User(
-                "testuser", // Same username
-                "anotherpassword",
-                "Jane",
-                "Smith",
-                LocalDate.of(1985, 3, 20)
-        );
+        User duplicateUser = User.builder()
+                .username("testuser") // Same username
+                .passwordHash("anotherpassword")
+                .firstName("Jane")
+                .lastName("Smith")
+                .birthDate(LocalDate.of(1985, 3, 20))
+                .build();
 
         // Then should throw exception due to unique constraint
         org.junit.jupiter.api.Assertions.assertThrows(
@@ -122,13 +122,13 @@ class DatabaseIntegrationTest {
     @Test
     void shouldHandleNullableFields() {
         // Given user with minimal required fields
-        User minimalUser = new User(
-                "minimal",
-                "password",
-                null, // firstName is nullable
-                null, // lastName is nullable
-                LocalDate.of(2000, 1, 1)
-        );
+        User minimalUser = User.builder()
+                .username("minimal")
+                .passwordHash("password")
+                .firstName(null) // firstName is nullable
+                .lastName(null) // lastName is nullable
+                .birthDate(LocalDate.of(2000, 1, 1))
+                .build();
 
         // When saving
         User saved = userRepository.save(minimalUser);

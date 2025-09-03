@@ -25,13 +25,13 @@ class EntityRelationshipTest {
     @Test
     void shouldCreateCompleteImmunizationScenario() {
         // Given: Create a user
-        User user = new User(
-                "patient1",
-                "hashedpassword",
-                "Jane",
-                "Patient",
-                LocalDate.of(1995, 8, 10)
-        );
+        User user = User.builder()
+                .username("patient1")
+                .passwordHash("hashedpassword")
+                .firstName("Jane")
+                .lastName("Patient")
+                .birthDate(LocalDate.of(1995, 8, 10))
+                .build();
         user = userRepository.save(user);
 
         // Verify user was created with proper UUID and timestamps
@@ -57,10 +57,22 @@ class EntityRelationshipTest {
     @Test
     void shouldValidateUserConstraints() {
         // Test username uniqueness
-        User user1 = new User("uniqueuser", "pass1", "First", "User", LocalDate.of(1990, 1, 1));
+        User user1 = User.builder()
+                .username("uniqueuser")
+                .passwordHash("pass1")
+                .firstName("First")
+                .lastName("User")
+                .birthDate(LocalDate.of(1990, 1, 1))
+                .build();
         userRepository.save(user1);
 
-        User user2 = new User("uniqueuser", "pass2", "Second", "User", LocalDate.of(1991, 1, 1));
+        User user2 = User.builder()
+                .username("uniqueuser")
+                .passwordHash("pass2")
+                .firstName("Second")
+                .lastName("User")
+                .birthDate(LocalDate.of(1991, 1, 1))
+                .build();
 
         // Should throw exception due to unique constraint on username
         org.junit.jupiter.api.Assertions.assertThrows(
@@ -72,13 +84,13 @@ class EntityRelationshipTest {
     @Test
     void shouldHandleNullableFieldsCorrectly() {
         // Test that nullable fields (firstName, lastName) can be null
-        User userWithNulls = new User(
-                "nulluser",
-                "password",
-                null, // firstName can be null
-                null, // lastName can be null
-                LocalDate.of(2000, 6, 15)
-        );
+        User userWithNulls = User.builder()
+                .username("nulluser")
+                .passwordHash("password")
+                .firstName(null) // firstName can be null
+                .lastName(null) // lastName can be null
+                .birthDate(LocalDate.of(2000, 6, 15))
+                .build();
 
         User saved = userRepository.save(userWithNulls);
 
@@ -92,7 +104,13 @@ class EntityRelationshipTest {
     @Test
     void shouldUpdateTimestampsCorrectly() throws InterruptedException {
         // Create user
-        User user = new User("timeuser", "pass", "Time", "User", LocalDate.of(1988, 12, 25));
+        User user = User.builder()
+                .username("timeuser")
+                .passwordHash("pass")
+                .firstName("Time")
+                .lastName("User")
+                .birthDate(LocalDate.of(1988, 12, 25))
+                .build();
         user = userRepository.save(user);
 
         var originalCreatedAt = user.getCreatedAt();
@@ -113,8 +131,21 @@ class EntityRelationshipTest {
     @Test
     void shouldFindUsersByUsername() {
         // Create test users
-        User user1 = userRepository.save(new User("finduser1", "pass", "Find", "User1", LocalDate.of(1985, 3, 15)));
-        User user2 = userRepository.save(new User("finduser2", "pass", "Find", "User2", LocalDate.of(1987, 7, 20)));
+        User user1 = userRepository.save(User.builder()
+                .username("finduser1")
+                .passwordHash("pass")
+                .firstName("Find")
+                .lastName("User1")
+                .birthDate(LocalDate.of(1985, 3, 15))
+                .build());
+
+        User user2 = userRepository.save(User.builder()
+                .username("finduser2")
+                .passwordHash("pass")
+                .firstName("Find")
+                .lastName("User2")
+                .birthDate(LocalDate.of(1987, 7, 20))
+                .build());
 
         // Test finding existing user
         var found = userRepository.findByUsername("finduser1");
