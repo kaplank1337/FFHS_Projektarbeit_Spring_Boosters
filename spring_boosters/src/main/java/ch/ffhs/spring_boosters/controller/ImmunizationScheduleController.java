@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/immunization-schedule")
+@RequestMapping("/api/v1/immunization-schedule")
 public class ImmunizationScheduleController {
 
     @GetMapping

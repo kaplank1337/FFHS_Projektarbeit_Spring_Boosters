@@ -11,6 +11,15 @@ import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import ch.ffhs.spring_boosters.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
@@ -28,8 +37,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @AllArgsConstructor
+@Tag(name = "Authentifizierung", description = "API-Endpoints für Benutzerregistrierung, Login und Benutzerverwaltung")
 public class UserController {
 
     private final UserService userService;
@@ -38,7 +48,44 @@ public class UserController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserRegistrationDto registrationDto) throws UserAlreadyExistException {
+    @Operation(
+        summary = "Benutzer registrieren",
+        description = "Erstellt einen neuen Benutzer im System. Der Benutzername muss eindeutig sein."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Benutzer erfolgreich registriert",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UserDto.class),
+                examples = @ExampleObject(
+                    name = "Erfolgreiche Registrierung",
+                    value = """
+                    {
+                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                        "username": "john.doe",
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "birthDate": "1990-05-15",
+                        "role": "USER"
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Ungültige Eingabedaten oder Benutzer existiert bereits",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
+            )
+        )
+    })
+    public ResponseEntity<UserDto> registerUser(
+        @Parameter(description = "Registrierungsdaten des neuen Benutzers", required = true)
+        @Valid @RequestBody UserRegistrationDto registrationDto) throws UserAlreadyExistException {
         User user = userMapper.userDtoToUser(registrationDto);
         User registeredUser = userService.registerUser(user);
         UserDto userDto = userMapper.userToDto(registeredUser);
@@ -47,7 +94,50 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> loginUser(@Valid @RequestBody UserLoginDto loginDto) {
+    @Operation(
+        summary = "Benutzer anmelden",
+        description = "Authentifiziert einen Benutzer und gibt ein JWT-Token zurück"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Login erfolgreich",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = LoginResponseDto.class),
+                examples = @ExampleObject(
+                    name = "Erfolgreicher Login",
+                    value = """
+                    {
+                        "success": true,
+                        "message": "Login successful",
+                        "username": "john.doe",
+                        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "user": {
+                            "id": "123e4567-e89b-12d3-a456-426614174000",
+                            "username": "john.doe",
+                            "firstName": "John",
+                            "lastName": "Doe",
+                            "birthDate": "1990-05-15",
+                            "role": "USER"
+                        }
+                    }
+                    """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Ungültige Anmeldedaten",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = LoginResponseDto.class)
+            )
+        )
+    })
+    public ResponseEntity<LoginResponseDto> loginUser(
+        @Parameter(description = "Anmeldedaten des Benutzers", required = true)
+        @Valid @RequestBody UserLoginDto loginDto) {
         try{
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -92,6 +182,29 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @Operation(
+        summary = "Aktueller Benutzer",
+        description = "Gibt die Daten des aktuell angemeldeten Benutzers zurück",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Benutzerdaten erfolgreich abgerufen",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UserDto.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Nicht authentifiziert oder ungültiges Token"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Benutzer nicht gefunden"
+        )
+    })
     public ResponseEntity<UserDto> getCurrentUser() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -111,6 +224,25 @@ public class UserController {
     }
 
     @DeleteMapping
+    @Operation(
+        summary = "Benutzer löschen",
+        description = "Löscht den aktuell angemeldeten Benutzer aus dem System",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Benutzer erfolgreich gelöscht"
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Nicht authentifiziert oder ungültiges Token"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Benutzer nicht gefunden"
+        )
+    })
     public ResponseEntity<Void> deleteCurrentUser() throws UserNotFoundException {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
