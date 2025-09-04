@@ -51,6 +51,163 @@ mvn spring-boot:run
 
 Die Anwendung ist dann verfügbar unter: http://localhost:8080
 
+## 📚 API-Dokumentation (Swagger UI)
+
+Das System bietet eine vollständige interaktive API-Dokumentation über Swagger UI basierend auf der OpenAPI 3.0 Spezifikation.
+
+### 🌐 Zugriff auf die API-Dokumentation
+
+Nach dem Start der Anwendung sind folgende URLs verfügbar:
+
+#### Swagger UI (Interaktive Dokumentation)
+```
+http://localhost:8080/swagger-ui.html
+```
+
+#### OpenAPI 3.0 JSON Specification
+```
+http://localhost:8080/v3/api-docs
+```
+
+### 🔑 API-Authentifizierung über Swagger UI
+
+Da alle API-Endpoints (außer Registrierung und Login) JWT-Authentifizierung erfordern, müssen Sie sich zunächst authentifizieren:
+
+#### Schritt 1: Benutzer registrieren oder anmelden
+
+1. **Öffnen Sie Swagger UI**: http://localhost:8080/swagger-ui.html
+2. **Navigieren Sie zur "Benutzer" Sektion**
+3. **Registrierung** (falls noch kein Account vorhanden):
+   - Klicken Sie auf `POST /api/v1/users/register`
+   - Klicken Sie auf "Try it out"
+   - Füllen Sie die Benutzerdaten aus:
+   ```json
+   {
+     "username": "testuser",
+     "password": "password123",
+     "firstName": "Max",
+     "lastName": "Mustermann",
+     "birthDate": "1990-01-01"
+   }
+   ```
+   - Klicken Sie auf "Execute"
+
+4. **Anmeldung**:
+   - Klicken Sie auf `POST /api/v1/users/login`
+   - Klicken Sie auf "Try it out"
+   - Geben Sie Ihre Anmeldedaten ein:
+   ```json
+   {
+     "username": "testuser",
+     "password": "password123"
+   }
+   ```
+   - Klicken Sie auf "Execute"
+   - **Kopieren Sie den `accessToken` aus der Antwort**
+
+#### Schritt 2: JWT-Token in Swagger konfigurieren
+
+1. **Klicken Sie auf den "Authorize" Button** (🔓 Symbol) oben rechts in Swagger UI
+2. **Geben Sie den Token ein** im Format: `Bearer YOUR_ACCESS_TOKEN`
+   ```
+   Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   ```
+3. **Klicken Sie auf "Authorize"**
+4. **Klicken Sie auf "Close"**
+
+> ✅ **Sie sind jetzt authentifiziert** und können alle API-Endpoints testen!
+
+### 🛠️ Verfügbare API-Endpunkte
+
+#### **Benutzer (Users)**
+- `POST /api/v1/users/register` - Benutzerregistrierung (öffentlich)
+- `POST /api/v1/users/login` - Benutzeranmeldung (öffentlich)
+- `GET /api/v1/users/me` - Aktuelle Benutzerinformationen
+- `DELETE /api/v1/users` - Benutzer löschen
+
+#### **Wirkstoffe (Active Substances)**
+- `GET /api/v1/active-substances` - Alle Wirkstoffe abrufen
+- `POST /api/v1/active-substances` - Neuen Wirkstoff erstellen
+- `GET /api/v1/active-substances/{id}` - Wirkstoff nach ID abrufen
+- `PATCH /api/v1/active-substances/{id}` - Wirkstoff aktualisieren
+- `DELETE /api/v1/active-substances/{id}` - Wirkstoff löschen
+
+#### **Alterskategorien (Age Categories)**
+- `GET /api/v1/age-categories` - Alle Alterskategorien abrufen
+- `POST /api/v1/age-categories` - Neue Alterskategorie erstellen
+- `GET /api/v1/age-categories/{id}` - Alterskategorie nach ID abrufen
+- `PATCH /api/v1/age-categories/{id}` - Alterskategorie aktualisieren
+- `DELETE /api/v1/age-categories/{id}` - Alterskategorie löschen
+
+#### **Impfstoff-Typen (Vaccine Types)**
+- `GET /api/v1/vaccine-types` - Alle Impfstoff-Typen abrufen
+- `POST /api/v1/vaccine-types` - Neuen Impfstoff-Typ erstellen
+- `GET /api/v1/vaccine-types/{id}` - Impfstoff-Typ nach ID abrufen
+- `PATCH /api/v1/vaccine-types/{id}` - Impfstoff-Typ aktualisieren
+- `DELETE /api/v1/vaccine-types/{id}` - Impfstoff-Typ löschen
+
+#### **Impfpläne (Immunization Plans)**
+- `GET /api/v1/immunization-plans` - Alle Impfpläne abrufen
+- `POST /api/v1/immunization-plans` - Neuen Impfplan erstellen
+- `GET /api/v1/immunization-plans/{id}` - Impfplan nach ID abrufen
+- `PATCH /api/v1/immunization-plans/{id}` - Impfplan aktualisieren
+- `DELETE /api/v1/immunization-plans/{id}` - Impfplan löschen
+- `GET /api/v1/immunization-plans/by-vaccine-type/{vaccineTypeId}` - Filter nach Impfstoff-Typ
+- `GET /api/v1/immunization-plans/by-age-category/{ageCategoryId}` - Filter nach Alterskategorie
+
+#### **Impfungen (Immunization Records)**
+- `GET /api/v1/immunization-records` - Alle Impfungen abrufen
+- `POST /api/v1/immunization-records` - Neue Impfung erstellen
+- `GET /api/v1/immunization-records/{id}` - Impfung nach ID abrufen
+- `PATCH /api/v1/immunization-records/{id}` - Impfung aktualisieren
+- `DELETE /api/v1/immunization-records/{id}` - Impfung löschen
+- `GET /api/v1/immunization-records/by-user/{userId}` - Impfungen nach Benutzer
+- `GET /api/v1/immunization-records/by-vaccine-type/{vaccineTypeId}` - Filter nach Impfstoff-Typ
+- `GET /api/v1/immunization-records/by-user/{userId}/vaccine-type/{vaccineTypeId}` - Kombinierte Filter
+
+### 💡 Tipps für die Nutzung von Swagger UI
+
+1. **Beispielwerte verwenden**: Swagger UI generiert automatisch Beispielwerte für alle Felder
+2. **Validierung testen**: Probieren Sie ungültige Daten aus, um die Validierung zu testen
+3. **Response-Codes verstehen**: Beachten Sie die verschiedenen HTTP-Status-Codes (200, 201, 400, 404, etc.)
+4. **Filter-Endpunkte nutzen**: Testen Sie die speziellen Filter-Endpunkte für erweiterte Abfragen
+5. **Fehlerbehandlung**: API-Fehler werden strukturiert im `ExceptionMessageBodyDto` Format zurückgegeben
+
+### 🔍 Beispiel-Workflow
+
+1. **Anmelden** und Token erhalten
+2. **Wirkstoff erstellen**: `POST /api/v1/active-substances`
+3. **Alterskategorie erstellen**: `POST /api/v1/age-categories`
+4. **Impfstoff-Typ erstellen**: `POST /api/v1/vaccine-types`
+5. **Impfplan erstellen**: `POST /api/v1/immunization-plans`
+6. **Impfung dokumentieren**: `POST /api/v1/immunization-records`
+7. **Daten abrufen**: Nutzen Sie die verschiedenen GET-Endpunkte und Filter
+
+### ⚙️ Swagger-Konfiguration
+
+Die Swagger-Dokumentation ist in der `application.yaml` konfiguriert:
+
+```yaml
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    try-it-out-enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    disable-swagger-default-url: true
+  show-actuator: false
+  group-configs:
+    - group: 'default'
+      paths-to-match: '/api/**'
+      packages-to-scan: ch.ffhs.spring_boosters.controller
+```
+
 ## 📊 Datenmodell
 
 Das System basiert auf einem hierarchischen Impfmanagement-Modell:
