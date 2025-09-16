@@ -4,12 +4,18 @@ import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordCreateDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordUpdateDto;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ImmunizationRecordMapper {
+    private final UserMapper userMapper;
+    private final VaccineTypeMapper vaccineTypeMapper;
+    private final ImmunizationPlanMapper immunizationPlanMapper;
 
     public ImmunizationRecordDto toDto(ImmunizationRecord immunizationRecord) {
         if (immunizationRecord == null) {
@@ -17,9 +23,9 @@ public class ImmunizationRecordMapper {
         }
         return new ImmunizationRecordDto(
                 immunizationRecord.getId(),
-                immunizationRecord.getUserId(),
-                immunizationRecord.getVaccineTypeId(),
-                immunizationRecord.getImmunizationPlanId(),
+                userMapper.userToDto(immunizationRecord.getUser()),
+                vaccineTypeMapper.vaccineTypeToDto(immunizationRecord.getVaccineType()),
+                immunizationPlanMapper.toDto(immunizationRecord.getImmunizationPlan()),
                 immunizationRecord.getAdministeredOn(),
                 immunizationRecord.getDoseOrderClaimed(),
                 immunizationRecord.getCreatedAt(),

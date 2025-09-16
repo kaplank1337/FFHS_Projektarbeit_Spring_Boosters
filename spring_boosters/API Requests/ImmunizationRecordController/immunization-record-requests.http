@@ -21,19 +21,4 @@ Content-Type: application/json
 GET http://localhost:8080/api/v1/immunization-records/myVaccinations
 Authorization: Bearer {{immunization_jwt_token}}
 
-### 3. Alle Impfungen im System abrufen (Admin oder Berechtigung nötig)
-GET http://localhost:8080/api/v1/immunization-records
-Authorization: Bearer {{immunization_jwt_token}}
 
-### 4. Impfungen eines bestimmten Benutzers abrufen (ersetze {userId} durch echte UUID)
-GET http://localhost:8080/api/v1/immunization-records/by-user/{userId}
-Authorization: Bearer {{immunization_jwt_token}}
-
-### 5. Impfungen nach Impfstoff-Typ abrufen (ersetze {vaccineTypeId} durch echte UUID)
-GET http://localhost:8080/api/v1/immunization-records/by-vaccine-type/{vaccineTypeId}
-Authorization: Bearer {{immunization_jwt_token}}
-
-### 6. Eigene Impfungen ohne Token (sollte 401 liefern)
-GET http://localhost:8080/api/v1/immunization-records/myVaccinations
-
-###
