@@ -5,6 +5,7 @@ import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordCreateDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordUpdateDto;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
+import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.controller.mapper.ImmunizationRecordMapper;
 import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
@@ -21,8 +22,10 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -263,6 +266,38 @@ public class ImmunizationRecordController {
         @Parameter(description = "ID des Impfstoff-Typs", required = true)
         @PathVariable UUID vaccineTypeId) {
         List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUserAndVaccineType(userId, vaccineTypeId);
+        List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
+        return ResponseEntity.ok(immunizationRecordDtos);
+    }
+
+    @GetMapping("/myVaccinations")
+    @Operation(
+        summary = "Eigene Impfungen abrufen",
+        description = "Gibt die Impfungen des aktuell authentifizierten Benutzers zurück",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Liste der Impfungen erfolgreich abgerufen",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ImmunizationRecordDto.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Nicht autorisiert"
+        )
+    })
+    public ResponseEntity<List<ImmunizationRecordDto>> getMyImmunizationRecords(Principal principal) {
+        UUID userId;
+        try {
+            userId = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getId();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUser(userId);
         List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
         return ResponseEntity.ok(immunizationRecordDtos);
     }

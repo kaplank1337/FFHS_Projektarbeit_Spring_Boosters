@@ -182,12 +182,12 @@ SELECT
     END
 FROM plan_refs p;
 
--- Insert a sample admin user (password: admin123)
+-- Insert a sample admin user (password: admin123 - 12 Runden bcrypt)
 INSERT INTO users (id, username, password_hash, first_name, last_name, birth_date, role) VALUES
-    (gen_random_uuid(), 'admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFGjwvWvxbZb5aqjII7eJdG', 'System', 'Administrator', '1990-01-01', 'ADMIN');
+    (gen_random_uuid(), 'admin', '$2a$12$kLzgXVPlkELs.4p/dYS7n.xzt9C8zUA3EmbFwilJyQa9jyVEtCaiC', 'System', 'Administrator', '1990-01-01', 'ADMIN');
 
--- Insert sample test users
+-- Insert sample test users (password: user123 - 12 Runden bcrypt)
 INSERT INTO users (id, username, password_hash, first_name, last_name, birth_date, role) VALUES
-    (gen_random_uuid(), 'john.doe', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFGjwvWvxbZb5aqjII7eJdG', 'John', 'Doe', '1985-05-15', 'USER'),
-    (gen_random_uuid(), 'jane.smith', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFGjwvWvxbZb5aqjII7eJdG', 'Jane', 'Smith', '1992-03-22', 'USER'),
-    (gen_random_uuid(), 'max.mustermann', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFGjwvWvxbZb5aqjII7eJdG', 'Max', 'Mustermann', '1978-11-08', 'USER');
+    (gen_random_uuid(), 'john.doe', '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6', 'John', 'Doe', '1985-05-15', 'USER'),
+    (gen_random_uuid(), 'jane.smith', '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6', 'Jane', 'Smith', '1992-03-22', 'USER'),
+    (gen_random_uuid(), 'max.mustermann', '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6', 'Max', 'Mustermann', '1978-11-08', 'USER');

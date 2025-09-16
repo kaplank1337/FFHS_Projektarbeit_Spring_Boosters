@@ -1,5 +1,5 @@
 ### 1. Create test user for VaccineTypeController testing
-POST http://localhost:8080/api/auth/register
+POST http://localhost:8080/api/v1/auth/register
 Content-Type: application/json
 
 {
@@ -11,7 +11,7 @@ Content-Type: application/json
 }
 
 ### 2. Login with test user to get JWT token
-POST http://localhost:8080/api/auth/login
+POST http://localhost:8080/api/v1/auth/login
 Content-Type: application/json
 
 {
@@ -21,7 +21,7 @@ Content-Type: application/json
 
 > {%
     // Extract JWT token from login response
-    if (response.status === 200) {
+    if (response.status === 200 && response.body.token) {
         client.global.set("vaccine_jwt_token", response.body.token);
         client.log("JWT Token extracted for VaccineType tests: " + response.body.token.substring(0, 20) + "...");
     } else {
@@ -72,11 +72,11 @@ GET http://localhost:8080/api/v1/vaccine-types/550e8400-e29b-41d4-a716-446655440
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJleHBpcmVkX3Rva2VuIiwibmFtZSI6IkV4cGlyZWQgVG9rZW4iLCJleHAiOjE1MTYyMzkwMjJ9.expired_signature
 
 ### 8. Verify user still exists after tests
-GET http://localhost:8080/api/auth/me
+GET http://localhost:8080/api/v1/auth/me
 Authorization: Bearer {{vaccine_jwt_token}}
 
 ### 9. Cleanup - Delete test user
-DELETE http://localhost:8080/api/auth
+DELETE http://localhost:8080/api/v1/auth
 Authorization: Bearer {{vaccine_jwt_token}}
 
 ###
