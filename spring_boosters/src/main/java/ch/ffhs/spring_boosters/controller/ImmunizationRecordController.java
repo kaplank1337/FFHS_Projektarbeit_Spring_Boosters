@@ -191,8 +191,9 @@ public class ImmunizationRecordController {
     })
     public ResponseEntity<Void> deleteImmunizationRecord(
         @Parameter(description = "ID der zu löschenden Impfung", required = true)
-        @PathVariable UUID id) throws ImmunizationRecordNotFoundException {
-        immunizationRecordService.deleteImmunizationRecord(id);
+        @PathVariable UUID id, Principal principal) throws ImmunizationRecordNotFoundException {
+        var userId = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getId();
+        immunizationRecordService.deleteImmunizationRecord(userId, id);
         return ResponseEntity.noContent().build();
     }
 

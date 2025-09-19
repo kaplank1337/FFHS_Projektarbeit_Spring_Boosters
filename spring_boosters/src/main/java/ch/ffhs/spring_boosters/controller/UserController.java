@@ -34,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @RestController
@@ -243,16 +244,18 @@ public class UserController {
             description = "Benutzer nicht gefunden"
         )
     })
-    public ResponseEntity<Void> deleteCurrentUser() throws UserNotFoundException {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public ResponseEntity<Void> deleteCurrentUser(Principal principal) throws UserNotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
+        if (!authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-            userService.deleteUser(authentication.getName());
-            return ResponseEntity.noContent().build();
+        User user = (User) authentication.getPrincipal();
+        userService.deleteUser(user.getId());
+        return ResponseEntity.noContent().build();
     }
+
 
     @ExceptionHandler({UserAlreadyExistException.class, MethodArgumentNotValidException.class , ValidationException.class, UserAlreadyExistException.class})
     public ResponseEntity<ExceptionMessageBodyDto> handleUserAlreadyExistException(

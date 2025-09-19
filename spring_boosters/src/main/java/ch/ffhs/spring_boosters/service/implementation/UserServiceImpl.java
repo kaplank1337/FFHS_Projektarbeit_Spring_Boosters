@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
@@ -41,9 +43,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(() -> UserNotFoundException.forUsername(username));
     }
 
+    public User findById(UUID userId) throws UserNotFoundException {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> UserNotFoundException.forId(userId));
+    }
+
     @Override
-    public void deleteUser(String username) throws UserNotFoundException {
-        User user = findByUsername(username);
+    public void deleteUser(UUID userId) throws UserNotFoundException {
+        User user = findById(userId);
         userRepository.delete(user);
     }
 

@@ -46,11 +46,11 @@ public class ImmunizationRecordServiceImpl implements ImmunizationRecordService 
     }
 
     @Override
-    public void deleteImmunizationRecord(UUID id) throws ImmunizationRecordNotFoundException {
-        if (!immunizationRecordRepository.existsById(id)) {
-            throw new ImmunizationRecordNotFoundException("Immunization record with id " + id + " not found");
+    public void deleteImmunizationRecord(UUID userId, UUID vaccinationId) throws ImmunizationRecordNotFoundException {
+        if (!immunizationRecordRepository.existsByUserIdAndVaccineTypeId(userId,vaccinationId)) {
+            throw new ImmunizationRecordNotFoundException("Immunization record with userId: " + userId + " and VaccinationId: " + vaccinationId + " not found");
         }
-        immunizationRecordRepository.deleteById(id);
+        immunizationRecordRepository.deleteByUserIdAndVaccineTypeId(userId, vaccinationId);
     }
 
     @Override

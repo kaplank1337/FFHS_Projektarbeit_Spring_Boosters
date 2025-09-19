@@ -1,5 +1,7 @@
 package ch.ffhs.spring_boosters.service.Exception;
 
+import java.util.UUID;
+
 public class UserNotFoundException extends Exception{
 
     public UserNotFoundException() {
@@ -18,5 +20,10 @@ public class UserNotFoundException extends Exception{
         return new UserNotFoundException(
                 String.format("User with username '%s' not exists", username)
         );
+    }
+
+    public static UserNotFoundException forId(UUID userId){
+        return new UserNotFoundException(
+                String.format("User with id '%s' not exists", userId));
     }
 }

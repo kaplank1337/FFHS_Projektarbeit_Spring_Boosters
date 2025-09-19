@@ -1,24 +1,85 @@
-### 1. Login mit Testbenutzer (john.doe) und erhalte JWT Token
+## 1. Create a new user for deletion test
+POST http://localhost:8080/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "test.immunizationRecord.delete",
+  "firstName": "Test",
+  "lastName": "ImmunizationRecordDelete",
+  "birthDate": "1995-03-10",
+  "password": "deleteTestPassword123"
+}
+
+
+
+### 2. Login with the created user to get JWT token
 POST http://localhost:8080/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "john.doe",
-  "password": "user123"
+  "username": "test.immunizationRecord.delete",
+  "password": "deleteTestPassword123"
 }
 
 > {%
-    // JWT-Token aus der Login-Antwort extrahieren
-    if (response.status === 200 && response.body.token) {
-        client.global.set("immunization_jwt_token", response.body.token);
-        client.log("JWT Token extrahiert: " + response.body.token.substring(0, 20) + "...");
+    // Extract JWT token from login response
+    if (response.status === 200) {
+        client.global.set("jwt_token", response.body.token);
+        client.log("JWT Token extracted: " + response.body.token.substring(0, 20) + "...");
     } else {
-        client.log("Login fehlgeschlagen: " + response.body.message);
+        client.log("Login failed: " + response.body.message);
     }
 %}
 
-### 2. Eigene Impfungen mit JWT Token abrufen
+
+
+### 3. Alle verfügbaren Impfstoff-Typen abrufen (VaccineTypeController)
+GET http://localhost:8080/api/v1/vaccine-types
+Authorization: Bearer {{jwt_token}}
+
+
+
+### 4. Verfügbare Impfpläne abrufen
+GET http://localhost:8080/api/v1/immunization-plans
+Authorization: Bearer {{jwt_token}}
+
+
+
+### 5. Neue Impfung erstellen
+POST http://localhost:8080/api/v1/immunization-records
+Content-Type: application/json
+Authorization: Bearer {{jwt_token}}
+
+{
+  "userId": "{{user_id}}",
+  "vaccineTypeId": "{{selected_vaccine_type_id}}",
+  "immunizationPlanId": "{{selected_plan_id}}",
+  "administeredOn": "2025-09-18",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    // Extract immunization record ID from response for later deletion
+    if (response.status === 201) {
+        client.global.set("created_record_id", response.body.id);
+        client.log("Created immunization record with ID: " + response.body.id);
+    }
+%}
+
+
+
+### 6. Eigene Impfungen überprüfen
 GET http://localhost:8080/api/v1/immunization-records/myVaccinations
-Authorization: Bearer {{immunization_jwt_token}}
+Authorization: Bearer {{jwt_token}}
 
 
+
+### 7. Erstellte Impfung wieder löschen
+DELETE http://localhost:8080/api/v1/immunization-records/{{created_record_id}}
+Authorization: Bearer {{jwt_token}}
+
+
+
+### 8. Benutzer löschen
+DELETE http://localhost:8080/api/v1/auth
+Authorization: Bearer {{jwt_token}}
