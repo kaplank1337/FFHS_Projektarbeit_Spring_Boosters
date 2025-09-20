@@ -38,21 +38,6 @@ public class AgeCategoryController {
     private final AgeCategoryMapper ageCategoryMapper;
 
     @GetMapping
-    @Operation(
-        summary = "Alle Alterskategorien abrufen",
-        description = "Gibt eine Liste aller verfügbaren Alterskategorien zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Alterskategorien erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = AgeCategoryDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<AgeCategoryDto>> getAllAgeCategories() {
         List<AgeCategory> ageCategories = ageCategoryService.getAllAgeCategories();
         List<AgeCategoryDto> ageCategoryDtos = ageCategoryMapper.toDtoList(ageCategories);
@@ -60,31 +45,7 @@ public class AgeCategoryController {
     }
 
     @GetMapping("/{id}")
-    @Operation(
-        summary = "Alterskategorie nach ID abrufen",
-        description = "Gibt eine spezifische Alterskategorie anhand ihrer ID zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Alterskategorie erfolgreich gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = AgeCategoryDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Alterskategorie nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<AgeCategoryDto> getAgeCategoryById(
-        @Parameter(description = "ID der Alterskategorie", required = true)
         @PathVariable UUID id) throws AgeCategoryNotFoundException {
         AgeCategory ageCategory = ageCategoryService.getAgeCategoryById(id);
         AgeCategoryDto ageCategoryDto = ageCategoryMapper.toDto(ageCategory);
@@ -92,29 +53,6 @@ public class AgeCategoryController {
     }
 
     @PostMapping
-    @Operation(
-        summary = "Neue Alterskategorie erstellen",
-        description = "Erstellt eine neue Alterskategorie im System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Alterskategorie erfolgreich erstellt",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = AgeCategoryDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten oder Alterskategorie existiert bereits",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<AgeCategoryDto> createAgeCategory(
         @Parameter(description = "Daten für die neue Alterskategorie", required = true)
         @Valid @RequestBody AgeCategoryCreateDto createDto) throws AgeCategoryAlreadyExistsException {
@@ -125,41 +63,8 @@ public class AgeCategoryController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(
-        summary = "Alterskategorie aktualisieren",
-        description = "Aktualisiert eine bestehende Alterskategorie",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Alterskategorie erfolgreich aktualisiert",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = AgeCategoryDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Alterskategorie nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten oder Name bereits vergeben",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<AgeCategoryDto> updateAgeCategory(
-        @Parameter(description = "ID der zu aktualisierenden Alterskategorie", required = true)
         @PathVariable UUID id,
-        @Parameter(description = "Aktualisierte Daten für die Alterskategorie", required = true)
         @Valid @RequestBody AgeCategoryUpdateDto updateDto) throws AgeCategoryNotFoundException, AgeCategoryAlreadyExistsException {
         AgeCategory ageCategory = ageCategoryMapper.fromUpdateDto(updateDto);
         AgeCategory updatedAgeCategory = ageCategoryService.updateAgeCategory(id, ageCategory);
@@ -168,25 +73,6 @@ public class AgeCategoryController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-        summary = "Alterskategorie löschen",
-        description = "Löscht eine Alterskategorie aus dem System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Alterskategorie erfolgreich gelöscht"
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Alterskategorie nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<Void> deleteAgeCategory(
         @Parameter(description = "ID der zu löschenden Alterskategorie", required = true)
         @PathVariable UUID id) throws AgeCategoryNotFoundException {
