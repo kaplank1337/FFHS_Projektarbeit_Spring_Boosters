@@ -54,7 +54,6 @@ public class AgeCategoryController {
 
     @PostMapping
     public ResponseEntity<AgeCategoryDto> createAgeCategory(
-        @Parameter(description = "Daten für die neue Alterskategorie", required = true)
         @Valid @RequestBody AgeCategoryCreateDto createDto) throws AgeCategoryAlreadyExistsException {
         AgeCategory ageCategory = ageCategoryMapper.fromCreateDto(createDto);
         AgeCategory createdAgeCategory = ageCategoryService.createAgeCategory(ageCategory);
@@ -74,7 +73,6 @@ public class AgeCategoryController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAgeCategory(
-        @Parameter(description = "ID der zu löschenden Alterskategorie", required = true)
         @PathVariable UUID id) throws AgeCategoryNotFoundException {
         ageCategoryService.deleteAgeCategory(id);
         return ResponseEntity.noContent().build();

@@ -38,21 +38,6 @@ public class ImmunizationPlanController {
     private final ImmunizationPlanMapper immunizationPlanMapper;
 
     @GetMapping
-    @Operation(
-        summary = "Alle Impfpläne abrufen",
-        description = "Gibt eine Liste aller verfügbaren Impfpläne zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfpläne erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationPlanDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ImmunizationPlanDto>> getAllImmunizationPlans() {
         List<ImmunizationPlan> immunizationPlans = immunizationPlanService.getAllImmunizationPlans();
         List<ImmunizationPlanDto> immunizationPlanDtos = immunizationPlanMapper.toDtoList(immunizationPlans);
@@ -60,31 +45,7 @@ public class ImmunizationPlanController {
     }
 
     @GetMapping("/{id}")
-    @Operation(
-        summary = "Impfplan nach ID abrufen",
-        description = "Gibt einen spezifischen Impfplan anhand seiner ID zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Impfplan erfolgreich gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationPlanDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfplan nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ImmunizationPlanDto> getImmunizationPlanById(
-        @Parameter(description = "ID des Impfplans", required = true)
         @PathVariable UUID id) throws ImmunizationPlanNotFoundException {
         ImmunizationPlan immunizationPlan = immunizationPlanService.getImmunizationPlanById(id);
         ImmunizationPlanDto immunizationPlanDto = immunizationPlanMapper.toDto(immunizationPlan);
@@ -92,31 +53,7 @@ public class ImmunizationPlanController {
     }
 
     @PostMapping
-    @Operation(
-        summary = "Neuen Impfplan erstellen",
-        description = "Erstellt einen neuen Impfplan im System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Impfplan erfolgreich erstellt",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationPlanDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten oder Impfplan existiert bereits",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ImmunizationPlanDto> createImmunizationPlan(
-        @Parameter(description = "Daten für den neuen Impfplan", required = true)
         @Valid @RequestBody ImmunizationPlanCreateDto createDto) throws ImmunizationPlanAlreadyExistsException {
         ImmunizationPlan immunizationPlan = immunizationPlanMapper.fromCreateDto(createDto);
         ImmunizationPlan createdImmunizationPlan = immunizationPlanService.createImmunizationPlan(immunizationPlan);
@@ -125,41 +62,8 @@ public class ImmunizationPlanController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(
-        summary = "Impfplan aktualisieren",
-        description = "Aktualisiert einen bestehenden Impfplan",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Impfplan erfolgreich aktualisiert",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationPlanDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfplan nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten oder Name bereits vergeben",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ImmunizationPlanDto> updateImmunizationPlan(
-        @Parameter(description = "ID des zu aktualisierenden Impfplans", required = true)
         @PathVariable UUID id,
-        @Parameter(description = "Aktualisierte Daten für den Impfplan", required = true)
         @Valid @RequestBody ImmunizationPlanUpdateDto updateDto) throws ImmunizationPlanNotFoundException, ImmunizationPlanAlreadyExistsException {
         ImmunizationPlan immunizationPlan = immunizationPlanMapper.fromUpdateDto(updateDto);
         ImmunizationPlan updatedImmunizationPlan = immunizationPlanService.updateImmunizationPlan(id, immunizationPlan);
@@ -168,50 +72,14 @@ public class ImmunizationPlanController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-        summary = "Impfplan löschen",
-        description = "Löscht einen Impfplan aus dem System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Impfplan erfolgreich gelöscht"
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfplan nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<Void> deleteImmunizationPlan(
-        @Parameter(description = "ID des zu löschenden Impfplans", required = true)
         @PathVariable UUID id) throws ImmunizationPlanNotFoundException {
         immunizationPlanService.deleteImmunizationPlan(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/by-vaccine-type/{vaccineTypeId}")
-    @Operation(
-        summary = "Impfpläne nach Impfstoff-Typ abrufen",
-        description = "Gibt alle Impfpläne für einen bestimmten Impfstoff-Typ zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfpläne erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationPlanDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ImmunizationPlanDto>> getImmunizationPlansByVaccineType(
-        @Parameter(description = "ID des Impfstoff-Typs", required = true)
         @PathVariable UUID vaccineTypeId) {
         List<ImmunizationPlan> immunizationPlans = immunizationPlanService.getImmunizationPlansByVaccineType(vaccineTypeId);
         List<ImmunizationPlanDto> immunizationPlanDtos = immunizationPlanMapper.toDtoList(immunizationPlans);
@@ -219,23 +87,7 @@ public class ImmunizationPlanController {
     }
 
     @GetMapping("/by-age-category/{ageCategoryId}")
-    @Operation(
-        summary = "Impfpläne nach Alterskategorie abrufen",
-        description = "Gibt alle Impfpläne für eine bestimmte Alterskategorie zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfpläne erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationPlanDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ImmunizationPlanDto>> getImmunizationPlansByAgeCategory(
-        @Parameter(description = "ID der Alterskategorie", required = true)
         @PathVariable UUID ageCategoryId) {
         List<ImmunizationPlan> immunizationPlans = immunizationPlanService.getImmunizationPlansByAgeCategory(ageCategoryId);
         List<ImmunizationPlanDto> immunizationPlanDtos = immunizationPlanMapper.toDtoList(immunizationPlans);

@@ -86,7 +86,6 @@ public class ImmunizationRecordController {
         )
     })
     public ResponseEntity<ImmunizationRecordDto> getImmunizationRecordById(
-        @Parameter(description = "ID der Impfung", required = true)
         @PathVariable UUID id) throws ImmunizationRecordNotFoundException {
         ImmunizationRecord immunizationRecord = immunizationRecordService.getImmunizationRecordById(id);
         ImmunizationRecordDto immunizationRecordDto = immunizationRecordMapper.toDto(immunizationRecord);
@@ -118,7 +117,6 @@ public class ImmunizationRecordController {
         )
     })
     public ResponseEntity<ImmunizationRecordDto> createImmunizationRecord(
-        @Parameter(description = "Daten für die neue Impfung", required = true)
         @Valid @RequestBody ImmunizationRecordCreateDto createDto) {
         ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromCreateDto(createDto);
         ImmunizationRecord createdImmunizationRecord = immunizationRecordService.createImmunizationRecord(immunizationRecord);
@@ -127,41 +125,8 @@ public class ImmunizationRecordController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(
-        summary = "Impfung aktualisieren",
-        description = "Aktualisiert eine bestehende Impfung",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Impfung erfolgreich aktualisiert",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfung nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ImmunizationRecordDto> updateImmunizationRecord(
-        @Parameter(description = "ID der zu aktualisierenden Impfung", required = true)
         @PathVariable UUID id,
-        @Parameter(description = "Aktualisierte Daten für die Impfung", required = true)
         @Valid @RequestBody ImmunizationRecordUpdateDto updateDto) throws ImmunizationRecordNotFoundException {
         ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromUpdateDto(updateDto);
         ImmunizationRecord updatedImmunizationRecord = immunizationRecordService.updateImmunizationRecord(id, immunizationRecord);
@@ -170,27 +135,7 @@ public class ImmunizationRecordController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-        summary = "Impfung löschen",
-        description = "Löscht eine Impfung aus dem System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Impfung erfolgreich gelöscht"
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfung nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<Void> deleteImmunizationRecord(
-        @Parameter(description = "ID der zu löschenden Impfung", required = true)
         @PathVariable UUID id, Principal principal) throws ImmunizationRecordNotFoundException {
         var userId = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getId();
         immunizationRecordService.deleteImmunizationRecord(userId, id);
@@ -198,23 +143,7 @@ public class ImmunizationRecordController {
     }
 
     @GetMapping("/by-user/{userId}")
-    @Operation(
-        summary = "Impfungen nach Benutzer abrufen",
-        description = "Gibt alle Impfungen für einen bestimmten Benutzer zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfungen erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ImmunizationRecordDto>> getImmunizationRecordsByUser(
-        @Parameter(description = "ID des Benutzers", required = true)
         @PathVariable UUID userId) {
         List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUser(userId);
         List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
@@ -222,23 +151,7 @@ public class ImmunizationRecordController {
     }
 
     @GetMapping("/by-vaccine-type/{vaccineTypeId}")
-    @Operation(
-        summary = "Impfungen nach Impfstoff-Typ abrufen",
-        description = "Gibt alle Impfungen für einen bestimmten Impfstoff-Typ zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfungen erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ImmunizationRecordDto>> getImmunizationRecordsByVaccineType(
-        @Parameter(description = "ID des Impfstoff-Typs", required = true)
         @PathVariable UUID vaccineTypeId) {
         List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByVaccineType(vaccineTypeId);
         List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
@@ -246,25 +159,8 @@ public class ImmunizationRecordController {
     }
 
     @GetMapping("/by-user/{userId}/vaccine-type/{vaccineTypeId}")
-    @Operation(
-        summary = "Impfungen nach Benutzer und Impfstoff-Typ abrufen",
-        description = "Gibt alle Impfungen für einen bestimmten Benutzer und Impfstoff-Typ zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfungen erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ImmunizationRecordDto>> getImmunizationRecordsByUserAndVaccineType(
-        @Parameter(description = "ID des Benutzers", required = true)
         @PathVariable UUID userId,
-        @Parameter(description = "ID des Impfstoff-Typs", required = true)
         @PathVariable UUID vaccineTypeId) {
         List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUserAndVaccineType(userId, vaccineTypeId);
         List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
@@ -272,25 +168,6 @@ public class ImmunizationRecordController {
     }
 
     @GetMapping("/myVaccinations")
-    @Operation(
-        summary = "Eigene Impfungen abrufen",
-        description = "Gibt die Impfungen des aktuell authentifizierten Benutzers zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfungen erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Nicht autorisiert"
-        )
-    })
     public ResponseEntity<List<ImmunizationRecordDto>> getMyImmunizationRecords(Principal principal) {
         UUID userId;
         try {

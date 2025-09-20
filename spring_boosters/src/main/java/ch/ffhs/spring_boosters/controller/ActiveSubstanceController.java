@@ -38,21 +38,6 @@ public class ActiveSubstanceController {
     private final ActiveSubstanceMapper activeSubstanceMapper;
 
     @GetMapping
-    @Operation(
-        summary = "Alle Wirkstoffe abrufen",
-        description = "Gibt eine Liste aller verfügbaren Wirkstoffe zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Wirkstoffe erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ActiveSubstanceDto.class)
-            )
-        )
-    })
     public ResponseEntity<List<ActiveSubstanceDto>> getAllActiveSubstances() {
         List<ActiveSubstance> activeSubstances = activeSubstanceService.getAllActiveSubstances();
         List<ActiveSubstanceDto> activeSubstanceDtos = activeSubstanceMapper.toDtoList(activeSubstances);
@@ -60,31 +45,7 @@ public class ActiveSubstanceController {
     }
 
     @GetMapping("/{id}")
-    @Operation(
-        summary = "Wirkstoff nach ID abrufen",
-        description = "Gibt einen spezifischen Wirkstoff anhand seiner ID zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Wirkstoff erfolgreich gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ActiveSubstanceDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Wirkstoff nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ActiveSubstanceDto> getActiveSubstanceById(
-        @Parameter(description = "ID des Wirkstoffs", required = true)
         @PathVariable UUID id) throws ActiveSubstanceNotFoundException {
         ActiveSubstance activeSubstance = activeSubstanceService.getActiveSubstanceById(id);
         ActiveSubstanceDto activeSubstanceDto = activeSubstanceMapper.toDto(activeSubstance);
@@ -92,31 +53,7 @@ public class ActiveSubstanceController {
     }
 
     @PostMapping
-    @Operation(
-        summary = "Neuen Wirkstoff erstellen",
-        description = "Erstellt einen neuen Wirkstoff im System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Wirkstoff erfolgreich erstellt",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ActiveSubstanceDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten oder Wirkstoff existiert bereits",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ActiveSubstanceDto> createActiveSubstance(
-        @Parameter(description = "Daten für den neuen Wirkstoff", required = true)
         @Valid @RequestBody ActiveSubstanceCreateDto createDto) throws ActiveSubstanceAlreadyExistsException {
         ActiveSubstance activeSubstance = activeSubstanceMapper.fromCreateDto(createDto);
         ActiveSubstance createdActiveSubstance = activeSubstanceService.createActiveSubstance(activeSubstance);
@@ -125,41 +62,8 @@ public class ActiveSubstanceController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(
-        summary = "Wirkstoff aktualisieren",
-        description = "Aktualisiert einen bestehenden Wirkstoff",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Wirkstoff erfolgreich aktualisiert",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ActiveSubstanceDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Wirkstoff nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten oder Name bereits vergeben",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ActiveSubstanceDto> updateActiveSubstance(
-        @Parameter(description = "ID des zu aktualisierenden Wirkstoffs", required = true)
         @PathVariable UUID id,
-        @Parameter(description = "Aktualisierte Daten für den Wirkstoff", required = true)
         @Valid @RequestBody ActiveSubstanceUpdateDto updateDto) throws ActiveSubstanceNotFoundException, ActiveSubstanceAlreadyExistsException {
         ActiveSubstance activeSubstance = activeSubstanceMapper.fromUpdateDto(updateDto);
         ActiveSubstance updatedActiveSubstance = activeSubstanceService.updateActiveSubstance(id, activeSubstance);
@@ -168,27 +72,7 @@ public class ActiveSubstanceController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-        summary = "Wirkstoff löschen",
-        description = "Löscht einen Wirkstoff aus dem System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "204",
-            description = "Wirkstoff erfolgreich gelöscht"
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Wirkstoff nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<Void> deleteActiveSubstance(
-        @Parameter(description = "ID des zu löschenden Wirkstoffs", required = true)
         @PathVariable UUID id) throws ActiveSubstanceNotFoundException {
         activeSubstanceService.deleteActiveSubstance(id);
         return ResponseEntity.noContent().build();

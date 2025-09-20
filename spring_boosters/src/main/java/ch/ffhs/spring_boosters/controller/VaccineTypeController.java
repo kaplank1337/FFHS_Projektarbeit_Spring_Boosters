@@ -40,47 +40,6 @@ public class VaccineTypeController {
     private final VaccineTypeMapper vaccineTypeMapper;
 
     @GetMapping
-    @Operation(
-        summary = "Alle Impfstoff-Typen abrufen",
-        description = "Gibt eine Liste aller verfügbaren Impfstoff-Typen zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfstoff-Typen erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = VaccineTypeListDto.class),
-                examples = @ExampleObject(
-                    name = "Impfstoff-Typen Liste",
-                    value = """
-                    {
-                        "vaccineTypes": [
-                            {
-                                "name": "COVID-19 mRNA Pfizer-BioNTech",
-                                "code": "COVID-PFZ",
-                                "vaccineTypeActiveSubstances": [
-                                    {
-                                        "qualitativeAmount": "30 μg",
-                                        "activeSubstance": {
-                                            "name": "BNT162b2",
-                                            "synonyms": ["Pfizer-BioNTech", "Comirnaty"]
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                    """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Nicht authentifiziert oder ungültiges Token"
-        )
-    })
     public ResponseEntity<VaccineTypeListDto> getVaccineTypes() {
         List<VaccineType> vaccineTypes = vaccineTypeService.getVaccineTypes();
         VaccineTypeListDto vaccineTypeListDto = vaccineTypeMapper.vaccineTypeListDto(vaccineTypes);
@@ -88,53 +47,7 @@ public class VaccineTypeController {
     }
 
     @GetMapping("/{id}")
-    @Operation(
-        summary = "Impfstoff-Typ nach ID abrufen",
-        description = "Gibt einen spezifischen Impfstoff-Typ anhand seiner ID zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Impfstoff-Typ erfolgreich gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = VaccineTypeDto.class),
-                examples = @ExampleObject(
-                    name = "Einzelner Impfstoff-Typ",
-                    value = """
-                    {
-                        "name": "COVID-19 mRNA Pfizer-BioNTech",
-                        "code": "COVID-PFZ",
-                        "vaccineTypeActiveSubstances": [
-                            {
-                                "qualitativeAmount": "30 μg",
-                                "activeSubstance": {
-                                    "name": "BNT162b2",
-                                    "synonyms": ["Pfizer-BioNTech", "Comirnaty"]
-                                }
-                            }
-                        ]
-                    }
-                    """
-                )
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Nicht authentifiziert oder ungültiges Token"
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfstoff-Typ nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<VaccineTypeDto> getVaccineTypeById(
-        @Parameter(description = "UUID des Impfstoff-Typs", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
         @PathVariable UUID id) throws VaccineTypeNotFoundException {
         VaccineType vaccineType = vaccineTypeService.getVaccineType(id);
         VaccineTypeDto vaccineTypeDto = vaccineTypeMapper.vaccineTypeToDto(vaccineType);
