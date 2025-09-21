@@ -30,7 +30,7 @@ public interface ImmunizationRecordRepository extends JpaRepository<Immunization
 
     @Override
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
-    java.util.Optional<ImmunizationRecord> findById(UUID id);
+    Optional<ImmunizationRecord> findById(UUID id);
 
     boolean existsByUserIdAndVaccineTypeId(UUID userId, UUID vaccineTypeId);
 }

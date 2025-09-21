@@ -1,6 +1,6 @@
 package ch.ffhs.spring_boosters.controller;
 
-import ch.ffhs.spring_boosters.config.JwtUtil;
+import ch.ffhs.spring_boosters.security.JwtUtil;
 import ch.ffhs.spring_boosters.controller.dto.LoginResponseDto;
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
 import ch.ffhs.spring_boosters.controller.mapper.UserMapper;
@@ -11,14 +11,6 @@ import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import ch.ffhs.spring_boosters.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

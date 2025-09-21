@@ -15,7 +15,7 @@ public class ImmunizationScheduleController {
 
     @GetMapping
     public ResponseEntity<Map<String, String>> getImmunizationSchedule() {
-        // Placeholder implementation
+        //TODO: Logik zur Abfrage des Immunisierungsplans implementieren
         Map<String, String> response = new HashMap<>();
         response.put("message", "Get Immunization Schedule - Not Implemented");
         return ResponseEntity.ok(response);
@@ -23,7 +23,7 @@ public class ImmunizationScheduleController {
 
     @PostMapping
     public ResponseEntity<Map<String, String>> createImmunizationSchedule() {
-        // Placeholder implementation
+        //TODO: Logik zur Erstellung des Immunisierungsplans implementieren
         Map<String, String> response = new HashMap<>();
         response.put("message", "Create Immunization Schedule - Not Implemented");
         return ResponseEntity.ok(response);

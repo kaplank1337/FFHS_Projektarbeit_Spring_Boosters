@@ -1,4 +1,4 @@
-package ch.ffhs.spring_boosters.config;
+package ch.ffhs.spring_boosters.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

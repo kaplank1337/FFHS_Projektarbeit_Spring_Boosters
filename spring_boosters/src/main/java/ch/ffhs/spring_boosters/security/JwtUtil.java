@@ -1,4 +1,4 @@
-package ch.ffhs.spring_boosters.config;
+package ch.ffhs.spring_boosters.security;
 
 import ch.ffhs.spring_boosters.controller.dto.UserDto;
 import io.jsonwebtoken.Claims;

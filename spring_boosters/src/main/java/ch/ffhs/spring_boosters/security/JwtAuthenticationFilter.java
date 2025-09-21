@@ -1,4 +1,4 @@
-package ch.ffhs.spring_boosters.config;
+package ch.ffhs.spring_boosters.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

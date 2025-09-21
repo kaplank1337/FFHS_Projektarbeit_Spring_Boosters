@@ -340,13 +340,14 @@ mvn test
 ```
 spring_boosters/
 ├── src/main/java/ch/ffhs/spring_boosters/
-│   ├── config/          # Security & JWT Konfiguration
-│   ├── controller/      # REST Controllers
-│   ├── dto/            # Data Transfer Objects
-│   ├── entity/         # JPA Entitäten
-│   ├── mapper/         # DTO ↔ Entity Mapping
-│   ├── repository/     # Datenzugriff
-│   └── service/        # Business Logic
+│   ├── config/                     # Konfigurationen
+│   ├── controller/                 # REST Controllers
+    │   ├── dto/                    # Data Transfer Objects
+    │   ├── entity/                 # JPA Entitäten
+    │   ├── mapper/                 # DTO ↔ Entity Mapping
+│   ├── repository/                 # Datenzugriff
+│   └── service/                    # Business Logic
+|   └── security/                   # Sicherheitskonfiguration
 ├── src/main/resources/
 │   ├── db/migration/   # Flyway SQL Scripts
 │   └── application.yaml
