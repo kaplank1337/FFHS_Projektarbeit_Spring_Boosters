@@ -38,7 +38,7 @@ class FlywayMigrationTest {
         var migrationInfos = flyway.info().all();
 
         // Then should have our migration
-        assertThat(migrationInfos).hasSize(1);
+        assertThat(migrationInfos).hasSize(3);
         assertThat(migrationInfos[0].getDescription()).isEqualTo("Create immunization schema");
         assertThat(migrationInfos[0].getState().isApplied()).isTrue();
     }

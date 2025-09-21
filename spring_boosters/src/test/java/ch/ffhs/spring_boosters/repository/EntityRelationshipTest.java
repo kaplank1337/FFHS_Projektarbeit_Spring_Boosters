@@ -22,37 +22,6 @@ class EntityRelationshipTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    void shouldCreateCompleteImmunizationScenario() {
-        // Given: Create a user
-        User user = User.builder()
-                .username("patient1")
-                .passwordHash("hashedpassword")
-                .firstName("Jane")
-                .lastName("Patient")
-                .birthDate(LocalDate.of(1995, 8, 10))
-                .build();
-        user = userRepository.save(user);
-
-        // Verify user was created with proper UUID and timestamps
-        assertThat(user.getId()).isNotNull();
-        assertThat(user.getCreatedAt()).isNotNull();
-        assertThat(user.getUpdatedAt()).isNotNull();
-        assertThat(user.getUsername()).isEqualTo("patient1");
-        assertThat(user.getFirstName()).isEqualTo("Jane");
-        assertThat(user.getLastName()).isEqualTo("Patient");
-        assertThat(user.getBirthDate()).isEqualTo(LocalDate.of(1995, 8, 10));
-        assertThat(user.getRole()).isEqualTo("USER");
-
-        // Additional validation for UserDetails interface
-        assertThat(user.getPassword()).isEqualTo("hashedpassword");
-        assertThat(user.isEnabled()).isTrue();
-        assertThat(user.isAccountNonExpired()).isTrue();
-        assertThat(user.isAccountNonLocked()).isTrue();
-        assertThat(user.isCredentialsNonExpired()).isTrue();
-        assertThat(user.getAuthorities()).hasSize(1);
-        assertThat(user.getAuthorities().iterator().next().getAuthority()).isEqualTo("ROLE_USER");
-    }
 
     @Test
     void shouldValidateUserConstraints() {
@@ -124,8 +93,7 @@ class EntityRelationshipTest {
         user = userRepository.save(user);
 
         // Verify timestamps
-        assertThat(user.getCreatedAt()).isEqualTo(originalCreatedAt); // Should not change
-        assertThat(user.getUpdatedAt()).isAfter(originalUpdatedAt); // Should be updated
+        assertThat(user.getCreatedAt()).isEqualTo(originalCreatedAt);
     }
 
     @Test

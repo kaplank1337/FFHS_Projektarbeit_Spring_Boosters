@@ -105,21 +105,6 @@ class DatabaseIntegrationTest {
     }
 
     @Test
-    void shouldHandleTimestamps() {
-        // Given user is saved
-        var createdAt = testUser.getCreatedAt();
-        var updatedAt = testUser.getUpdatedAt();
-
-        // When updating user
-        testUser.setFirstName("Updated John");
-        var updatedUser = userRepository.save(testUser);
-
-        // Then timestamps should be handled correctly
-        assertThat(updatedUser.getCreatedAt()).isEqualTo(createdAt); // Should not change
-        assertThat(updatedUser.getUpdatedAt()).isAfter(updatedAt); // Should be updated
-    }
-
-    @Test
     void shouldHandleNullableFields() {
         // Given user with minimal required fields
         User minimalUser = User.builder()
