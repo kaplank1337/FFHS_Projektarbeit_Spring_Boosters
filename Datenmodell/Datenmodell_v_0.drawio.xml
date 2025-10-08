@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/27.0.9 Chrome/134.0.6998.205 Electron/35.4.0 Safari/537.36" version="27.0.9">
+  <diagram id="3e067628-d95b-4749-bbab-3f11053bed77" name="Data Model">
+    <mxGraphModel dx="2262" dy="981" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="user" value="&lt;b&gt;user&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;username: TEXT not null&lt;br/&gt;password_hash: TEXT not null&lt;br/&gt;first_name: TEXT&lt;br/&gt;last_name: TEXT&lt;br/&gt;birth_date: DATE not null&lt;br/&gt;role: TEXT&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="vaccine_type" value="&lt;b&gt;vaccine_type&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;name: TEXT not null&lt;br/&gt;code: TEXT&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="40" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="active_substance" value="&lt;b&gt;active_substance&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;name: TEXT not null&lt;br/&gt;synonyms: TEXT[]&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="40" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="age_category" value="&lt;b&gt;age_category&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;name: TEXT not null&lt;br/&gt;age_min_days: INT not null&lt;br/&gt;age_max_days: INT (NULL=open)&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="940" y="560" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="vaccine_type_active_substance" value="&lt;b&gt;vaccine_type_active_substance&lt;/b&gt;&lt;br/&gt;&lt;i&gt;(PK)&lt;/i&gt; vaccine_type_id: UUID (FK→vaccine_type.id)&lt;br/&gt;&lt;i&gt;(PK)&lt;/i&gt; active_substance_id: UUID (FK→active_substance.id)&lt;br/&gt;qualitative_amount: TEXT" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="520" y="300" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="immunization_plan" value="&lt;b&gt;immunization_plan&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;name: TEXT not null&lt;br/&gt;vaccine_type_id: UUID not null (FK)&lt;br/&gt;age_category_id: UUID not null (FK)&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="560" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="immunization_plan_series" value="&lt;b&gt;immunization_plan_series&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;immunization_plan_id: UUID not null (FK)&lt;br/&gt;series_name: TEXT not null&lt;br/&gt;required_doses: INT not null&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="360" y="820" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="follow_up_rule" value="&lt;b&gt;follow_up_rule&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;from_plan_id: UUID (FK→immunization_plan.id)&lt;br/&gt;to_plan_id: UUID (FK→immunization_plan.id)&lt;br/&gt;required_series_id: UUID (FK→immunization_plan_series.id)&lt;br/&gt;min_completed_doses: INT not null&lt;br/&gt;target_min_age_days: INT&lt;br/&gt;target_max_age_days: INT&lt;br/&gt;min_interval_days_since_last: INT&lt;br/&gt;preferred_age_days: INT&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="680" y="820" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="immunization_record" value="&lt;b&gt;immunization_record&lt;/b&gt;&lt;br/&gt;&lt;i&gt;id: UUID (PK)&lt;/i&gt;&lt;br/&gt;user_id: UUID not null (FK)&lt;br/&gt;vaccine_type_id: UUID not null (FK)&lt;br/&gt;immunization_plan_id: UUID not null (FK)&lt;br/&gt;administered_on: DATE not null&lt;br/&gt;dose_order_claimed: INT&lt;br/&gt;created_at: TIMESTAMPTZ&lt;br/&gt;updated_at: TIMESTAMPTZ" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="-60" y="560" width="260" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="100" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="vaccine_type" target="vaccine_type_active_substance" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="101" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="active_substance" target="vaccine_type_active_substance" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="102" value="n → 1" style="endArrow=block;html=1;rounded=0;" parent="1" source="vaccine_type_active_substance" target="vaccine_type" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="103" value="n → 1" style="endArrow=block;html=1;rounded=0;" parent="1" source="vaccine_type_active_substance" target="active_substance" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="104" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="age_category" target="immunization_plan" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="105" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="vaccine_type" target="immunization_plan" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="106" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="immunization_plan" target="immunization_plan_series" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="107" value="1 → n (as from_plan)" style="endArrow=block;html=1;rounded=0;" parent="1" source="immunization_plan" target="follow_up_rule" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="108" value="1 → n (as to_plan)" style="endArrow=block;html=1;rounded=0;" parent="1" source="immunization_plan" target="follow_up_rule" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="109" value="1 → n (required_series)" style="endArrow=block;html=1;rounded=0;" parent="1" source="immunization_plan_series" target="follow_up_rule" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="110" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="user" target="immunization_record" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="111" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="vaccine_type" target="immunization_record" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="112" value="1 → n" style="endArrow=block;html=1;rounded=0;" parent="1" source="immunization_plan" target="immunization_record" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

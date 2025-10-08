@@ -1,0 +1,377 @@
+@startuml
+' PlantUML Klassendiagramm für das Spring_Boosters Projekt
+skinparam classAttributeIconSize 0
+
+' === Entities ===
+package "ch.ffhs.spring_boosters.controller.entity" {
+  class ActiveSubstance {
+    +id : UUID
+    +name : String
+    +synonyms : String[]
+  }
+  class AgeCategory {
+    +id : UUID
+    +name : String
+    +ageMinDays : Integer
+    +ageMaxDays : Integer
+  }
+  class VaccineType {
+    +id : UUID
+    +name : String
+    +code : String
+  }
+  class VaccineTypeActiveSubstance {
+    +vaccineTypeId : UUID
+    +activeSubstanceId : UUID
+  }
+  class ImmunizationPlan {
+    +id : UUID
+    +name : String
+  }
+  class ImmunizationPlanSeries {
+    +id : UUID
+    +immunizationPlanId : UUID
+  }
+  class FollowUpRule {
+    +id : UUID
+  }
+  class ImmunizationRecord {
+    +id : UUID
+    +userId : UUID
+    +vaccineTypeId : UUID
+    +immunizationPlanId : UUID
+    +administeredOn : LocalDate
+  }
+  class User {
+    +id : UUID
+    +username : String
+    +passwordHash : String
+  }
+}
+
+' === Entity Beziehungen ===
+VaccineType "1" <|-- "*" VaccineTypeActiveSubstance
+ActiveSubstance "1" <|-- "*" VaccineTypeActiveSubstance
+VaccineType "1" -- "*" ImmunizationPlan
+AgeCategory "1" -- "*" ImmunizationPlan
+ImmunizationPlan "1" -- "*" ImmunizationPlanSeries
+ImmunizationPlan "1" -- "*" FollowUpRule
+ImmunizationPlan "1" -- "*" ImmunizationRecord
+VaccineType "1" -- "*" ImmunizationRecord
+User "1" -- "*" ImmunizationRecord
+
+' === Controllers ===
+package "ch.ffhs.spring_boosters.controller" {
+  class AgeCategoryController {
+    +getAll
+    +getById
+    +create
+    +update
+    +delete
+  }
+  class ActiveSubstanceController {
+    +getAll
+    +getById
+    +create
+    +update
+    +delete
+  }
+  class VaccineTypeController {
+    +getAll
+    +getById
+    +create
+    +update
+    +delete
+  }
+  class ImmunizationPlanController {
+    +getAll
+    +getById
+    +create
+    +update
+    +delete
+  }
+  class ImmunizationRecordController {
+    +getAll
+    +getById
+    +create
+    +update
+    +delete
+    +getMyVaccinations
+  }
+  class ImmunizationScheduleController {
+    +getScheduleForUser
+  }
+  class UserController {
+    +register
+    +login
+    +getCurrentUser
+    +deleteCurrentUser
+  }
+}
+
+' === Services and Implementations ===
+package "ch.ffhs.spring_boosters.service" {
+  interface AgeCategoryService
+  AgeCategoryService : +findAll
+  AgeCategoryService : +findById
+  AgeCategoryService : +create
+  AgeCategoryService : +update
+  AgeCategoryService : +delete
+  class AgeCategoryServiceImpl {
+    +findAll
+    +findById
+    +create
+    +update
+    +delete
+  }
+
+  interface ActiveSubstanceService
+  ActiveSubstanceService : +findAll
+  ActiveSubstanceService : +findById
+  ActiveSubstanceService : +create
+  ActiveSubstanceService : +update
+  ActiveSubstanceService : +delete
+  class ActiveSubstanceServiceImpl {
+    +findAll
+    +findById
+    +create
+    +update
+    +delete
+  }
+
+  interface VaccineTypeService
+  VaccineTypeService : +findAll
+  VaccineTypeService : +findById
+  VaccineTypeService : +create
+  VaccineTypeService : +update
+  VaccineTypeService : +delete
+  class VaccineTypeServiceImpl {
+    +findAll
+    +findById
+    +create
+    +update
+    +delete
+  }
+
+  interface ImmunizationPlanService
+  ImmunizationPlanService : +findAll
+  ImmunizationPlanService : +findById
+  ImmunizationPlanService : +create
+  ImmunizationPlanService : +update
+  ImmunizationPlanService : +delete
+  class ImmunizationPlanServiceImpl {
+    +findAll
+    +findById
+    +create
+    +update
+    +delete
+  }
+
+  interface ImmunizationRecordService
+  ImmunizationRecordService : +findAll
+  ImmunizationRecordService : +findById
+  ImmunizationRecordService : +create
+  ImmunizationRecordService : +update
+  ImmunizationRecordService : +delete
+  ImmunizationRecordService : +getMyVaccinations
+  class ImmunizationRecordServiceImpl {
+    +findAll
+    +findById
+    +create
+    +update
+    +delete
+    +getMyVaccinations
+  }
+
+  interface UserService
+  UserService : +register
+  UserService : +login
+  UserService : +getCurrentUser
+  UserService : +deleteCurrentUser
+  class UserServiceImpl {
+    +register
+    +login
+    +getCurrentUser
+    +deleteCurrentUser
+  }
+}
+
+' === Repositories ===
+package "ch.ffhs.spring_boosters.repository" {
+  interface AgeCategoryRepository
+  AgeCategoryRepository : +findAll
+  AgeCategoryRepository : +findById
+  AgeCategoryRepository : +save
+  AgeCategoryRepository : +deleteById
+
+  interface ActiveSubstanceRepository
+  ActiveSubstanceRepository : +findAll
+  ActiveSubstanceRepository : +findById
+  ActiveSubstanceRepository : +save
+  ActiveSubstanceRepository : +deleteById
+
+  interface VaccineTypeRepository
+  VaccineTypeRepository : +findAll
+  VaccineTypeRepository : +findById
+  VaccineTypeRepository : +save
+  VaccineTypeRepository : +deleteById
+
+  interface ImmunizationPlanRepository
+  ImmunizationPlanRepository : +findAll
+  ImmunizationPlanRepository : +findById
+  ImmunizationPlanRepository : +save
+  ImmunizationPlanRepository : +deleteById
+
+  interface ImmunizationRecordRepository
+  ImmunizationRecordRepository : +findAll
+  ImmunizationRecordRepository : +findById
+  ImmunizationRecordRepository : +save
+  ImmunizationRecordRepository : +deleteById
+
+  interface UserRepository
+  UserRepository : +findAll
+  UserRepository : +findById
+  UserRepository : +save
+  UserRepository : +deleteById
+  UserRepository : +findByUsername
+}
+
+' === Beziehungen zwischen Schichten ===
+AgeCategoryController ..> AgeCategoryService
+AgeCategoryService <|.. AgeCategoryServiceImpl
+AgeCategoryServiceImpl ..> AgeCategoryRepository
+AgeCategoryRepository ..> AgeCategory
+
+ActiveSubstanceController ..> ActiveSubstanceService
+ActiveSubstanceService <|.. ActiveSubstanceServiceImpl
+ActiveSubstanceServiceImpl ..> ActiveSubstanceRepository
+ActiveSubstanceRepository ..> ActiveSubstance
+
+VaccineTypeController ..> VaccineTypeService
+VaccineTypeService <|.. VaccineTypeServiceImpl
+VaccineTypeServiceImpl ..> VaccineTypeRepository
+VaccineTypeRepository ..> VaccineType
+
+ImmunizationPlanController ..> ImmunizationPlanService
+ImmunizationPlanService <|.. ImmunizationPlanServiceImpl
+ImmunizationPlanServiceImpl ..> ImmunizationPlanRepository
+ImmunizationPlanRepository ..> ImmunizationPlan
+
+ImmunizationRecordController ..> ImmunizationRecordService
+ImmunizationRecordService <|.. ImmunizationRecordServiceImpl
+ImmunizationRecordServiceImpl ..> ImmunizationRecordRepository
+ImmunizationRecordRepository ..> ImmunizationRecord
+
+UserController ..> UserService
+UserService <|.. UserServiceImpl
+UserServiceImpl ..> UserRepository
+UserRepository ..> User
+
+ImmunizationScheduleController ..> ImmunizationPlanService
+ImmunizationScheduleController ..> ImmunizationRecordService
+
+' === DTOs ===
+package "ch.ffhs.spring_boosters.controller.dto" {
+  class ActiveSubstanceCreateDto {
+    +name : String
+    +synonyms : String[]
+  }
+  class ActiveSubstanceUpdateDto {
+    +name : String
+    +synonyms : String[]
+  }
+  class ActiveSubstanceDto {
+    +id : UUID
+    +name : String
+    +synonyms : String[]
+  }
+
+  class AgeCategoryCreateDto {
+    +name : String
+    +ageMinDays : Integer
+    +ageMaxDays : Integer
+  }
+  class AgeCategoryUpdateDto {
+    +name : String
+    +ageMinDays : Integer
+    +ageMaxDays : Integer
+  }
+  class AgeCategoryDto {
+    +id : UUID
+    +name : String
+    +ageMinDays : Integer
+    +ageMaxDays : Integer
+  }
+
+  class VaccineTypeCreateDto {
+    +name : String
+    +code : String
+  }
+  class VaccineTypeUpdateDto {
+    +name : String
+    +code : String
+  }
+  class VaccineTypeDto {
+    +id : UUID
+    +name : String
+    +code : String
+  }
+
+  class ImmunizationPlanCreateDto {
+    +name : String
+    +vaccineTypeId : UUID
+    +ageCategoryId : UUID
+  }
+  class ImmunizationPlanUpdateDto {
+    +name : String
+    +vaccineTypeId : UUID
+    +ageCategoryId : UUID
+  }
+  class ImmunizationPlanDto {
+    +id : UUID
+    +name : String
+    +vaccineTypeId : UUID
+    +ageCategoryId : UUID
+  }
+
+  class ImmunizationRecordCreateDto {
+    +vaccineTypeId : UUID
+    +immunizationPlanId : UUID
+    +administeredOn : LocalDate
+    +doseOrderClaimed : Integer
+  }
+  class ImmunizationRecordUpdateDto {
+    +administeredOn : LocalDate
+    +doseOrderClaimed : Integer
+  }
+  class ImmunizationRecordDto {
+    +id : UUID
+    +userId : UUID
+    +vaccineTypeId : UUID
+    +immunizationPlanId : UUID
+    +administeredOn : LocalDate
+    +doseOrderClaimed : Integer
+  }
+
+  class UserRegistrationDto {
+    +username : String
+    +firstName : String
+    +lastName : String
+    +birthDate : LocalDate
+    +password : String
+  }
+  class UserLoginDto {
+    +username : String
+    +password : String
+  }
+  class UserDto {
+    +id : UUID
+    +username : String
+    +firstName : String
+    +lastName : String
+    +birthDate : LocalDate
+    +role : String
+  }
+}
+
+@enduml

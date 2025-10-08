@@ -5,4 +5,3 @@ ENV POSTGRES_PASSWORD=postgres
 ENV POSTGRES_DB=spring_booster_db
 
 EXPOSE 5432
-
