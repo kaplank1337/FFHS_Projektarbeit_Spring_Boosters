@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impfungsbenachrichtigung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin: -30px -30px 20px -30px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-pending {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        .status-urgent {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .status-completed {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #4CAF50;
+            font-size: 14px;
+            color: #666;
+        }
+        .important-note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🩺 Impfungsbenachrichtigung</h1>
+        </div>
+
+        <div class="greeting">
+            Hallo <strong th:text="${recipientName}">Patient</strong>,
+        </div>
+
+        <p>
+            Wir möchten Sie über Ihre anstehenden Impfungen informieren.
+            Bitte beachten Sie die folgenden Impftermine und deren Status:
+        </p>
+
+        <div class="important-note">
+            <strong>⚠️ Wichtig:</strong> Bitte vereinbaren Sie rechtzeitig einen Termin für die anstehenden Impfungen.
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Impfung</th>
+                    <th>Fälligkeitsdatum</th>
+                    <th>Status</th>
+                    <th>Beschreibung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="vaccination : ${vaccinations}">
+                    <td th:text="${vaccination.vaccineName}">Tetanus</td>
+                    <td th:text="${vaccination.dueDate}">2024-12-31</td>
+                    <td>
+                        <span th:text="${vaccination.status}"
+                              th:class="${'status-' + #strings.toLowerCase(vaccination.status)}">
+                            Ausstehend
+                        </span>
+                    </td>
+                    <td th:text="${vaccination.description}">Auffrischungsimpfung empfohlen</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            Falls Sie Fragen zu den Impfungen haben oder einen Termin vereinbaren möchten,
+            kontaktieren Sie bitte Ihren Hausarzt oder unsere Impfstelle.
+        </p>
+
+        <div class="footer">
+            <p><strong>Mit freundlichen Grüßen,</strong></p>
+            <p>Ihr Spring Boosters Team</p>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+            <p style="font-size: 12px;">
+                Dies ist eine automatisch generierte E-Mail. Bitte antworten Sie nicht direkt auf diese Nachricht.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
