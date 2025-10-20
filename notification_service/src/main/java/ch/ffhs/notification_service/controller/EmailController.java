@@ -3,6 +3,7 @@ package ch.ffhs.notification_service.controller;
 import ch.ffhs.notification_service.dto.EmailRequestDto;
 import ch.ffhs.notification_service.dto.EmailResponseDto;
 import ch.ffhs.notification_service.service.EmailService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class EmailController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<EmailResponseDto> sendEmail(@RequestBody EmailRequestDto emailRequest) {
+    public ResponseEntity<EmailResponseDto> sendEmail(@Valid @RequestBody EmailRequestDto emailRequest) {
         EmailResponseDto response = emailService.sendVaccinationEmail(emailRequest);
 
         if (response.success()) {

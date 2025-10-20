@@ -7,12 +7,14 @@ import ch.ffhs.notification_service.repository.EmailRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 
 @Service
@@ -21,6 +23,12 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     private final EmailRepository emailRepository;
+
+    @Value("${notification.email.from}")
+    private String fromAddress;
+
+    @Value("${notification.email.from-personal}")
+    private String fromPersonal;
 
     @Autowired
     public EmailServiceImpl(JavaMailSender mailSender, SpringTemplateEngine templateEngine, EmailRepository emailRepository) {
@@ -43,11 +51,11 @@ public class EmailServiceImpl implements EmailService {
             // Create and send email
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setTo(emailRequest.recipientEmail());
-            helper.setSubject(emailRequest.subject());
+            String subject = (emailRequest.subject() == null || emailRequest.subject().isBlank()) ? "Impfbenachrichtigung" : emailRequest.subject();
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
-            helper.setFrom("noreply@springboosters.ch");
+            helper.setFrom(fromAddress, fromPersonal);
 
             mailSender.send(message);
 
@@ -55,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
             EmailLog log = new EmailLog(
                     emailRequest.recipientEmail(),
                     emailRequest.recipientName(),
-                    emailRequest.subject(),
+                    subject,
                     htmlContent,
                     true,
                     null
@@ -68,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
                     LocalDateTime.now().toString()
             );
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             // Log failed email
             EmailLog log = new EmailLog(
                     emailRequest.recipientEmail(),

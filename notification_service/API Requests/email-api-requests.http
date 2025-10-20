@@ -3,7 +3,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "max.mustermann@example.com",
+  "recipientEmail": "kaplan.kaan@windowslive.com",
   "recipientName": "Max Mustermann",
   "subject": "Ihre anstehenden Impfungen - Wichtige Erinnerung",
   "vaccinations": [
@@ -39,7 +39,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "anna.schmidt@example.com",
+  "recipientEmail": "kaplan.kaan@windowslive.com",
   "recipientName": "Anna Schmidt",
   "subject": "Impferinnerung: Tetanus Auffrischung",
   "vaccinations": [
@@ -57,7 +57,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "peter.mueller@example.com",
+  "recipientEmail": "pkaplan.kaan@windowslive.com",
   "recipientName": "Peter Müller",
   "subject": "DRINGEND: Überfällige Impfungen",
   "vaccinations": [
@@ -81,7 +81,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "sarah.weber@example.com",
+  "recipientEmail": "kaplan.kaan@windowslive.com",
   "recipientName": "Sarah Weber",
   "subject": "Impfstatus-Übersicht",
   "vaccinations": [
@@ -105,7 +105,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "familie.schneider@example.com",
+  "recipientEmail": "kaplan.kaan@windowslive.com",
   "recipientName": "Familie Schneider",
   "subject": "Impfplan für Ihr Kind",
   "vaccinations": [
@@ -171,7 +171,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "test@example.com",
+  "recipientEmail": "kaplan.kaan@windowslive.com",
   "recipientName": "Test User",
   "subject": "Test Email",
   "vaccinations": []
@@ -182,7 +182,7 @@ POST http://localhost:8081/api/v1/email/send
 Content-Type: application/json
 
 {
-  "recipientEmail": "test@example.com",
+  "recipientEmail": "kaplan.kaan@windowslive.com",
   "vaccinations": [
     {
       "vaccineName": "Test Vaccine",

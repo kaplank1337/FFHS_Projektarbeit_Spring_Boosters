@@ -22,8 +22,9 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:your-email@gmail.com}
-    password: ${MAIL_PASSWORD:your-app-password}
+    username: ${MAIL_USERNAME:noreply.springboosters@gmail.com}
+    password: ${MAIL_PASSWORD:CHANGE_ME_APP_PASSWORD}
+    default-encoding: UTF-8
     properties:
       mail:
         smtp:
@@ -34,6 +35,13 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+        transport.protocol: smtp
+        debug: false
+
+notification:
+  email:
+    from: ${MAIL_FROM:noreply.springboosters@gmail.com}
+    from-personal: ${MAIL_FROM_PERSONAL:Spring Boosters Notification Service}
 
 server:
   port: 8081

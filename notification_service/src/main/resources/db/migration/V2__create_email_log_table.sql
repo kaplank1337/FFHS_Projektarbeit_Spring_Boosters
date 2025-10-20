@@ -17,7 +17,7 @@ CREATE INDEX idx_email_log_recipient ON notification_service.email_log(recipient
 CREATE INDEX idx_email_log_sent_at ON notification_service.email_log(sent_at);
 CREATE INDEX idx_email_log_success ON notification_service.email_log(success);
 
--- Kommentar für die Tabelle
+-- Kommentare
 COMMENT ON TABLE notification_service.email_log IS 'Log-Tabelle für alle versendeten E-Mails des Notification Service';
 COMMENT ON COLUMN notification_service.email_log.recipient_email IS 'E-Mail-Adresse des Empfängers';
 COMMENT ON COLUMN notification_service.email_log.recipient_name IS 'Name des Empfängers';
@@ -26,8 +26,3 @@ COMMENT ON COLUMN notification_service.email_log.content IS 'HTML-Inhalt der E-M
 COMMENT ON COLUMN notification_service.email_log.sent_at IS 'Zeitstempel wann die E-Mail versendet wurde';
 COMMENT ON COLUMN notification_service.email_log.success IS 'Gibt an ob die E-Mail erfolgreich versendet wurde';
 COMMENT ON COLUMN notification_service.email_log.error_message IS 'Fehlermeldung falls der Versand fehlgeschlagen ist';
--- V1__create_schema.sql
--- Erstelle das notification_service Schema
-
-CREATE SCHEMA IF NOT EXISTS notification_service;
-
