@@ -1,0 +1,68 @@
+server.port: 8000
+spring:
+  application:
+    name: authentification_services
+  cloud:
+    gateway:
+      filter:
+        token-relay:
+          enabled: false
+        local-response-cache:
+          enabled: false
+      routes:
+        # Route für Active Substances
+        - id: active-substances
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/active-substances/**
+          filters:
+            - RewritePath=/api/v1/active-substances/(?<segment>.*), /api/v1/active-substances/$\{segment}
+
+        # Route für Vaccine Types
+        - id: vaccine-types
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/vaccine-types/**
+          filters:
+            - RewritePath=/api/v1/vaccine-types/(?<segment>.*), /api/v1/vaccine-types/$\{segment}
+
+        # Route für Immunization Records
+        - id: immunization-records
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/immunization-records/**
+          filters:
+            - RewritePath=/api/v1/immunization-records/(?<segment>.*), /api/v1/immunization-records/$\{segment}
+
+        # Route für Age Categories
+        - id: age-categories
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/age-categories/**
+          filters:
+            - RewritePath=/api/v1/age-categories/(?<segment>.*), /api/v1/age-categories/$\{segment}
+
+        # Route für Immunization Schedule
+        - id: immunization-schedule
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/immunization-schedule/**
+          filters:
+            - RewritePath=/api/v1/immunization-schedule/(?<segment>.*), /api/v1/immunization-schedule/$\{segment}
+
+        # Route für Immunization Plans
+        - id: immunization-plans
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/immunization-plans/**
+          filters:
+            - RewritePath=/api/v1/immunization-plans/(?<segment>.*), /api/v1/immunization-plans/$\{segment}
+
+        # Route für Users (interne Verwaltung)
+        - id: users
+          uri: ${remote.boosters.base-url}
+          predicates:
+            - Path=/api/v1/users/**
+          filters:
+            - RewritePath=/api/v1/users/(?<segment>.*), /api/v1/users/$\{segment}
+
