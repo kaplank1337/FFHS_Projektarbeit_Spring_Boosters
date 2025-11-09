@@ -1,7 +1,16 @@
 server:
   port: 8000
 
+jwt:
+  secret: "f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51"
+  expiration-seconds: 3600
+
 spring:
+  security:
+    password:
+      encoding:
+        bcrypt:
+          strength: 10
   cloud:
     gateway:
       routes:
