@@ -1,0 +1,108 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Datenbank
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: spring_booster_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring_network
+
+  # Core Backend Service (Port 8081)
+  core_backend:
+    build:
+      context: ./core_backend
+      dockerfile: Dockerfile
+    container_name: core_backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_booster_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SERVER_PORT: 8081
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - spring_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/v3/api-docs", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Notification Service (Port 8082)
+  notification_service:
+    build:
+      context: ./notification_service
+      dockerfile: Dockerfile
+    container_name: notification_service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_booster_db?currentSchema=notification_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME:-your-email@gmail.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-your-app-password}
+      SERVER_PORT: 8082
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - spring_network
+
+  # Authentification Service / API Gateway (Port 8000)
+  authentification_service:
+    build:
+      context: ./authentification_service
+      dockerfile: Dockerfile
+    container_name: authentification_service
+    environment:
+      SERVER_PORT: 8000
+      CORE_BACKEND_HOST: core_backend
+      CORE_BACKEND_PORT: 8081
+      NOTIFICATION_SERVICE_HOST: notification_service
+      NOTIFICATION_SERVICE_PORT: 8082
+      JWT_SECRET: f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51
+      JWT_EXPIRATION_SECONDS: 3600
+      JAVA_OPTS: "-Xmx512m -Xms256m"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - core_backend
+      - notification_service
+    restart: unless-stopped
+    networks:
+      - spring_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  spring_network:
+    driver: bridge

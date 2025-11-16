@@ -1,13 +1,13 @@
 spring.application.name: notification_service
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/spring_booster_db?currentSchema=notification_service
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/spring_booster_db?currentSchema=notification_service}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -20,8 +20,8 @@ spring:
     default-schema: notification_service
     locations: classpath:db/migration
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME:your-email@gmail.com}
     password: ${MAIL_PASSWORD:your-app-password}
     properties:
@@ -36,4 +36,4 @@ spring:
           writetimeout: 5000
 
 server:
-  port: 8082
+  port: ${SERVER_PORT:8082}
