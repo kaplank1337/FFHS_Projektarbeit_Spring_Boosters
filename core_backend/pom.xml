@@ -8,7 +8,7 @@
 		<version>3.4.8</version>
 	</parent>
 	<groupId>ch.ffhs</groupId>
-	<artifactId>spring_boosters</artifactId>
+	<artifactId>core_backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring_boosters</name>
 	<description>Projektarbeit - FFHS - Spring Boosters - Backend</description>
