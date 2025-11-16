@@ -1,0 +1,15 @@
+spring:
+  security:
+    password:
+      encoding:
+        bcrypt:
+          strength: 10
+  cloud:
+    gateway:
+      routes:
+        - id: all-forward
+          uri: http://localhost:8081
+          predicates:
+            - Path=/**
+          filters:
+            - RewritePath=/(?<remaining>.*), /${remaining}

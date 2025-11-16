@@ -1,0 +1,29 @@
+server:
+  port: ${SERVER_PORT:8000}
+
+jwt:
+  secret: ${JWT_SECRET:f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51}
+  expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
+
+spring:
+  security:
+    password:
+      encoding:
+        bcrypt:
+          strength: 10
+  cloud:
+    gateway:
+      routes:
+        - id: core-backend
+          uri: http://${CORE_BACKEND_HOST:core_backend}:${CORE_BACKEND_PORT:8081}
+          predicates:
+            - Path=/api/**
+          filters:
+            - RewritePath=/api/(?<remaining>.*), /api/${remaining}
+        - id: notification-service
+          uri: http://${NOTIFICATION_SERVICE_HOST:notification_service}:${NOTIFICATION_SERVICE_PORT:8082}
+          predicates:
+            - Path=/**
+          filters:
+            - RewritePath=/(?<remaining>.*), /${remaining}
+
