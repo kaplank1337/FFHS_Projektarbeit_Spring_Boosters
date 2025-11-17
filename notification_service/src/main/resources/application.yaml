@@ -34,6 +34,13 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+        transport.protocol: smtp
+        debug: false
+
+notification:
+  email:
+    from: ${MAIL_FROM:noreply.springboosters@gmail.com}
+    from-personal: ${MAIL_FROM_PERSONAL:Spring Boosters Notification Service}
 
 server:
   port: ${SERVER_PORT:8082}

@@ -4,9 +4,6 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/authentification_service/pom.xml" />
-        <option value="$PROJECT_DIR$/spring_boosters/pom.xml" />
-        <option value="$PROJECT_DIR$/core_backend/pom.xml" />
         <option value="$PROJECT_DIR$/notification_service/pom.xml" />
       </list>
     </option>

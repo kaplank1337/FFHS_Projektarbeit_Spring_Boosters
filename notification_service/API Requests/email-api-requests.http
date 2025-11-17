@@ -1,0 +1,297 @@
+### Send Vaccination Email - Valid Request with Multiple Vaccinations
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "kaplan.kaan@windowslive.com",
+  "recipientName": "Max Mustermann",
+  "subject": "Ihre anstehenden Impfungen - Wichtige Erinnerung",
+  "vaccinations": [
+    {
+      "vaccineName": "Tetanus",
+      "dueDate": "2025-12-31",
+      "status": "pending",
+      "description": "Auffrischungsimpfung alle 10 Jahre empfohlen"
+    },
+    {
+      "vaccineName": "Influenza",
+      "dueDate": "2025-11-15",
+      "status": "urgent",
+      "description": "Jährliche Grippeimpfung für Risikogruppen"
+    },
+    {
+      "vaccineName": "COVID-19 Booster",
+      "dueDate": "2025-10-20",
+      "status": "urgent",
+      "description": "Booster-Impfung empfohlen"
+    },
+    {
+      "vaccineName": "FSME",
+      "dueDate": "2026-03-15",
+      "status": "pending",
+      "description": "Zeckenschutzimpfung für gefährdete Gebiete"
+    }
+  ]
+}
+
+### Send Vaccination Email - Single Vaccination
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "kaplan.kaan@windowslive.com",
+  "recipientName": "Anna Schmidt",
+  "subject": "Impferinnerung: Tetanus Auffrischung",
+  "vaccinations": [
+    {
+      "vaccineName": "Tetanus",
+      "dueDate": "2025-12-31",
+      "status": "pending",
+      "description": "Ihre letzte Tetanus-Impfung liegt 10 Jahre zurück"
+    }
+  ]
+}
+
+### Send Vaccination Email - Urgent Vaccinations Only
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "pkaplan.kaan@windowslive.com",
+  "recipientName": "Peter Müller",
+  "subject": "DRINGEND: Überfällige Impfungen",
+  "vaccinations": [
+    {
+      "vaccineName": "Masern-Mumps-Röteln (MMR)",
+      "dueDate": "2025-10-01",
+      "status": "urgent",
+      "description": "Impfung überfällig - bitte umgehend nachholen"
+    },
+    {
+      "vaccineName": "Hepatitis B",
+      "dueDate": "2025-09-15",
+      "status": "urgent",
+      "description": "Auffrischung dringend erforderlich"
+    }
+  ]
+}
+
+### Send Vaccination Email - Completed Status
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "kaplan.kaan@windowslive.com",
+  "recipientName": "Sarah Weber",
+  "subject": "Impfstatus-Übersicht",
+  "vaccinations": [
+    {
+      "vaccineName": "COVID-19",
+      "dueDate": "2025-09-30",
+      "status": "completed",
+      "description": "Impfung erfolgreich durchgeführt"
+    },
+    {
+      "vaccineName": "Influenza 2025",
+      "dueDate": "2025-11-30",
+      "status": "pending",
+      "description": "Nächste Grippeimpfung empfohlen"
+    }
+  ]
+}
+
+### Send Vaccination Email - Child Vaccinations
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "kaplan.kaan@windowslive.com",
+  "recipientName": "Familie Schneider",
+  "subject": "Impfplan für Ihr Kind",
+  "vaccinations": [
+    {
+      "vaccineName": "6-fach-Impfung (DTPa-IPV-Hib-HepB)",
+      "dueDate": "2025-11-10",
+      "status": "urgent",
+      "description": "Dritte Dosis nach Impfplan"
+    },
+    {
+      "vaccineName": "Pneumokokken",
+      "dueDate": "2025-11-10",
+      "status": "urgent",
+      "description": "Dritte Dosis nach Impfplan"
+    },
+    {
+      "vaccineName": "MMR (Masern-Mumps-Röteln)",
+      "dueDate": "2026-03-20",
+      "status": "pending",
+      "description": "Erste Dosis ab 12 Monaten"
+    }
+  ]
+}
+
+### Send Vaccination Email - Test Missing Recipient Email
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "",
+  "recipientName": "Test User",
+  "subject": "Test Email",
+  "vaccinations": [
+    {
+      "vaccineName": "Test Vaccine",
+      "dueDate": "2025-12-31",
+      "status": "pending",
+      "description": "Test Description"
+    }
+  ]
+}
+
+### Send Vaccination Email - Test Invalid Email Format
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "invalid-email-format",
+  "recipientName": "Test User",
+  "subject": "Test Email",
+  "vaccinations": [
+    {
+      "vaccineName": "Test Vaccine",
+      "dueDate": "2025-12-31",
+      "status": "pending",
+      "description": "Test Description"
+    }
+  ]
+}
+
+### Send Vaccination Email - Test Empty Vaccinations List
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "kaplan.kaan@windowslive.com",
+  "recipientName": "Test User",
+  "subject": "Test Email",
+  "vaccinations": []
+}
+
+### Send Vaccination Email - Test Missing Required Fields
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "kaplan.kaan@windowslive.com",
+  "vaccinations": [
+    {
+      "vaccineName": "Test Vaccine",
+      "status": "pending"
+    }
+  ]
+}
+
+### Send Vaccination Email - Travel Vaccinations
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "traveler@example.com",
+  "recipientName": "Thomas Reisende",
+  "subject": "Reiseimpfungen für Ihren Urlaub",
+  "vaccinations": [
+    {
+      "vaccineName": "Gelbfieber",
+      "dueDate": "2025-11-01",
+      "status": "urgent",
+      "description": "Pflichtimpfung für Einreise nach Brasilien"
+    },
+    {
+      "vaccineName": "Hepatitis A",
+      "dueDate": "2025-10-25",
+      "status": "urgent",
+      "description": "Empfohlen für Reisen nach Südostasien"
+    },
+    {
+      "vaccineName": "Typhus",
+      "dueDate": "2025-10-25",
+      "status": "pending",
+      "description": "Empfohlen bei Reisen in Risikogebiete"
+    },
+    {
+      "vaccineName": "Tollwut",
+      "dueDate": "2025-10-20",
+      "status": "pending",
+      "description": "Prophylaxe bei Kontakt mit Wildtieren"
+    }
+  ]
+}
+
+### Send Vaccination Email - Elderly Person (65+)
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "senior@example.com",
+  "recipientName": "Herr Dr. Friedrich Seniore",
+  "subject": "Impfempfehlungen für Personen über 65 Jahre",
+  "vaccinations": [
+    {
+      "vaccineName": "Influenza (Hochdosis)",
+      "dueDate": "2025-10-31",
+      "status": "urgent",
+      "description": "Jährliche Grippeimpfung für Senioren - Hochdosis-Vakzin"
+    },
+    {
+      "vaccineName": "Pneumokokken (PPSV23)",
+      "dueDate": "2025-11-15",
+      "status": "pending",
+      "description": "Schutz vor Lungenentzündung"
+    },
+    {
+      "vaccineName": "Herpes Zoster (Gürtelrose)",
+      "dueDate": "2025-12-01",
+      "status": "pending",
+      "description": "Empfohlen ab 60 Jahren - 2 Dosen im Abstand von 2-6 Monaten"
+    }
+  ]
+}
+
+### Send Vaccination Email - Healthcare Worker
+POST http://localhost:8081/api/v1/email/send
+Content-Type: application/json
+
+{
+  "recipientEmail": "nurse@hospital.ch",
+  "recipientName": "Dr. med. Sandra Pflegerin",
+  "subject": "Berufsbedingte Impfungen - Gesundheitspersonal",
+  "vaccinations": [
+    {
+      "vaccineName": "Hepatitis B Titer-Kontrolle",
+      "dueDate": "2025-11-01",
+      "status": "urgent",
+      "description": "Kontrolle des Impfschutzes erforderlich"
+    },
+    {
+      "vaccineName": "Masern-Mumps-Röteln (MMR) - Serologische Kontrolle",
+      "dueDate": "2025-10-20",
+      "status": "urgent",
+      "description": "Nachweis Immunschutz für Gesundheitspersonal obligatorisch"
+    },
+    {
+      "vaccineName": "Pertussis (Keuchhusten)",
+      "dueDate": "2025-12-15",
+      "status": "pending",
+      "description": "Auffrischung alle 10 Jahre für med. Personal"
+    }
+  ]
+}
+
+### Test Health Check (if Spring Actuator is configured)
+GET http://localhost:8081/actuator/health
+
+### Test Application Info
+GET http://localhost:8081/actuator/info
+
+###
+
