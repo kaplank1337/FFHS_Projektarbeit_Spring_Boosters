@@ -6,9 +6,6 @@ import java.util.UUID;
 
 public record ImmunizationRecordDto(
     UUID id,
-    UserDto user,
-    VaccineTypeDto vaccineType,
-    ImmunizationPlanDto immunizationPlan,
     LocalDate administeredOn,
     Integer doseOrderClaimed,
     OffsetDateTime createdAt,

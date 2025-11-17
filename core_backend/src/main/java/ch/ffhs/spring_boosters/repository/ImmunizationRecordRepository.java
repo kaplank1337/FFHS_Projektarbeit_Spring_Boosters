@@ -23,7 +23,7 @@ public interface ImmunizationRecordRepository extends JpaRepository<Immunization
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
     List<ImmunizationRecord> findByUserIdAndVaccineTypeId(UUID userId, UUID vaccineTypeId);
 
-    Void deleteByUserIdAndVaccineTypeId(UUID userId, UUID vaccineTypeId);
+    Void deleteByUserIdAndId(UUID userId, UUID id);
 
     @Override
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
@@ -33,5 +33,5 @@ public interface ImmunizationRecordRepository extends JpaRepository<Immunization
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
     Optional<ImmunizationRecord> findById(UUID id);
 
-    boolean existsByUserIdAndVaccineTypeId(UUID userId, UUID vaccineTypeId);
+    boolean existsByUserIdAndId(UUID userId, UUID id);
 }

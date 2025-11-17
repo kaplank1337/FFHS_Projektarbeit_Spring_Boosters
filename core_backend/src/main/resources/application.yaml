@@ -1,4 +1,6 @@
 spring.application.name: spring_boosters
+jwt.secret: e4f9c3ad7b1f4a89d3e92bf7a8c4d1f6e7b9a2c3d4f1b6e8c9a3f7d2e4b8c1a7f6d3e9b4c2a1f7d8c6b3e4a9d2f1c7b8e3a4
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/spring_booster_db}

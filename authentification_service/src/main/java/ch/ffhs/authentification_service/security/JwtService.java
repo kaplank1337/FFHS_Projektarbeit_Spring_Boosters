@@ -35,10 +35,11 @@ public class JwtService {
         this.ttlSeconds = ttlSeconds;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String userId) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .setSubject(username)
+                .claim("username", username)
+                .claim("userid", userId)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(ttlSeconds)))
                 .signWith(key, SignatureAlgorithm.HS256)

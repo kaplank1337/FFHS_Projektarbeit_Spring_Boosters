@@ -3,6 +3,7 @@ package ch.ffhs.authentification_service.security;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.netty.util.internal.StringUtil;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -60,15 +61,20 @@ public class JwtResponseFilter implements GlobalFilter, Ordered {
 
                                 // Username extrahieren
                                 String username = null;
+                                String userId = null;
                                 if (jsonNode.has("userName")) {
                                     username = jsonNode.get("userName").asText();
                                 } else if (jsonNode.has("username")) {
                                     username = jsonNode.get("username").asText();
                                 }
 
-                                if (username != null) {
+                                if(jsonNode.has("user") && jsonNode.get("user").has("id")) {
+                                    userId = jsonNode.get("user").get("id").asText();
+                                }
+
+                                if (!StringUtil.isNullOrEmpty(username) && !StringUtil.isNullOrEmpty(userId)) {
                                     // JWT Token generieren
-                                    String token = jwtService.generateToken(username);
+                                    String token = jwtService.generateToken(username, userId);
 
                                     // Token zum Response hinzufügen
                                     ((ObjectNode) jsonNode).put("token", token);

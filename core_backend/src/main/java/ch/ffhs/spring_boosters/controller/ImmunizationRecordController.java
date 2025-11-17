@@ -1,5 +1,6 @@
 package ch.ffhs.spring_boosters.controller;
 
+import ch.ffhs.spring_boosters.config.JwtTokenReader;
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordCreateDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
@@ -34,6 +35,7 @@ public class ImmunizationRecordController {
 
     private final ImmunizationRecordService immunizationRecordService;
     private final ImmunizationRecordMapper immunizationRecordMapper;
+    private final JwtTokenReader jwtTokenReader;
 
     @GetMapping
     @Operation(
@@ -133,15 +135,13 @@ public class ImmunizationRecordController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteImmunizationRecord(
         @PathVariable UUID id,
-        @RequestHeader(value = "X-User-Id", required = false) String userId) throws ImmunizationRecordNotFoundException {
+        @RequestHeader("Authorization") String authToken) throws ImmunizationRecordNotFoundException {
 
-        if (userId == null || userId.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        String token = authToken.replace("Bearer ", "");
+        UUID userId = UUID.fromString(jwtTokenReader.getUserId(token));
 
         try {
-            UUID userUuid = UUID.fromString(userId);
-            immunizationRecordService.deleteImmunizationRecord(userUuid, id);
+            immunizationRecordService.deleteImmunizationRecord(userId, id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
