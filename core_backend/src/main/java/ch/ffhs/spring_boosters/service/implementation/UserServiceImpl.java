@@ -6,26 +6,15 @@ import ch.ffhs.spring_boosters.service.UserService;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-    }
 
     @Override
     public User registerUser(User user) throws UserAlreadyExistException {
@@ -33,7 +22,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw UserAlreadyExistException.forUsername(user.getUsername());
         }
 
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        // Passwort wird bereits vom Gateway gehasht
         return userRepository.save(user);
     }
 

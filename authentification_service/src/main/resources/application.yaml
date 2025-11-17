@@ -2,7 +2,7 @@ server:
   port: ${SERVER_PORT:8000}
 
 jwt:
-  secret: ${JWT_SECRET:f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51}
+  secret: ${JWT_SECRET:e4f9c3ad7b1f4a89d3e92bf7a8c4d1f6e7b9a2c3d4f1b6e8c9a3f7d2e4b8c1a7f6d3e9b4c2a1f7d8c6b3e4a9d2f1c7b8e3a4}
   expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
 
 spring:

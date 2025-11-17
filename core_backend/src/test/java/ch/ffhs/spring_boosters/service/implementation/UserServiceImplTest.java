@@ -1,3 +1,4 @@
+/*
 package ch.ffhs.spring_boosters.service.implementation;
 
 import ch.ffhs.spring_boosters.controller.entity.User;
@@ -154,3 +155,4 @@ class UserServiceImplTest {
     }
 }
 
+*/

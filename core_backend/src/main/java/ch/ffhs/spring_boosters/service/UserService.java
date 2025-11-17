@@ -12,6 +12,8 @@ public interface UserService {
 
     User findByUsername(String username) throws UserNotFoundException;
 
+    User findById(UUID userId) throws UserNotFoundException;
+
     void deleteUser(UUID userId) throws UserNotFoundException;
 
     boolean existsByUsername(String username);
