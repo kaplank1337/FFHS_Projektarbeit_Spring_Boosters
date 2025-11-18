@@ -10,6 +10,12 @@ Content-Type: application/json
   "password": "securePassword123"
 }
 
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+%}
+
 ### Benutzer einloggen (Falscher Login)
 POST http://localhost:8000/api/v1/auth/login
 Content-Type: application/json
