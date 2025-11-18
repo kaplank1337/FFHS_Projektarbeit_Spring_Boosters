@@ -76,14 +76,9 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getCurrentUser(@RequestHeader(value = "X-User-Id", required = false) String userId) {
+    public ResponseEntity<UserDto> getCurrentUser( @RequestHeader("Authorization") String authToken) {
         try {
-            // User-ID wird vom Gateway im Header gesetzt
-            if (userId == null || userId.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-
-            User user = userService.findById(java.util.UUID.fromString(userId));
+            User user = userService.findById(getUserIdFromToken(authToken));
             UserDto userDto = userMapper.userToDto(user);
 
             return ResponseEntity.ok(userDto);
@@ -124,5 +119,10 @@ public class UserController {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    private UUID getUserIdFromToken(String authToken) {
+        String token = authToken.replace("Bearer ", "");
+        return UUID.fromString(jwtTokenReader.getUserId(token));
     }
 }

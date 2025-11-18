@@ -137,11 +137,8 @@ public class ImmunizationRecordController {
         @PathVariable UUID id,
         @RequestHeader("Authorization") String authToken) throws ImmunizationRecordNotFoundException {
 
-        String token = authToken.replace("Bearer ", "");
-        UUID userId = UUID.fromString(jwtTokenReader.getUserId(token));
-
         try {
-            immunizationRecordService.deleteImmunizationRecord(userId, id);
+            immunizationRecordService.deleteImmunizationRecord(getUserIdFromToken(authToken), id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -175,15 +172,10 @@ public class ImmunizationRecordController {
 
     @GetMapping("/myVaccinations")
     public ResponseEntity<List<ImmunizationRecordDto>> getMyImmunizationRecords(
-            @RequestHeader(value = "X-User-Id", required = false) String userId) {
-
-        if (userId == null || userId.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
+            @RequestHeader("Authorization") String authToken
+    ) {
         try {
-            UUID userUuid = UUID.fromString(userId);
-            List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUser(userUuid);
+            List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUser(getUserIdFromToken(authToken));
             List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
             return ResponseEntity.ok(immunizationRecordDtos);
         } catch (IllegalArgumentException e) {
@@ -204,5 +196,10 @@ public class ImmunizationRecordController {
                 ex.getClass().getSimpleName()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    private UUID getUserIdFromToken(String authToken) {
+        String token = authToken.replace("Bearer ", "");
+        return UUID.fromString(jwtTokenReader.getUserId(token));
     }
 }
