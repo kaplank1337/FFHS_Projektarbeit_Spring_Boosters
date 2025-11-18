@@ -1,6 +1,7 @@
 package ch.ffhs.spring_boosters.controller.exception;
 
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
+import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,22 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionMessageBodyDto> handleUserNotFoundException(
+            Exception ex,
+            HttpServletRequest request) {
+
+        ExceptionMessageBodyDto errorResponse = new ExceptionMessageBodyDto(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "User not found",
+                "An unexpected error occurred: " + ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
