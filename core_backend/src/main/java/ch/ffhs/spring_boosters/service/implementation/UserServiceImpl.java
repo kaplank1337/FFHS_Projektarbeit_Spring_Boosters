@@ -23,7 +23,11 @@ public class UserServiceImpl implements UserService {
             throw UserAlreadyExistException.forUsername(user.getUsername());
         }
 
-        // Passwort wird bereits vom Gateway gehasht
+        // Passwort mit BCrypt hashen
+        String plainPassword = user.getPasswordHash();
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt(10));
+        user.setPasswordHash(hashedPassword);
+
         return userRepository.save(user);
     }
 
@@ -32,7 +36,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> UserNotFoundException.forUsername(username));
 
-        if(!BCrypt.checkpw(password, user.getPasswordHash())){
+        if (!BCrypt.checkpw(password, user.getPasswordHash())) {
             throw new UserNotFoundException("Ungültige Anmeldedaten");
         }
 
