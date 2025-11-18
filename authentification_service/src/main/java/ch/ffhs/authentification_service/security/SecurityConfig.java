@@ -11,7 +11,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    // Keine InMemory Benutzer oder Passwort-Encoder mehr – JWT übernimmt Authentifizierung
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {

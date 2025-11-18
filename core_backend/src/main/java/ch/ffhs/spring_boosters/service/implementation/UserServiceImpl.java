@@ -6,6 +6,7 @@ import ch.ffhs.spring_boosters.service.UserService;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -24,6 +25,18 @@ public class UserServiceImpl implements UserService {
 
         // Passwort wird bereits vom Gateway gehasht
         return userRepository.save(user);
+    }
+
+    @Override
+    public User findByUsernameAndPassword(String username, String password) throws UserNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> UserNotFoundException.forUsername(username));
+
+        if(!BCrypt.checkpw(password, user.getPasswordHash())){
+            throw new UserNotFoundException("Ungültige Anmeldedaten");
+        }
+
+        return user;
     }
 
     @Override

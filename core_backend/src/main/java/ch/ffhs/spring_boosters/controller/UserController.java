@@ -1,5 +1,6 @@
 package ch.ffhs.spring_boosters.controller;
 
+import ch.ffhs.spring_boosters.config.JwtTokenReader;
 import ch.ffhs.spring_boosters.controller.dto.LoginResponseDto;
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
 import ch.ffhs.spring_boosters.controller.mapper.UserMapper;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,6 +32,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private final JwtTokenReader jwtTokenReader;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(
@@ -45,9 +48,7 @@ public class UserController {
     public ResponseEntity<LoginResponseDto> loginUser(
         @Valid @RequestBody UserLoginDto loginDto) {
         try {
-            // Authentifizierung erfolgt über den Gateway Service
-            // Hier wird nur geprüft, ob der Benutzer existiert
-            User user = userService.findByUsername(loginDto.getUsername());
+            User user = userService.findByUsernameAndPassword(loginDto.getUsername(), loginDto.getPassword());
             UserDto userDto = userMapper.userToDto(user);
 
             return ResponseEntity.ok(new LoginResponseDto(
@@ -90,10 +91,13 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String userId) throws UserNotFoundException {
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteUser( @RequestHeader("Authorization") String authToken) throws UserNotFoundException {
         try {
-            userService.deleteUser(java.util.UUID.fromString(userId));
+            String token = authToken.replace("Bearer ", "");
+            UUID userId = UUID.fromString(jwtTokenReader.getUserId(token));
+
+            userService.deleteUser(userId);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
