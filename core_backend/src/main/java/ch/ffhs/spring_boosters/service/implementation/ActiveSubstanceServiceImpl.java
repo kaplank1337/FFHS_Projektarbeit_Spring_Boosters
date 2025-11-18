@@ -40,12 +40,6 @@ public class ActiveSubstanceServiceImpl implements ActiveSubstanceService {
     public ActiveSubstance updateActiveSubstance(UUID id, ActiveSubstance activeSubstance) throws ActiveSubstanceNotFoundException, ActiveSubstanceAlreadyExistsException {
         ActiveSubstance existingActiveSubstance = getActiveSubstanceById(id);
 
-        // Check if name is being changed and if new name already exists
-        if (!existingActiveSubstance.getName().equals(activeSubstance.getName())
-            && activeSubstanceRepository.existsByName(activeSubstance.getName())) {
-            throw new ActiveSubstanceAlreadyExistsException("Active substance with name '" + activeSubstance.getName() + "' already exists");
-        }
-
         existingActiveSubstance.setName(activeSubstance.getName());
         existingActiveSubstance.setSynonyms(activeSubstance.getSynonyms());
 

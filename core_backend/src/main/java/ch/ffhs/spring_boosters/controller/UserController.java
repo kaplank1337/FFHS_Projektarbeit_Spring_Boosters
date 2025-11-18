@@ -49,13 +49,17 @@ public class UserController {
         @Valid @RequestBody UserLoginDto loginDto) {
         try {
             User user = userService.findByUsernameAndPassword(loginDto.getUsername(), loginDto.getPassword());
+
+            // JWT-Token im Core Backend generieren
+            String token = userService.generateToken(user);
+
             UserDto userDto = userMapper.userToDto(user);
 
             return ResponseEntity.ok(new LoginResponseDto(
                     true,
-                    "User found - authentication handled by gateway",
+                    "Login successful",
                     loginDto.getUsername(),
-                    null, // Token wird vom Gateway generiert
+                    token,
                     userDto
             ));
 
@@ -63,7 +67,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponseDto(
                             false,
-                            "User not found",
+                            "Invalid credentials",
                             null,
                             null,
                             null

@@ -19,4 +19,6 @@ public interface UserService {
     void deleteUser(UUID userId) throws UserNotFoundException;
 
     boolean existsByUsername(String username);
+
+    String generateToken(User user);
 }

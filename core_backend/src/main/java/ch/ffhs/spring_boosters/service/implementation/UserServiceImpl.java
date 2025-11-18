@@ -2,6 +2,7 @@ package ch.ffhs.spring_boosters.service.implementation;
 
 import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.repository.UserRepository;
+import ch.ffhs.spring_boosters.security.JwtService;
 import ch.ffhs.spring_boosters.service.UserService;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     @Override
     public User registerUser(User user) throws UserAlreadyExistException {
@@ -63,5 +65,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public String generateToken(User user) {
+        return jwtService.generateToken(user.getUsername(), user.getId());
     }
 }

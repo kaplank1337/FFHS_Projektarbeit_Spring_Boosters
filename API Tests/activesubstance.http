@@ -1,0 +1,266 @@
+### Neuen Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "active.substance",
+  "firstName": "Active",
+  "lastName": "Substance",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Registrierung erfolgreich (201 Created)", function() {
+        client.assert(response.status === 201, "Status ist nicht 201, sondern: " + response.status);
+    });
+%}
+
+### Benutzer einloggen
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "active.substance",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Token vorhanden", function() {
+        client.assert(response.body.token !== undefined, "Kein Token in Response");
+    });
+
+    // Token global speichern
+    client.global.set("authToken", response.body.token);
+    client.log("Token gespeichert: " + response.body.token);
+%}
+
+### Alle Wirkstoffe abrufen
+GET http://localhost:8000/api/v1/active-substances
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.log("Anzahl der Wirkstoffe: " + response.body.length);
+%}
+
+### Neuen Wirkstoff erstellen
+POST http://localhost:8000/api/v1/active-substances
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Paracetamol",
+  "synonyms": ["Acetaminophen", "APAP"]
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.test("Wirkstoff hat ID", function() {
+        client.assert(response.body.id !== undefined, "Keine ID in Response");
+    });
+
+    client.test("Name korrekt", function() {
+        client.assert(response.body.name === "Paracetamol", "Name nicht korrekt");
+    });
+
+    // ID für weitere Tests speichern
+    client.global.set("activeSubstanceId", response.body.id);
+    client.log("Wirkstoff-ID gespeichert: " + response.body.id);
+%}
+
+### Duplikat erstellen (Fehlerfall - sollte 400 sein)
+POST http://localhost:8000/api/v1/active-substances
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Paracetamol",
+  "synonyms": ["Acetaminophen", "APAP"]
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+
+### Weiteren Wirkstoff erstellen (für Tests)
+POST http://localhost:8000/api/v1/active-substances
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Ibuprofen",
+  "synonyms": []
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    // Zweite ID für Löschen-Test speichern
+    client.global.set("activeSubstanceId2", response.body.id);
+    client.log("Zweite Wirkstoff-ID gespeichert: " + response.body.id);
+%}
+
+### Einzelnen Wirkstoff abrufen (by ID)
+GET http://localhost:8000/api/v1/active-substances/{{activeSubstanceId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Wirkstoff hat korrekte ID", function() {
+        client.assert(response.body.id === client.global.get("activeSubstanceId"), "ID stimmt nicht überein");
+    });
+
+    client.test("Name ist Paracetamol", function() {
+        client.assert(response.body.name === "Paracetamol", "Name nicht korrekt");
+    });
+%}
+
+### Wirkstoff aktualisieren (PATCH)
+PATCH http://localhost:8000/api/v1/active-substances/{{activeSubstanceId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Paracetamol 500mg",
+  "synonyms": ["Kaanone"]
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Name wurde aktualisiert", function() {
+        client.assert(response.body.name === "Paracetamol 500mg", "Name wurde nicht aktualisiert");
+    });
+
+    // ID für weitere Tests speichern
+    client.global.set("activeSubstanceId", response.body.id);
+    client.log("Wirkstoff-ID gespeichert: " + response.body.id);
+%}
+
+### Wirkstoff abrufen nach Update (Verifizierung)
+GET http://localhost:8000/api/v1/active-substances/{{activeSubstanceId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Update wurde persistiert", function() {
+        client.assert(response.body.name === "Paracetamol 500mg", "Update wurde nicht gespeichert");
+    });
+%}
+
+### Wirkstoff löschen (den Zweiten)
+DELETE http://localhost:8000/api/v1/active-substances/{{activeSubstanceId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+
+### Gelöschten Wirkstoff abrufen (sollte 404 sein)
+GET http://localhost:8000/api/v1/active-substances/{{activeSubstanceId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Nicht existierenden Wirkstoff abrufen (Fehlerfall)
+GET http://localhost:8000/api/v1/active-substances/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Wirkstoff mit ungültigen Daten erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/active-substances
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "synonyms": []
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+%}
+
+### Alle Wirkstoffe abrufen (Final Check)
+GET http://localhost:8000/api/v1/active-substances
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.log("Finale Anzahl der Wirkstoffe: " + response.body.length);
+%}
+
+### Wirkstoff löschen (den ersten)
+DELETE http://localhost:8000/api/v1/active-substances/{{activeSubstanceId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Benutzer löschen
+DELETE http://localhost:8000/api/v1/auth
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}

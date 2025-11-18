@@ -20,16 +20,15 @@ import java.util.List;
 @Order(-100) // Früh ausführen
 public class JwtAuthenticationFilter implements WebFilter {
 
-    private final JwtService jwtService;
+    private final JwtValidator jwtValidator;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
+    public JwtAuthenticationFilter(JwtValidator jwtValidator) {
+        this.jwtValidator = jwtValidator;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         var path = exchange.getRequest().getPath().value();
-        System.out.println("[JWT] Incoming request: " + exchange.getRequest().getMethod() + " " + path);
         // Öffentliche Endpunkte überspringen
         if (path.equals("/api/v1/auth/login") || path.equals("/api/v1/auth/register")) {
             System.out.println("[JWT] Public endpoint – skipping token check");
@@ -43,12 +42,12 @@ public class JwtAuthenticationFilter implements WebFilter {
         }
 
         String token = authHeader.substring(7);
-        if (!jwtService.isValid(token)) {
+        if (!jwtValidator.isValid(token)) {
             System.out.println("[JWT] Token invalid");
             return unauthorized(exchange); // Ungültiger Token
         }
 
-        String username = jwtService.extractUsername(token);
+        String username = jwtValidator.extractUsername(token);
         System.out.println("[JWT] Token valid for user=" + username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 username,

@@ -20,8 +20,8 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Status ist 400", function() {
-        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    client.test("Status ist 401", function() {
+        client.assert(response.status === 401, "Erwartet: 401, Erhalten: " + response.status);
     });
 %}
 

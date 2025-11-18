@@ -1,4 +1,4 @@
-package ch.ffhs.authentification_service.security;
+package ch.ffhs.spring_boosters.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtService {
@@ -35,11 +36,12 @@ public class JwtService {
         this.ttlSeconds = ttlSeconds;
     }
 
-    public String generateToken(String username, String userId) {
+    public String generateToken(String username, UUID userId) {
         Instant now = Instant.now();
         return Jwts.builder()
+                .setSubject(username)
                 .claim("username", username)
-                .claim("userid", userId)
+                .claim("userid", userId.toString())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusSeconds(ttlSeconds)))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -48,6 +50,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
+    }
+
+    public String extractUserId(String token) {
+        return parseClaims(token).get("userId", String.class);
     }
 
     public boolean isValid(String token) {
@@ -60,10 +66,11 @@ public class JwtService {
     }
 
     private Claims parseClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
+        return Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
+
