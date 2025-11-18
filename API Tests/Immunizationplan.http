@@ -1,0 +1,525 @@
+### Neuen Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "immunization.plan",
+  "firstName": "Immunization",
+  "lastName": "Plan",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Registrierung erfolgreich (201 Created)", function() {
+        client.assert(response.status === 201, "Status ist nicht 201, sondern: " + response.status);
+    });
+%}
+
+### Benutzer einloggen
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "immunization.plan",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Token vorhanden", function() {
+        client.assert(response.body.token !== undefined, "Kein Token in Response");
+    });
+
+    // Token global speichern
+    client.global.set("authToken", response.body.token);
+    client.log("Token gespeichert: " + response.body.token);
+%}
+
+### Voraussetzung: Alle VaccineTypes abrufen
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("VaccineTypes vorhanden", function() {
+        client.assert(response.body.vaccineTypeDtoList.length > 0, "Keine VaccineTypes gefunden");
+    });
+
+    // Speichere erste beiden VaccineType IDs
+    if (response.body.vaccineTypeDtoList.length > 0) {
+        client.global.set("vaccineTypeId1", response.body.vaccineTypeDtoList[0].id);
+        client.log("VaccineType 1: " + response.body.vaccineTypeDtoList[0].name + " (ID: " + response.body.vaccineTypeDtoList[0].id + ")");
+    }
+    if (response.body.vaccineTypeDtoList.length > 1) {
+        client.global.set("vaccineTypeId2", response.body.vaccineTypeDtoList[1].id);
+        client.log("VaccineType 2: " + response.body.vaccineTypeDtoList[1].name + " (ID: " + response.body.vaccineTypeDtoList[1].id + ")");
+    }
+%}
+
+### Alle Impfpläne abrufen (initial)
+GET http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.log("Anzahl der Impfpläne: " + response.body.length);
+%}
+
+### Neuen Impfplan erstellen
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Impfplan Säugling",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.test("Impfplan hat ID", function() {
+        client.assert(response.body.id !== undefined, "Keine ID in Response");
+    });
+
+    client.test("Name korrekt", function() {
+        client.assert(response.body.name === "Test Impfplan Säugling", "Name nicht korrekt");
+    });
+
+    client.test("VaccineTypeId korrekt", function() {
+        client.assert(response.body.vaccineTypeId === client.global.get("vaccineTypeId1"), "VaccineTypeId nicht korrekt");
+    });
+
+    client.test("AgeCategoryId korrekt", function() {
+        client.assert(response.body.ageCategoryId === client.global.get("ageCategoryId1"), "AgeCategoryId nicht korrekt");
+    });
+
+    client.test("CreatedAt vorhanden", function() {
+        client.assert(response.body.createdAt !== undefined, "CreatedAt fehlt");
+    });
+
+    // ID für weitere Tests speichern
+    client.global.set("immunizationPlanId1", response.body.id);
+    client.log("ImmunizationPlan ID 1 gespeichert: " + response.body.id);
+%}
+
+### Duplikat erstellen (Fehlerfall - sollte 400 sein)
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Impfplan Säugling",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+
+    client.log("Fehlermeldung: " + response.body.message);
+%}
+
+### Weiteren Impfplan erstellen
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Impfplan Kleinkind",
+  "vaccineTypeId": "{{vaccineTypeId2}}",
+  "ageCategoryId": "{{ageCategoryId2}}"
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    // ID für weitere Tests speichern
+    client.global.set("immunizationPlanId2", response.body.id);
+    client.log("ImmunizationPlan ID 2 gespeichert: " + response.body.id);
+%}
+
+### Dritten Impfplan erstellen (gleicher VaccineType, andere AgeCategory)
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Impfplan Auffrischung",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId2}}"
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    // ID für weitere Tests speichern
+    client.global.set("immunizationPlanId3", response.body.id);
+    client.log("ImmunizationPlan ID 3 gespeichert: " + response.body.id);
+%}
+
+### Einzelnen Impfplan abrufen (by ID)
+GET http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Impfplan hat korrekte ID", function() {
+        client.assert(response.body.id === client.global.get("immunizationPlanId1"), "ID stimmt nicht überein");
+    });
+
+    client.test("Name ist korrekt", function() {
+        client.assert(response.body.name === "Test Impfplan Säugling", "Name nicht korrekt");
+    });
+
+    client.test("Timestamps vorhanden", function() {
+        client.assert(response.body.createdAt !== undefined, "CreatedAt fehlt");
+        client.assert(response.body.updatedAt !== undefined, "UpdatedAt fehlt");
+    });
+%}
+
+### Impfplan aktualisieren (PATCH)
+PATCH http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId1}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Impfplan Säugling (aktualisiert)",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Name wurde aktualisiert", function() {
+        client.assert(response.body.name === "Test Impfplan Säugling (aktualisiert)", "Name wurde nicht aktualisiert");
+    });
+
+    client.test("UpdatedAt wurde aktualisiert", function() {
+        client.assert(response.body.updatedAt !== undefined, "UpdatedAt fehlt");
+    });
+%}
+
+### Impfplan abrufen nach Update (Verifizierung)
+GET http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Update wurde persistiert", function() {
+        client.assert(response.body.name === "Test Impfplan Säugling (aktualisiert)", "Update wurde nicht gespeichert");
+    });
+%}
+
+### Impfpläne nach Impfstofftyp abrufen
+GET http://localhost:8000/api/v1/immunization-plans/by-vaccine-type/{{vaccineTypeId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.test("Mindestens 2 Impfpläne für diesen VaccineType", function() {
+        client.assert(response.body.length >= 2, "Erwartet mindestens 2 Impfpläne, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl Impfpläne für VaccineType: " + response.body.length);
+%}
+
+### Impfpläne nach Alterskategorie abrufen (erste Kategorie)
+GET http://localhost:8000/api/v1/immunization-plans/by-age-category/{{ageCategoryId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.test("Mindestens 1 Impfplan für diese AgeCategory", function() {
+        client.assert(response.body.length >= 1, "Erwartet mindestens 1 Impfplan, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl Impfpläne für AgeCategory 1: " + response.body.length);
+%}
+
+### Impfpläne nach Alterskategorie abrufen (zweite Kategorie)
+GET http://localhost:8000/api/v1/immunization-plans/by-age-category/{{ageCategoryId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Mindestens 2 Impfpläne für diese AgeCategory", function() {
+        client.assert(response.body.length >= 2, "Erwartet mindestens 2 Impfpläne, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl Impfpläne für AgeCategory 2: " + response.body.length);
+%}
+
+### Impfplan löschen
+DELETE http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Gelöschten Impfplan abrufen (sollte 404 sein)
+GET http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Nicht existierenden Impfplan abrufen (Fehlerfall)
+GET http://localhost:8000/api/v1/immunization-plans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Impfplan mit leerem Namen erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'name'", function() {
+        client.assert(response.body.message.toLowerCase().includes("name"), "Fehlermeldung sollte 'name' enthalten");
+    });
+%}
+
+### Impfplan ohne vaccineTypeId erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Plan",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'vaccineTypeId'", function() {
+        client.assert(response.body.message.toLowerCase().includes("vaccinetypeid"), "Fehlermeldung sollte 'vaccineTypeId' enthalten");
+    });
+%}
+
+### Impfplan ohne ageCategoryId erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Plan",
+  "vaccineTypeId": "{{vaccineTypeId1}}"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'ageCategoryId'", function() {
+        client.assert(response.body.message.toLowerCase().includes("agecategoryid"), "Fehlermeldung sollte 'ageCategoryId' enthalten");
+    });
+%}
+
+### Impfplan mit allen null Feldern erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": null,
+  "vaccineTypeId": null,
+  "ageCategoryId": null
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Impfplan mit ungültiger UUID aktualisieren (Fehlerfall)
+PATCH http://localhost:8000/api/v1/immunization-plans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Update",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Nicht existierenden Impfplan löschen (Fehlerfall)
+DELETE http://localhost:8000/api/v1/immunization-plans/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Impfpläne nach nicht existierendem Impfstofftyp abrufen
+GET http://localhost:8000/api/v1/immunization-plans/by-vaccine-type/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Leeres Array zurückgegeben", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+        client.assert(response.body.length === 0, "Sollte leeres Array sein");
+    });
+%}
+
+### Impfpläne nach nicht existierender Alterskategorie abrufen
+GET http://localhost:8000/api/v1/immunization-plans/by-age-category/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Leeres Array zurückgegeben", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+        client.assert(response.body.length === 0, "Sollte leeres Array sein");
+    });
+%}
+
+### Alle Impfpläne abrufen (Final Check)
+GET http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.log("Finale Anzahl der Impfpläne: " + response.body.length);
+%}
+
+### Cleanup: Erste Impfplan löschen
+DELETE http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Cleanup: Dritten Impfplan löschen
+DELETE http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId3}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Benutzer löschen
+DELETE http://localhost:8000/api/v1/auth
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}
