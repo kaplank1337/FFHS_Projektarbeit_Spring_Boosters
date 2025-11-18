@@ -1,15 +1,13 @@
 package ch.ffhs.spring_boosters.controller.exception;
 
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
-import ch.ffhs.spring_boosters.service.Exception.ActiveSubstanceAlreadyExistsException;
-import ch.ffhs.spring_boosters.service.Exception.ActiveSubstanceNotFoundException;
-import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -34,6 +32,23 @@ public class GlobalExceptionHandler {
                 "Bad Request",
                 errorMessage,
                 request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ExceptionMessageBodyDto> handleTypeMismatchException(
+            Exception ex,
+            HttpServletRequest request) {
+
+        ExceptionMessageBodyDto errorResponse = new ExceptionMessageBodyDto(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Internal Server Error",
+                "An unexpected error occurred: " + ex.getMessage(),
+                request.getRequestURI(),
+                ex.getClass().getSimpleName()
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
