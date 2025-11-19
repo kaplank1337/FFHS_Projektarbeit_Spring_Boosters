@@ -76,6 +76,14 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
+        // Swagger/OpenAPI Pfade nicht abfangen - null zurückgeben damit Spring's Default Handler greift
+        String path = request.getRequestURI();
+        if (path.startsWith("/v3/api-docs") ||
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/webjars")) {
+            return null;
+        }
+
         ExceptionMessageBodyDto errorResponse = new ExceptionMessageBodyDto(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

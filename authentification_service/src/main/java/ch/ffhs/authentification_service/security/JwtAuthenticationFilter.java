@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -21,6 +22,14 @@ import java.util.List;
 public class JwtAuthenticationFilter implements WebFilter {
 
     private final JwtValidator jwtValidator;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    private final String[] publicPaths = {
+            "/api/v1/auth/login",
+            "/api/v1/auth/register",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    };
 
     public JwtAuthenticationFilter(JwtValidator jwtValidator) {
         this.jwtValidator = jwtValidator;
@@ -30,7 +39,7 @@ public class JwtAuthenticationFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         var path = exchange.getRequest().getPath().value();
         // Öffentliche Endpunkte überspringen
-        if (path.equals("/api/v1/auth/login") || path.equals("/api/v1/auth/register")) {
+        if (checkIfPathExists(path)) {
             System.out.println("[JWT] Public endpoint – skipping token check");
             return chain.filter(exchange);
         }
@@ -64,5 +73,14 @@ public class JwtAuthenticationFilter implements WebFilter {
     private Mono<Void> unauthorized(ServerWebExchange exchange) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         return exchange.getResponse().setComplete();
+    }
+
+    private boolean checkIfPathExists(String pathToCheck) {
+        for (String pattern : publicPaths) {
+            if (pathMatcher.match(pattern, pathToCheck)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

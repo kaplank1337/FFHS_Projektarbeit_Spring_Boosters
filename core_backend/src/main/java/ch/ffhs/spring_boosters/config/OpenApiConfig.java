@@ -20,6 +20,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "bearerAuth";
 
+        //Alles verfügbar über: http://localhost:8081/swagger-ui/index.html
         return new OpenAPI()
                 .info(new Info()
                         .title("Spring Boosters API")
@@ -32,8 +33,8 @@ public class OpenApiConfig {
                                 .name("MIT License")
                                 .url("https://opensource.org/licenses/MIT")))
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Entwicklungsserver"),
-                        new Server().url("https://api.springboosters.ch").description("Produktionsserver")))
+                        new Server().url("http://localhost:8000").description("API Gateway"),
+                        new Server().url("http://localhost:8081").description("Core Backend direkt")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
