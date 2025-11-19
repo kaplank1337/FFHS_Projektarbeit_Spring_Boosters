@@ -1,0 +1,382 @@
+### Neuen Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "age.category",
+  "firstName": "Age",
+  "lastName": "Category",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Registrierung erfolgreich (201 Created)", function() {
+        client.assert(response.status === 201, "Status ist nicht 201, sondern: " + response.status);
+    });
+%}
+
+### Benutzer einloggen
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "age.category",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Token vorhanden", function() {
+        client.assert(response.body.token !== undefined, "Kein Token in Response");
+    });
+
+    // Token global speichern
+    client.global.set("authToken", response.body.token);
+    client.log("Token gespeichert: " + response.body.token);
+%}
+
+### Alle Alterskategorien abrufen
+GET http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.log("Anzahl der Alterskategorien: " + response.body.length);
+%}
+
+### Neue Alterskategorie erstellen (Säugling)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Säugling",
+  "ageMinDays": 0,
+  "ageMaxDays": 365
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.test("Alterskategorie hat ID", function() {
+        client.assert(response.body.id !== undefined, "Keine ID in Response");
+    });
+
+    client.test("Name korrekt", function() {
+        client.assert(response.body.name === "Säugling", "Name nicht korrekt");
+    });
+
+    client.test("Alter korrekt", function() {
+        client.assert(response.body.ageMinDays === 0, "ageMinDays nicht korrekt");
+        client.assert(response.body.ageMaxDays === 365, "ageMaxDays nicht korrekt");
+    });
+
+    // ID für weitere Tests speichern
+    client.global.set("ageCategoryId", response.body.id);
+    client.log("Alterskategorie-ID gespeichert: " + response.body.id);
+%}
+
+### Duplikat erstellen (Fehlerfall - sollte 400 sein)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Säugling",
+  "ageMinDays": 0,
+  "ageMaxDays": 365
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+
+    client.log("Fehlermeldung: " + response.body.message);
+%}
+
+### Weitere Alterskategorie erstellen (Kleinkind)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Kleinkind",
+  "ageMinDays": 366,
+  "ageMaxDays": 1095
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    // Zweite ID für Löschen-Test speichern
+    client.global.set("ageCategoryId2", response.body.id);
+    client.log("Zweite Alterskategorie-ID gespeichert: " + response.body.id);
+%}
+
+### Alterskategorie ohne Maximalwert erstellen (Senior)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Senior",
+  "ageMinDays": 23725
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.test("ageMaxDays ist null", function() {
+        client.assert(response.body.ageMaxDays === null, "ageMaxDays sollte null sein");
+    });
+
+    // Dritte ID für weitere Tests speichern
+    client.global.set("ageCategoryId3", response.body.id);
+    client.log("Dritte Alterskategorie-ID gespeichert: " + response.body.id);
+%}
+
+### Einzelne Alterskategorie abrufen (by ID)
+GET http://localhost:8000/api/v1/age-categories/{{ageCategoryId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Alterskategorie hat korrekte ID", function() {
+        client.assert(response.body.id === client.global.get("ageCategoryId"), "ID stimmt nicht überein");
+    });
+
+    client.test("Name ist Säugling", function() {
+        client.assert(response.body.name === "Säugling", "Name nicht korrekt");
+    });
+%}
+
+### Alterskategorie aktualisieren (PATCH)
+PATCH http://localhost:8000/api/v1/age-categories/{{ageCategoryId}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Säugling (0-12 Monate)",
+  "ageMinDays": 0,
+  "ageMaxDays": 365
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Name wurde aktualisiert", function() {
+        client.assert(response.body.name === "Säugling (0-12 Monate)", "Name wurde nicht aktualisiert");
+    });
+%}
+
+### Alterskategorie abrufen nach Update (Verifizierung)
+GET http://localhost:8000/api/v1/age-categories/{{ageCategoryId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Update wurde persistiert", function() {
+        client.assert(response.body.name === "Säugling (0-12 Monate)", "Update wurde nicht gespeichert");
+    });
+%}
+
+### Alterskategorie löschen (Kleinkind)
+DELETE http://localhost:8000/api/v1/age-categories/{{ageCategoryId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Gelöschte Alterskategorie abrufen (sollte 404 sein)
+GET http://localhost:8000/api/v1/age-categories/{{ageCategoryId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Nicht existierende Alterskategorie abrufen (Fehlerfall)
+GET http://localhost:8000/api/v1/age-categories/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Alterskategorie mit leerem Namen erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "ageMinDays": 0,
+  "ageMaxDays": 100
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'Name'", function() {
+        client.assert(response.body.message.includes("name"), "Fehlermeldung sollte 'name' enthalten");
+    });
+%}
+
+### Alterskategorie ohne ageMinDays erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Kategorie",
+  "ageMaxDays": 100
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'ageMinDays'", function() {
+        client.assert(response.body.message.includes("ageMinDays"), "Fehlermeldung sollte 'ageMinDays' enthalten");
+    });
+%}
+
+### Alterskategorie mit ungültigen Daten erstellen (alle Felder leer/null)
+POST http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "ageMinDays": null,
+  "ageMaxDays": null
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Alterskategorie mit ungültiger UUID aktualisieren (Fehlerfall)
+PATCH http://localhost:8000/api/v1/age-categories/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "ageMinDays": 0,
+  "ageMaxDays": 100
+}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Nicht existierende Alterskategorie löschen (Fehlerfall)
+DELETE http://localhost:8000/api/v1/age-categories/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Alle Alterskategorien abrufen (Final Check)
+GET http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.log("Finale Anzahl der Alterskategorien: " + response.body.length);
+%}
+
+### Cleanup: Restliche Alterskategorien löschen
+DELETE http://localhost:8000/api/v1/age-categories/{{ageCategoryId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Cleanup: Senior Kategorie löschen
+DELETE http://localhost:8000/api/v1/age-categories/{{ageCategoryId3}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Benutzer löschen
+DELETE http://localhost:8000/api/v1/auth
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}

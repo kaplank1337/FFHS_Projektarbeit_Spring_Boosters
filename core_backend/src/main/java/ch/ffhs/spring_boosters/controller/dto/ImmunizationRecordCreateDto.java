@@ -10,8 +10,8 @@ public record ImmunizationRecordCreateDto(
     UUID userId,
     @NotNull(message = "Vaccine type ID is required")
     UUID vaccineTypeId,
-    @NotNull(message = "Immunization plan ID is required")
-    UUID immunizationPlanId,
+    @NotNull(message = "Age category ID is required")
+    UUID ageCategoryId,
     @NotNull(message = "Administration date is required")
     LocalDate administeredOn,
     Integer doseOrderClaimed

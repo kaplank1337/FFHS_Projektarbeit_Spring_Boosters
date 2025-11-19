@@ -1,0 +1,619 @@
+### Neuen Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "immunization.record",
+  "firstName": "Immunization",
+  "lastName": "Record",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Registrierung erfolgreich (201 Created)", function() {
+        client.assert(response.status === 201, "Status ist nicht 201, sondern: " + response.status);
+    });
+
+    client.test("User ID vorhanden", function() {
+        client.assert(response.body.id !== undefined, "Keine User ID in Response");
+    });
+
+    // User ID für weitere Tests speichern
+    client.global.set("currentUserId", response.body.id);
+    client.log("User ID gespeichert: " + response.body.id);
+%}
+
+### Benutzer einloggen
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "immunization.record",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Token vorhanden", function() {
+        client.assert(response.body.token !== undefined, "Kein Token in Response");
+    });
+
+    // Token global speichern
+    client.global.set("authToken", response.body.token);
+    client.log("Token gespeichert: " + response.body.token);
+%}
+
+### Voraussetzung: VaccineTypes abrufen
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("VaccineTypes vorhanden", function() {
+        client.assert(response.body.vaccineTypeDtoList.length > 0, "Keine VaccineTypes gefunden");
+    });
+
+    if (response.body.vaccineTypeDtoList.length > 0) {
+        client.global.set("vaccineTypeId1", response.body.vaccineTypeDtoList[0].id);
+        client.log("VaccineType 1: " + response.body.vaccineTypeDtoList[0].name + " (ID: " + response.body.vaccineTypeDtoList[0].id + ")");
+    }
+    if (response.body.vaccineTypeDtoList.length > 1) {
+        client.global.set("vaccineTypeId2", response.body.vaccineTypeDtoList[1].id);
+        client.log("VaccineType 2: " + response.body.vaccineTypeDtoList[1].name + " (ID: " + response.body.vaccineTypeDtoList[1].id + ")");
+    }
+%}
+
+### Voraussetzung: AgeCategories abrufen
+GET http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("AgeCategories vorhanden", function() {
+        client.assert(response.body.length > 0, "Keine AgeCategories gefunden");
+    });
+
+    if (response.body.length > 0) {
+        client.global.set("ageCategoryId1", response.body[0].id);
+        client.log("AgeCategory 1: " + response.body[0].name + " (ID: " + response.body[0].id + ")");
+    }
+    if (response.body.length > 1) {
+        client.global.set("ageCategoryId2", response.body[1].id);
+        client.log("AgeCategory 2: " + response.body[1].name + " (ID: " + response.body[1].id + ")");
+    }
+%}
+
+### Alle Impfeinträge abrufen (initial)
+GET http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.log("Anzahl der Impfeinträge: " + response.body.length);
+%}
+
+### Neuen Impfeintrag erstellen
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}",
+  "administeredOn": "2024-01-15",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.test("Impfeintrag hat ID", function() {
+        client.assert(response.body.id !== undefined, "Keine ID in Response");
+    });
+
+    client.test("AdministeredOn korrekt", function() {
+        client.assert(response.body.administeredOn === "2024-01-15", "Datum nicht korrekt");
+    });
+
+    client.test("DoseOrderClaimed korrekt", function() {
+        client.assert(response.body.doseOrderClaimed === 1, "DoseOrderClaimed nicht korrekt");
+    });
+
+    client.test("Timestamps vorhanden", function() {
+        client.assert(response.body.createdAt !== undefined, "CreatedAt fehlt");
+        client.assert(response.body.updatedAt !== undefined, "UpdatedAt fehlt");
+    });
+
+    client.global.set("immunizationRecordId1", response.body.id);
+    client.log("ImmunizationRecord ID 1 gespeichert: " + response.body.id);
+%}
+
+### Weiteren Impfeintrag erstellen (andere Impfung)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId2}}",
+  "ageCategoryId": "{{ageCategoryId2}}",
+  "administeredOn": "2024-06-20",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.global.set("immunizationRecordId2", response.body.id);
+    client.log("ImmunizationRecord ID 2 gespeichert: " + response.body.id);
+%}
+
+### Dritten Impfeintrag erstellen (zweite Dosis)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}",
+  "administeredOn": "2024-02-15",
+  "doseOrderClaimed": 2
+}
+
+> {%
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
+    });
+
+    client.test("DoseOrderClaimed ist 2", function() {
+        client.assert(response.body.doseOrderClaimed === 2, "DoseOrderClaimed sollte 2 sein");
+    });
+
+    client.global.set("immunizationRecordId3", response.body.id);
+    client.log("ImmunizationRecord ID 3 gespeichert: " + response.body.id);
+%}
+
+### Einzelnen Impfeintrag abrufen (by ID)
+GET http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Impfeintrag hat korrekte ID", function() {
+        client.assert(response.body.id === client.global.get("immunizationRecordId1"), "ID stimmt nicht überein");
+    });
+
+    client.test("Alle Felder vorhanden", function() {
+        client.assert(response.body.administeredOn !== undefined, "administeredOn fehlt");
+        client.assert(response.body.doseOrderClaimed !== undefined, "doseOrderClaimed fehlt");
+        client.assert(response.body.createdAt !== undefined, "createdAt fehlt");
+        client.assert(response.body.updatedAt !== undefined, "updatedAt fehlt");
+    });
+%}
+
+### Impfeinträge für aktuellen User abrufen (myVaccinations)
+GET http://localhost:8000/api/v1/immunization-records/myVaccinations
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.test("Mindestens 3 Impfungen vorhanden", function() {
+        client.assert(response.body.length >= 3, "Erwartet mindestens 3 Impfungen, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl meiner Impfungen: " + response.body.length);
+%}
+
+### Impfeinträge nach User abrufen (by-user)
+GET http://localhost:8000/api/v1/immunization-records/by-user/{{currentUserId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Mindestens 3 Impfungen für User", function() {
+        client.assert(response.body.length >= 3, "Erwartet mindestens 3 Impfungen, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl Impfungen für User: " + response.body.length);
+%}
+
+### Impfeinträge nach VaccineType abrufen
+GET http://localhost:8000/api/v1/immunization-records/by-vaccine-type/{{vaccineTypeId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response ist ein Array", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+    });
+
+    client.test("Mindestens 2 Impfungen für diesen VaccineType", function() {
+        client.assert(response.body.length >= 2, "Erwartet mindestens 2 Impfungen, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl Impfungen für VaccineType: " + response.body.length);
+%}
+
+### Impfeinträge nach User und VaccineType abrufen
+GET http://localhost:8000/api/v1/immunization-records/by-user/{{currentUserId}}/vaccine-type/{{vaccineTypeId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Genau 2 Impfungen für User und VaccineType", function() {
+        client.assert(response.body.length === 2, "Erwartet 2 Impfungen, erhalten: " + response.body.length);
+    });
+
+    client.log("Anzahl Impfungen für User und VaccineType: " + response.body.length);
+%}
+
+### Voraussetzung: ImmunizationPlan erstellen für Update
+POST http://localhost:8000/api/v1/immunization-plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Test Impfplan für Update",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}"
+}
+
+> {%
+    client.test("ImmunizationPlan erstellt", function() {
+        client.assert(response.status === 201, "Status ist nicht 201");
+    });
+
+    client.global.set("immunizationPlanId", response.body.id);
+    client.log("ImmunizationPlan ID gespeichert: " + response.body.id);
+%}
+
+### Impfeintrag aktualisieren (PATCH)
+PATCH http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId1}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "immunizationPlanId": "{{immunizationPlanId}}",
+  "administeredOn": "2024-01-20",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Datum wurde aktualisiert", function() {
+        client.assert(response.body.administeredOn === "2024-01-20", "Datum wurde nicht aktualisiert");
+    });
+
+    client.test("UpdatedAt wurde aktualisiert", function() {
+        client.assert(response.body.updatedAt !== undefined, "UpdatedAt fehlt");
+    });
+%}
+
+### Impfeintrag nach Update abrufen (Verifizierung)
+GET http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Update wurde persistiert", function() {
+        client.assert(response.body.administeredOn === "2024-01-20", "Update wurde nicht gespeichert");
+    });
+%}
+
+### Impfeintrag löschen
+DELETE http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Gelöschten Impfeintrag abrufen (sollte 404 sein)
+GET http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId2}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Nicht existierenden Impfeintrag abrufen (Fehlerfall)
+GET http://localhost:8000/api/v1/immunization-records/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Impfeintrag ohne userId erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}",
+  "administeredOn": "2024-01-15",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'userId'", function() {
+        client.assert(response.body.message.toLowerCase().includes("userid"), "Fehlermeldung sollte 'userId' enthalten");
+    });
+%}
+
+### Impfeintrag ohne vaccineTypeId erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "ageCategoryId": "{{ageCategoryId1}}",
+  "administeredOn": "2024-01-15",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'vaccineTypeId'", function() {
+        client.assert(response.body.message.toLowerCase().includes("vaccinetypeid"), "Fehlermeldung sollte 'vaccineTypeId' enthalten");
+    });
+%}
+
+### Impfeintrag ohne ageCategoryId erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "administeredOn": "2024-01-15",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'ageCategoryId'", function() {
+        client.assert(response.body.message.toLowerCase().includes("agecategoryid"), "Fehlermeldung sollte 'ageCategoryId' enthalten");
+    });
+%}
+
+### Impfeintrag ohne administeredOn erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "ageCategoryId": "{{ageCategoryId1}}",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung enthält 'administeredOn'", function() {
+        client.assert(response.body.message.toLowerCase().includes("administeredon"), "Fehlermeldung sollte 'administeredOn' enthalten");
+    });
+%}
+
+### Impfeintrag mit allen null Feldern erstellen (Validierungsfehler)
+POST http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": null,
+  "vaccineTypeId": null,
+  "ageCategoryId": null,
+  "administeredOn": null,
+  "doseOrderClaimed": null
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+%}
+
+### Impfeintrag mit ungültiger UUID aktualisieren (Fehlerfall)
+PATCH http://localhost:8000/api/v1/immunization-records/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "userId": "{{currentUserId}}",
+  "vaccineTypeId": "{{vaccineTypeId1}}",
+  "immunizationPlanId": "{{immunizationPlanId}}",
+  "administeredOn": "2024-01-20",
+  "doseOrderClaimed": 1
+}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Nicht existierenden Impfeintrag löschen (Fehlerfall)
+DELETE http://localhost:8000/api/v1/immunization-records/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+%}
+
+### Impfeinträge für nicht existierenden User abrufen
+GET http://localhost:8000/api/v1/immunization-records/by-user/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Leeres Array zurückgegeben", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+        client.assert(response.body.length === 0, "Sollte leeres Array sein");
+    });
+%}
+
+### Impfeinträge für nicht existierenden VaccineType abrufen
+GET http://localhost:8000/api/v1/immunization-records/by-vaccine-type/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Leeres Array zurückgegeben", function() {
+        client.assert(Array.isArray(response.body), "Response ist kein Array");
+        client.assert(response.body.length === 0, "Sollte leeres Array sein");
+    });
+%}
+
+### Impfeinträge für User und nicht existierenden VaccineType abrufen
+GET http://localhost:8000/api/v1/immunization-records/by-user/{{currentUserId}}/vaccine-type/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Leeres Array zurückgegeben", function() {
+        client.assert(response.body.length === 0, "Sollte leeres Array sein");
+    });
+%}
+
+### Alle Impfeinträge abrufen (Final Check)
+GET http://localhost:8000/api/v1/immunization-records
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.log("Finale Anzahl der Impfeinträge: " + response.body.length);
+%}
+
+### Cleanup: Impfeinträge löschen
+DELETE http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId1}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Cleanup: Dritten Impfeintrag löschen
+DELETE http://localhost:8000/api/v1/immunization-records/{{immunizationRecordId3}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+%}
+
+### Cleanup: ImmunizationPlan löschen
+DELETE http://localhost:8000/api/v1/immunization-plans/{{immunizationPlanId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("ImmunizationPlan gelöscht", function() {
+        client.assert(response.status === 204, "Status ist nicht 204");
+    });
+%}
+
+### Benutzer löschen
+DELETE http://localhost:8000/api/v1/auth
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}

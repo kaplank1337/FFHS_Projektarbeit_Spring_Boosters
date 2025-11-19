@@ -23,9 +23,6 @@ public class ImmunizationRecordMapper {
         }
         return new ImmunizationRecordDto(
                 immunizationRecord.getId(),
-                userMapper.userToDto(immunizationRecord.getUser()),
-                vaccineTypeMapper.vaccineTypeToDto(immunizationRecord.getVaccineType()),
-                immunizationPlanMapper.toDto(immunizationRecord.getImmunizationPlan()),
                 immunizationRecord.getAdministeredOn(),
                 immunizationRecord.getDoseOrderClaimed(),
                 immunizationRecord.getCreatedAt(),
@@ -46,7 +43,7 @@ public class ImmunizationRecordMapper {
         ImmunizationRecord record = new ImmunizationRecord(
                 dto.userId(),
                 dto.vaccineTypeId(),
-                dto.immunizationPlanId(),
+                dto.ageCategoryId(),
                 dto.administeredOn()
         );
         record.setDoseOrderClaimed(dto.doseOrderClaimed());

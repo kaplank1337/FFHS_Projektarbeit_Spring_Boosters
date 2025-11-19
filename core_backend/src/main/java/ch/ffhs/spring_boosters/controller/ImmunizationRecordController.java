@@ -1,16 +1,15 @@
 package ch.ffhs.spring_boosters.controller;
 
+import ch.ffhs.spring_boosters.config.JwtTokenReader;
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordCreateDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordUpdateDto;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
-import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.controller.mapper.ImmunizationRecordMapper;
 import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,10 +21,8 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +35,7 @@ public class ImmunizationRecordController {
 
     private final ImmunizationRecordService immunizationRecordService;
     private final ImmunizationRecordMapper immunizationRecordMapper;
+    private final JwtTokenReader jwtTokenReader;
 
     @GetMapping
     @Operation(
@@ -136,10 +134,15 @@ public class ImmunizationRecordController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteImmunizationRecord(
-        @PathVariable UUID id, Principal principal) throws ImmunizationRecordNotFoundException {
-        var userId = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getId();
-        immunizationRecordService.deleteImmunizationRecord(userId, id);
-        return ResponseEntity.noContent().build();
+        @PathVariable UUID id,
+        @RequestHeader("Authorization") String authToken) throws ImmunizationRecordNotFoundException {
+
+        try {
+            immunizationRecordService.deleteImmunizationRecord(getUserIdFromToken(authToken), id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/by-user/{userId}")
@@ -168,16 +171,16 @@ public class ImmunizationRecordController {
     }
 
     @GetMapping("/myVaccinations")
-    public ResponseEntity<List<ImmunizationRecordDto>> getMyImmunizationRecords(Principal principal) {
-        UUID userId;
+    public ResponseEntity<List<ImmunizationRecordDto>> getMyImmunizationRecords(
+            @RequestHeader("Authorization") String authToken
+    ) {
         try {
-            userId = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getId();
+            List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUser(getUserIdFromToken(authToken));
+            List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
+            return ResponseEntity.ok(immunizationRecordDtos);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getImmunizationRecordsByUser(userId);
-        List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
-        return ResponseEntity.ok(immunizationRecordDtos);
     }
 
     @ExceptionHandler({ImmunizationRecordNotFoundException.class})
@@ -193,5 +196,10 @@ public class ImmunizationRecordController {
                 ex.getClass().getSimpleName()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    private UUID getUserIdFromToken(String authToken) {
+        String token = authToken.replace("Bearer ", "");
+        return UUID.fromString(jwtTokenReader.getUserId(token));
     }
 }

@@ -24,6 +24,7 @@ public class VaccineTypeMapper {
             return null;
         }
         return new VaccineTypeDto(
+                vaccineType.getId(),
                 vaccineType.getName(),
                 vaccineType.getCode(),
                 vaccineType.getVaccineTypeActiveSubstances()

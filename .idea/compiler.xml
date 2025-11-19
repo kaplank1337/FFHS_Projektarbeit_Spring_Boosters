@@ -8,15 +8,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="notification_service" />
+        <module name="core_backend" />
+        <module name="authentification_service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="authentification_service" target="21" />
       <module name="spring_boosters" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="authentification_service" options="-parameters" />
+      <module name="core_backend" options="-parameters" />
       <module name="notification_service" options="-parameters" />
     </option>
   </component>

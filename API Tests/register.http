@@ -1,0 +1,196 @@
+### Neuen Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Registrierung erfolgreich (201 Created)", function() {
+        client.assert(response.status === 201, "Status ist nicht 201, sondern: " + response.status);
+    });
+%}
+
+### Bereits vorhandener Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "John",
+  "lastName": "Doe",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    // Status prüfen
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    // Fehlermeldung prüfen
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung in Response");
+    });
+
+    // Timestamp prüfen
+    client.test("Response enthält Timestamp", function() {
+        client.assert(response.body.timestamp !== undefined, "Kein Timestamp");
+    });
+%}
+
+### Ungültige Daten bei der Registrierung (ohne firstname)
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "lastName": "Doe",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung in Response");
+    });
+
+    client.test("Response enthält Timestamp", function() {
+        client.assert(response.body.timestamp !== undefined, "Kein Timestamp");
+    });
+%}
+
+
+### Ungültige Daten bei der Registrierung (ohne lastName)
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "John",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung in Response");
+    });
+
+    client.test("Response enthält Timestamp", function() {
+        client.assert(response.body.timestamp !== undefined, "Kein Timestamp");
+    });
+%}
+
+### Ungültige Daten bei der Registrierung (ohne birthDate)
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "John",
+  "lastName" : "Doe",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung in Response");
+    });
+
+    client.test("Response enthält Timestamp", function() {
+        client.assert(response.body.timestamp !== undefined, "Kein Timestamp");
+    });
+%}
+
+### Ungültige Daten bei der Registrierung (Schwaches Passwort)
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "firstName": "John",
+  "lastName" : "Doe",
+  "birthDate": "1990-05-15",
+  "password": "pass"
+}
+
+> {%
+    client.test("Status ist 400", function() {
+        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung in Response");
+    });
+
+    client.test("Response enthält Timestamp", function() {
+        client.assert(response.body.timestamp !== undefined, "Kein Timestamp");
+    });
+%}
+
+
+### Benutzer einloggen
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "john.doe",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Token vorhanden", function() {
+        client.assert(response.body.token !== undefined, "Kein Token in Response");
+    });
+
+    // Token global speichern
+    client.global.set("authToken", response.body.token);
+    client.log("Token gespeichert: " + response.body.token);
+%}
+
+### Benutzer löschen (ohne Token)
+DELETE http://localhost:8000/api/v1/auth
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 401", function() {
+        client.assert(response.status === 401, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}
+
+
+### Benutzer löschen
+DELETE http://localhost:8000/api/v1/auth
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}

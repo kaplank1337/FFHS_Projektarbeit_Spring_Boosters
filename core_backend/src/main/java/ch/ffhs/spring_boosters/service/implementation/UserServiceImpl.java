@@ -2,30 +2,22 @@ package ch.ffhs.spring_boosters.service.implementation;
 
 import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.repository.UserRepository;
+import ch.ffhs.spring_boosters.security.JwtService;
 import ch.ffhs.spring_boosters.service.UserService;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-    }
+    private final JwtService jwtService;
 
     @Override
     public User registerUser(User user) throws UserAlreadyExistException {
@@ -33,8 +25,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw UserAlreadyExistException.forUsername(user.getUsername());
         }
 
-        user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+        // Passwort mit BCrypt hashen
+        String plainPassword = user.getPasswordHash();
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt(10));
+        user.setPasswordHash(hashedPassword);
+
         return userRepository.save(user);
+    }
+
+    @Override
+    public User findByUsernameAndPassword(String username, String password) throws UserNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> UserNotFoundException.forUsername(username));
+
+        if (!BCrypt.checkpw(password, user.getPasswordHash())) {
+            throw new UserNotFoundException("Ungültige Anmeldedaten");
+        }
+
+        return user;
     }
 
     @Override
@@ -57,5 +65,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public String generateToken(User user) {
+        return jwtService.generateToken(user.getUsername(), user.getId());
     }
 }

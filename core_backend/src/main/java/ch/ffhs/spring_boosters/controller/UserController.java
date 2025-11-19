@@ -1,6 +1,6 @@
 package ch.ffhs.spring_boosters.controller;
 
-import ch.ffhs.spring_boosters.security.JwtUtil;
+import ch.ffhs.spring_boosters.config.JwtTokenReader;
 import ch.ffhs.spring_boosters.controller.dto.LoginResponseDto;
 import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
 import ch.ffhs.spring_boosters.controller.mapper.UserMapper;
@@ -18,16 +18,11 @@ import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -36,9 +31,8 @@ import java.time.LocalDateTime;
 public class UserController {
 
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenReader jwtTokenReader;
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(
@@ -53,29 +47,23 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> loginUser(
         @Valid @RequestBody UserLoginDto loginDto) {
-        try{
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginDto.getUsername(),
-                            loginDto.getPassword()
-                    )
-            );
+        try {
+            User user = userService.findByUsernameAndPassword(loginDto.getUsername(), loginDto.getPassword());
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // JWT-Token im Core Backend generieren
+            String token = userService.generateToken(user);
 
-            User user = userService.findByUsername(loginDto.getUsername());
             UserDto userDto = userMapper.userToDto(user);
-            String jwtToken = jwtUtil.generateToken(userDto);
 
             return ResponseEntity.ok(new LoginResponseDto(
                     true,
                     "Login successful",
                     loginDto.getUsername(),
-                    jwtToken,
+                    token,
                     userDto
             ));
 
-        } catch (AuthenticationException exception){
+        } catch (UserNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponseDto(
                             false,
@@ -84,52 +72,39 @@ public class UserController {
                             null,
                             null
                     ));
-        } catch (UserNotFoundException exception){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new LoginResponseDto(
-                            false,
-                            "User not found",
-                            null,
-                            null,
-                            null
-                    ));
         }
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getCurrentUser() {
+    public ResponseEntity<UserDto> getCurrentUser( @RequestHeader("Authorization") String authToken) {
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-
-            User user = userService.findByUsername(authentication.getName());
+            User user = userService.findById(getUserIdFromToken(authToken));
             UserDto userDto = userMapper.userToDto(user);
 
             return ResponseEntity.ok(userDto);
 
         } catch (UserNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteCurrentUser(Principal principal) throws UserNotFoundException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @DeleteMapping()
+    public ResponseEntity<Void> deleteUser( @RequestHeader("Authorization") String authToken) throws UserNotFoundException {
+        try {
+            String token = authToken.replace("Bearer ", "");
+            UUID userId = UUID.fromString(jwtTokenReader.getUserId(token));
 
-        if (!authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            userService.deleteUser(userId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-        User user = (User) authentication.getPrincipal();
-        userService.deleteUser(user.getId());
-        return ResponseEntity.noContent().build();
     }
 
 
-    @ExceptionHandler({UserAlreadyExistException.class, MethodArgumentNotValidException.class , ValidationException.class, UserAlreadyExistException.class})
+    @ExceptionHandler({UserAlreadyExistException.class, MethodArgumentNotValidException.class , ValidationException.class})
     public ResponseEntity<ExceptionMessageBodyDto> handleUserAlreadyExistException(
             Exception ex,
             HttpServletRequest request) {
@@ -144,5 +119,10 @@ public class UserController {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    private UUID getUserIdFromToken(String authToken) {
+        String token = authToken.replace("Bearer ", "");
+        return UUID.fromString(jwtTokenReader.getUserId(token));
     }
 }

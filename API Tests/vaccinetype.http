@@ -1,0 +1,330 @@
+### Neuen Benutzer registrieren
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "username": "vaccine.type",
+  "firstName": "Vaccine",
+  "lastName": "Type",
+  "birthDate": "1990-05-15",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Registrierung erfolgreich (201 Created)", function() {
+        client.assert(response.status === 201, "Status ist nicht 201, sondern: " + response.status);
+    });
+%}
+
+### Benutzer einloggen
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "vaccine.type",
+  "password": "securePassword123"
+}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Token vorhanden", function() {
+        client.assert(response.body.token !== undefined, "Kein Token in Response");
+    });
+
+    // Token global speichern
+    client.global.set("authToken", response.body.token);
+    client.log("Token gespeichert: " + response.body.token);
+%}
+
+### Alle Impfstofftypen abrufen
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Response hat vaccineTypeDtoList", function() {
+        client.assert(response.body.vaccineTypeDtoList !== undefined, "vaccineTypeDtoList fehlt");
+    });
+
+    client.test("VaccineTypeDtoList ist ein Array", function() {
+        client.assert(Array.isArray(response.body.vaccineTypeDtoList), "vaccineTypeDtoList ist kein Array");
+    });
+
+    client.test("Mindestens 1 VaccineType vorhanden", function() {
+        client.assert(response.body.vaccineTypeDtoList.length > 0, "Keine VaccineTypes gefunden");
+    });
+
+    client.log("Anzahl der VaccineTypes: " + response.body.vaccineTypeDtoList.length);
+
+    // Speichere erste VaccineType ID für weitere Tests
+    if (response.body.vaccineTypeDtoList.length > 0) {
+        client.global.set("vaccineTypeId", response.body.vaccineTypeDtoList[0].id);
+        client.global.set("vaccineTypeName", response.body.vaccineTypeDtoList[0].name);
+        client.global.set("vaccineTypeCode", response.body.vaccineTypeDtoList[0].code);
+        client.log("VaccineType gespeichert: " + response.body.vaccineTypeDtoList[0].name + " (ID: " + response.body.vaccineTypeDtoList[0].id + ")");
+    }
+%}
+
+### Einzelnen Impfstofftyp abrufen (by ID)
+GET http://localhost:8000/api/v1/vaccine-types/{{vaccineTypeId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("VaccineType hat korrekte ID", function() {
+        client.assert(response.body.id === client.global.get("vaccineTypeId"), "ID stimmt nicht überein");
+    });
+
+    client.test("VaccineType hat Name", function() {
+        client.assert(response.body.name !== undefined, "Name fehlt");
+        client.assert(response.body.name === client.global.get("vaccineTypeName"), "Name stimmt nicht überein");
+    });
+
+    client.test("VaccineType hat Code", function() {
+        client.assert(response.body.code !== undefined, "Code fehlt");
+        client.assert(response.body.code === client.global.get("vaccineTypeCode"), "Code stimmt nicht überein");
+    });
+
+    client.test("VaccineType hat vaccineTypeActiveSubstances", function() {
+        client.assert(response.body.vaccineTypeActiveSubstances !== undefined, "vaccineTypeActiveSubstances fehlt");
+        client.assert(Array.isArray(response.body.vaccineTypeActiveSubstances), "vaccineTypeActiveSubstances ist kein Array");
+    });
+
+    client.log("VaccineType Details: " + response.body.name + " (" + response.body.code + ")");
+    client.log("Anzahl ActiveSubstances: " + response.body.vaccineTypeActiveSubstances.length);
+%}
+
+### Alle Impfstofftypen abrufen - Struktur Validierung
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Jeder VaccineType hat erforderliche Felder", function() {
+        response.body.vaccineTypeDtoList.forEach(function(vt, index) {
+            client.assert(vt.id !== undefined, "VaccineType " + index + " hat keine ID");
+            client.assert(vt.name !== undefined, "VaccineType " + index + " hat keinen Namen");
+            client.assert(vt.code !== undefined, "VaccineType " + index + " hat keinen Code");
+            client.assert(vt.vaccineTypeActiveSubstances !== undefined, "VaccineType " + index + " hat keine vaccineTypeActiveSubstances");
+            client.assert(Array.isArray(vt.vaccineTypeActiveSubstances), "vaccineTypeActiveSubstances ist kein Array bei " + index);
+        });
+    });
+
+    // Suche nach spezifischen VaccineTypes aus der Migration
+    var mmrtype = response.body.vaccineTypeDtoList.find(vt => vt.code === "MMR");
+    if (mmrtype) {
+        client.global.set("mmrVaccineTypeId", mmrtype.id);
+        client.log("MMR VaccineType gefunden: " + mmrtype.id);
+    }
+
+    var covidModType = response.body.vaccineTypeDtoList.find(vt => vt.code === "COVID-MOD");
+    if (covidModType) {
+        client.global.set("covidModVaccineTypeId", covidModType.id);
+        client.log("COVID-MOD VaccineType gefunden: " + covidModType.id);
+    }
+%}
+
+### Spezifischen Impfstofftyp abrufen (MMR)
+GET http://localhost:8000/api/v1/vaccine-types/{{mmrVaccineTypeId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("MMR VaccineType korrekt", function() {
+        client.assert(response.body.code === "MMR", "Code ist nicht MMR");
+        client.assert(response.body.name.includes("MMR"), "Name enthält nicht MMR");
+    });
+%}
+
+### Spezifischen Impfstofftyp abrufen (COVID Moderna)
+GET http://localhost:8000/api/v1/vaccine-types/{{covidModVaccineTypeId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("COVID Moderna VaccineType korrekt", function() {
+        client.assert(response.body.code === "COVID-MOD", "Code ist nicht COVID-MOD");
+        client.assert(response.body.name.includes("Moderna"), "Name enthält nicht Moderna");
+    });
+
+    client.test("COVID Moderna hat ActiveSubstances", function() {
+        client.assert(response.body.vaccineTypeActiveSubstances.length > 0, "Keine ActiveSubstances vorhanden");
+    });
+
+    if (response.body.vaccineTypeActiveSubstances.length > 0) {
+        client.test("ActiveSubstance hat erforderliche Felder", function() {
+            var as = response.body.vaccineTypeActiveSubstances[0];
+            client.assert(as.vaccineTypeId !== undefined, "vaccineTypeId fehlt");
+            client.assert(as.activeSubstanceId !== undefined, "activeSubstanceId fehlt");
+            client.assert(as.qualitativeAmount !== undefined, "qualitativeAmount fehlt");
+        });
+
+        client.log("ActiveSubstance: " + response.body.vaccineTypeActiveSubstances[0].qualitativeAmount);
+    }
+%}
+
+### Nicht existierenden Impfstofftyp abrufen (Fehlerfall)
+GET http://localhost:8000/api/v1/vaccine-types/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 404", function() {
+        client.assert(response.status === 404, "Erwartet: 404, Erhalten: " + response.status);
+    });
+
+    client.test("Fehlermeldung vorhanden", function() {
+        client.assert(response.body.message !== undefined, "Keine Fehlermeldung vorhanden");
+    });
+
+    client.test("Error ist 'Vaccine Type Not Found'", function() {
+        client.assert(response.body.error === "Vaccine Type Not Found", "Error-Text nicht korrekt");
+    });
+
+    client.test("Exception-Typ korrekt", function() {
+        client.assert(response.body.exception === "VaccineTypeNotFoundException", "Exception-Typ nicht korrekt");
+    });
+
+    client.log("Fehlermeldung: " + response.body.message);
+%}
+
+### Impfstofftyp mit ungültiger UUID abrufen (Fehlerfall)
+GET http://localhost:8000/api/v1/vaccine-types/invalid-uuid
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 400 oder 404", function() {
+        client.assert(response.status === 400 || response.status === 404, "Erwartet: 400 oder 404, Erhalten: " + response.status);
+    });
+%}
+
+### Alle Impfstofftypen prüfen - COVID Impfstoffe
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("COVID Impfstoffe vorhanden", function() {
+        var covidTypes = response.body.vaccineTypeDtoList.filter(vt => vt.code.startsWith("COVID-"));
+        client.assert(covidTypes.length >= 5, "Erwarte mindestens 5 COVID Impfstoffe, gefunden: " + covidTypes.length);
+        client.log("Anzahl COVID Impfstoffe: " + covidTypes.length);
+    });
+
+    client.test("Standard Impfstoffe vorhanden", function() {
+        var mmr = response.body.vaccineTypeDtoList.find(vt => vt.code === "MMR");
+        var dtpa = response.body.vaccineTypeDtoList.find(vt => vt.code === "DTPA-6");
+        var hepb = response.body.vaccineTypeDtoList.find(vt => vt.code === "HEPB");
+
+        client.assert(mmr !== undefined, "MMR Impfstoff nicht gefunden");
+        client.assert(dtpa !== undefined, "DTPa-6 Impfstoff nicht gefunden");
+        client.assert(hepb !== undefined, "Hepatitis B Impfstoff nicht gefunden");
+    });
+%}
+
+### Alle Impfstofftypen prüfen - Mehrfachimpfstoffe
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Mehrfachimpfstoffe vorhanden", function() {
+        var dtpa6 = response.body.vaccineTypeDtoList.find(vt => vt.code === "DTPA-6");
+        var dtpa4 = response.body.vaccineTypeDtoList.find(vt => vt.code === "DTPA-4");
+        var mmrv = response.body.vaccineTypeDtoList.find(vt => vt.code === "MMRV");
+
+        client.assert(dtpa6 !== undefined, "DTPa-6 (6-fach) Impfstoff nicht gefunden");
+        client.assert(dtpa4 !== undefined, "DTPa-4 (4-fach) Impfstoff nicht gefunden");
+        client.assert(mmrv !== undefined, "MMRV Impfstoff nicht gefunden");
+
+        client.log("Gefundene Mehrfachimpfstoffe:");
+        if (dtpa6) client.log("  - " + dtpa6.name);
+        if (dtpa4) client.log("  - " + dtpa4.name);
+        if (mmrv) client.log("  - " + mmrv.name);
+    });
+%}
+
+### Impfstofftyp Details prüfen - Struktur der ActiveSubstances
+GET http://localhost:8000/api/v1/vaccine-types/{{covidModVaccineTypeId}}
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    if (response.body.vaccineTypeActiveSubstances.length > 0) {
+        client.test("ActiveSubstance Struktur vollständig", function() {
+            var as = response.body.vaccineTypeActiveSubstances[0];
+
+            // Prüfe alle Felder
+            client.assert(as.vaccineTypeId !== null, "vaccineTypeId ist null");
+            client.assert(as.activeSubstanceId !== null, "activeSubstanceId ist null");
+            client.assert(as.qualitativeAmount !== null, "qualitativeAmount ist null");
+
+            // Prüfe Datentypen
+            client.assert(typeof as.vaccineTypeId === "string", "vaccineTypeId ist kein String");
+            client.assert(typeof as.activeSubstanceId === "string", "activeSubstanceId ist kein String");
+            client.assert(typeof as.qualitativeAmount === "string", "qualitativeAmount ist kein String");
+        });
+    }
+%}
+
+### Alle Impfstofftypen abrufen (Final Check)
+GET http://localhost:8000/api/v1/vaccine-types
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("Konsistenz-Check: Alle VaccineTypes haben eindeutige IDs", function() {
+        var ids = response.body.vaccineTypeDtoList.map(vt => vt.id);
+        var uniqueIds = [...new Set(ids)];
+        client.assert(ids.length === uniqueIds.length, "Duplikate IDs gefunden!");
+    });
+
+    client.test("Konsistenz-Check: Alle Codes sind eindeutig", function() {
+        var codes = response.body.vaccineTypeDtoList.map(vt => vt.code);
+        var uniqueCodes = [...new Set(codes)];
+        client.assert(codes.length === uniqueCodes.length, "Duplikate Codes gefunden!");
+    });
+
+    client.log("Finale Anzahl der Impfstofftypen: " + response.body.vaccineTypeDtoList.length);
+    client.log("Alle Codes: " + response.body.vaccineTypeDtoList.map(vt => vt.code).join(", "));
+%}
+
+### Benutzer löschen
+DELETE http://localhost:8000/api/v1/auth
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+> {%
+    client.test("Status ist 204", function() {
+        client.assert(response.status === 204, "Erwartet: 204, Erhalten: " + response.status);
+    });
+
+%}

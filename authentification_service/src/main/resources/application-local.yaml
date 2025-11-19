@@ -7,9 +7,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: all-forward
+        - id: core-backend
           uri: http://localhost:8081
           predicates:
             - Path=/**
-          filters:
-            - RewritePath=/(?<remaining>.*), /${remaining}
