@@ -15,8 +15,7 @@ spring:
     gateway:
       routes:
         - id: core-backend
-          uri: http://${CORE_BACKEND_HOST:core_backend}:${CORE_BACKEND_PORT:8081}
+          uri: http://corebackend:8081
           predicates:
-            - Path=/api/**
-          filters:
-            - RewritePath=/api/(?<remaining>.*), /api/${remaining}
+            - Path=/**
+

@@ -1,6 +1,3 @@
-CORE_BACKEND_HOST: localhost
-CORE_BACKEND_PORT: 8081
-
 spring:
   security:
     password:
@@ -10,9 +7,7 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: proxy-all-to-core-backend
+        - id: core-backend
           uri: http://localhost:8081
           predicates:
             - Path=/**
-          filters:
-            - PreserveHostHeader

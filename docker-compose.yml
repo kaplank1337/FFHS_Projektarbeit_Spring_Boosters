@@ -22,17 +22,19 @@ services:
       - spring_network
 
   # Core Backend Service (Port 8081)
-  core_backend:
+  corebackend:
     build:
       context: ./core_backend
       dockerfile: Dockerfile
-    container_name: core_backend
+    container_name: corebackend
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_booster_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SERVER_PORT: 8081
+      JWT_SECRET: f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51
+      JWT_EXPIRATION_SECONDS: 3600
       JAVA_OPTS: "-Xmx512m -Xms256m"
     ports:
       - "8081:8081"
@@ -83,17 +85,15 @@ services:
     container_name: authentification_service
     environment:
       SERVER_PORT: 8000
-      CORE_BACKEND_HOST: core_backend
+      CORE_BACKEND_HOST: corebackend
       CORE_BACKEND_PORT: 8081
-      NOTIFICATION_SERVICE_HOST: notification_service
-      NOTIFICATION_SERVICE_PORT: 8082
       JWT_SECRET: f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51
       JWT_EXPIRATION_SECONDS: 3600
       JAVA_OPTS: "-Xmx512m -Xms256m"
     ports:
       - "8000:8000"
     depends_on:
-      - core_backend
+      - corebackend
       - notification_service
     restart: unless-stopped
     networks:
