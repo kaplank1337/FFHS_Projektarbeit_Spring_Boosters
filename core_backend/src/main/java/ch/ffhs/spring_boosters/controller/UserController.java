@@ -1,13 +1,9 @@
 package ch.ffhs.spring_boosters.controller;
 
 import ch.ffhs.spring_boosters.config.JwtTokenReader;
-import ch.ffhs.spring_boosters.controller.dto.LoginResponseDto;
-import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
-import ch.ffhs.spring_boosters.controller.mapper.UserMapper;
-import ch.ffhs.spring_boosters.controller.dto.UserDto;
-import ch.ffhs.spring_boosters.controller.dto.UserLoginDto;
-import ch.ffhs.spring_boosters.controller.dto.UserRegistrationDto;
+import ch.ffhs.spring_boosters.controller.dto.*;
 import ch.ffhs.spring_boosters.controller.entity.User;
+import ch.ffhs.spring_boosters.controller.mapper.UserMapper;
 import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import ch.ffhs.spring_boosters.service.UserService;

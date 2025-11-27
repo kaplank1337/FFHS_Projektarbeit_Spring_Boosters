@@ -9,6 +9,5 @@ import java.util.UUID;
 
 @Repository
 public interface ActiveSubstanceRepository extends JpaRepository<ActiveSubstance, UUID> {
-    Optional<ActiveSubstance> findByName(String name);
     boolean existsByName(String name);
 }

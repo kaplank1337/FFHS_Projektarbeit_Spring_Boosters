@@ -5,7 +5,6 @@ import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordUpdateDto;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
