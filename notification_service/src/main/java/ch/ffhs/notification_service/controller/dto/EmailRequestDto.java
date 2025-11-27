@@ -1,4 +1,4 @@
-package ch.ffhs.notification_service.dto;
+package ch.ffhs.notification_service.controller.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
