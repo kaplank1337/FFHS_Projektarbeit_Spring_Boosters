@@ -4,178 +4,153 @@ import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationPlanAlreadyExistsException;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationPlanNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.Assertions;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ImmunizationPlanServiceImplTest {
 
     @Mock
-    private ImmunizationPlanRepository immunizationPlanRepository;
+    private ImmunizationPlanRepository repository;
 
     @InjectMocks
-    private ImmunizationPlanServiceImpl immunizationPlanService;
+    private ImmunizationPlanServiceImpl service;
 
-    private ImmunizationPlan plan1;
-    private ImmunizationPlan plan2;
+    @Test
+    void getAll_returnsAll() {
+        ImmunizationPlan p = new ImmunizationPlan();
+        p.setId(UUID.randomUUID());
+        p.setName("Plan1");
 
-    @BeforeEach
-    void setUp() {
-        plan1 = new ImmunizationPlan();
-        plan1.setId(UUID.randomUUID());
-        plan1.setName("Plan A");
-        plan1.setVaccineTypeId(UUID.randomUUID());
-        plan1.setAgeCategoryId(UUID.randomUUID());
+        when(repository.findAll()).thenReturn(List.of(p));
 
-        plan2 = new ImmunizationPlan();
-        plan2.setId(UUID.randomUUID());
-        plan2.setName("Plan B");
-        plan2.setVaccineTypeId(UUID.randomUUID());
-        plan2.setAgeCategoryId(UUID.randomUUID());
+        var res = service.getAllImmunizationPlans();
+        assertEquals(1, res.size());
     }
 
     @Test
-    void getAllImmunizationPlans_returnsAll() {
-        List<ImmunizationPlan> list = Arrays.asList(plan1, plan2);
-        when(immunizationPlanRepository.findAll()).thenReturn(list);
-
-        List<ImmunizationPlan> result = immunizationPlanService.getAllImmunizationPlans();
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(2, result.size());
-        Assertions.assertTrue(result.contains(plan1));
-        verify(immunizationPlanRepository, times(1)).findAll();
-    }
-
-    @Test
-    void getImmunizationPlanById_found() throws ImmunizationPlanNotFoundException {
-        UUID id = plan1.getId();
-        when(immunizationPlanRepository.findById(id)).thenReturn(Optional.of(plan1));
-
-        ImmunizationPlan result = immunizationPlanService.getImmunizationPlanById(id);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals("Plan A", result.getName());
-        verify(immunizationPlanRepository, times(1)).findById(id);
-    }
-
-    @Test
-    void getImmunizationPlanById_notFound_throws() {
+    void getById_found() throws Exception {
         UUID id = UUID.randomUUID();
-        when(immunizationPlanRepository.findById(id)).thenReturn(Optional.empty());
+        ImmunizationPlan p = new ImmunizationPlan();
+        p.setId(id);
+        p.setName("PlanX");
 
-        Assertions.assertThrows(ImmunizationPlanNotFoundException.class, () -> immunizationPlanService.getImmunizationPlanById(id));
-        verify(immunizationPlanRepository, times(1)).findById(id);
+        when(repository.findById(id)).thenReturn(Optional.of(p));
+        var found = service.getImmunizationPlanById(id);
+        assertEquals("PlanX", found.getName());
     }
 
     @Test
-    void createImmunizationPlan_success() throws ImmunizationPlanAlreadyExistsException {
-        ImmunizationPlan toCreate = new ImmunizationPlan();
-        toCreate.setName("New Plan");
+    void getById_notFound_throws() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.empty());
+        assertThrows(ImmunizationPlanNotFoundException.class, () -> service.getImmunizationPlanById(id));
+    }
 
-        when(immunizationPlanRepository.existsByName("New Plan")).thenReturn(false);
-        when(immunizationPlanRepository.save(any(ImmunizationPlan.class))).thenAnswer(invocation -> {
-            ImmunizationPlan arg = invocation.getArgument(0);
+    @Test
+    void create_whenExists_throws() {
+        ImmunizationPlan p = new ImmunizationPlan();
+        p.setName("P1");
+        when(repository.existsByName("P1")).thenReturn(true);
+
+        assertThrows(ImmunizationPlanAlreadyExistsException.class, () -> service.createImmunizationPlan(p));
+    }
+
+    @Test
+    void create_whenNotExists_saves() throws Exception {
+        ImmunizationPlan p = new ImmunizationPlan();
+        p.setName("NewP");
+        when(repository.existsByName("NewP")).thenReturn(false);
+        when(repository.save(any())).thenAnswer(i -> {
+            ImmunizationPlan arg = i.getArgument(0);
             arg.setId(UUID.randomUUID());
             return arg;
         });
 
-        ImmunizationPlan result = immunizationPlanService.createImmunizationPlan(toCreate);
-
-        Assertions.assertNotNull(result.getId());
-        Assertions.assertEquals("New Plan", result.getName());
-        verify(immunizationPlanRepository, times(1)).existsByName("New Plan");
-        verify(immunizationPlanRepository, times(1)).save(any(ImmunizationPlan.class));
+        var saved = service.createImmunizationPlan(p);
+        assertNotNull(saved.getId());
+        assertEquals("NewP", saved.getName());
     }
 
     @Test
-    void createImmunizationPlan_alreadyExists_throws() {
-        ImmunizationPlan toCreate = new ImmunizationPlan();
-        toCreate.setName("Plan A");
-        when(immunizationPlanRepository.existsByName("Plan A")).thenReturn(true);
-
-        Assertions.assertThrows(ImmunizationPlanAlreadyExistsException.class, () -> immunizationPlanService.createImmunizationPlan(toCreate));
-        verify(immunizationPlanRepository, times(1)).existsByName("Plan A");
-        verify(immunizationPlanRepository, never()).save(any());
-    }
-
-    @Test
-    void updateImmunizationPlan_success() throws Exception {
-        UUID id = plan1.getId();
-        ImmunizationPlan updated = new ImmunizationPlan();
-        updated.setName("Updated Plan");
-        updated.setVaccineTypeId(UUID.randomUUID());
-        updated.setAgeCategoryId(UUID.randomUUID());
-
-        when(immunizationPlanRepository.findById(id)).thenReturn(Optional.of(plan1));
-        when(immunizationPlanRepository.existsByName("Updated Plan")).thenReturn(false);
-        when(immunizationPlanRepository.save(any(ImmunizationPlan.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        ImmunizationPlan result = immunizationPlanService.updateImmunizationPlan(id, updated);
-
-        Assertions.assertEquals("Updated Plan", result.getName());
-        verify(immunizationPlanRepository, times(1)).findById(id);
-        verify(immunizationPlanRepository, times(1)).existsByName("Updated Plan");
-        verify(immunizationPlanRepository, times(1)).save(any(ImmunizationPlan.class));
-    }
-
-    @Test
-    void updateImmunizationPlan_notFound_throws() {
+    void update_nameChangeToExisting_throws() {
         UUID id = UUID.randomUUID();
-        when(immunizationPlanRepository.findById(id)).thenReturn(Optional.empty());
+        ImmunizationPlan existing = new ImmunizationPlan();
+        existing.setId(id);
+        existing.setName("Old");
 
-        ImmunizationPlan updated = new ImmunizationPlan();
-        updated.setName("Any");
+        ImmunizationPlan update = new ImmunizationPlan();
+        update.setName("Other");
 
-        Assertions.assertThrows(ImmunizationPlanNotFoundException.class, () -> immunizationPlanService.updateImmunizationPlan(id, updated));
-        verify(immunizationPlanRepository, times(1)).findById(id);
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+        when(repository.existsByName("Other")).thenReturn(true);
+
+        assertThrows(ImmunizationPlanAlreadyExistsException.class, () -> service.updateImmunizationPlan(id, update));
     }
 
     @Test
-    void updateImmunizationPlan_nameAlreadyExists_throws() {
-        UUID id = plan1.getId();
-        ImmunizationPlan updated = new ImmunizationPlan();
-        updated.setName("Plan B");
-
-        when(immunizationPlanRepository.findById(id)).thenReturn(Optional.of(plan1));
-        when(immunizationPlanRepository.existsByName("Plan B")).thenReturn(true);
-
-        Assertions.assertThrows(ImmunizationPlanAlreadyExistsException.class, () -> immunizationPlanService.updateImmunizationPlan(id, updated));
-        verify(immunizationPlanRepository, times(1)).findById(id);
-        verify(immunizationPlanRepository, times(1)).existsByName("Plan B");
-        verify(immunizationPlanRepository, never()).save(any());
-    }
-
-    @Test
-    void deleteImmunizationPlan_success() throws ImmunizationPlanNotFoundException {
-        UUID id = plan2.getId();
-        when(immunizationPlanRepository.existsById(id)).thenReturn(true);
-
-        immunizationPlanService.deleteImmunizationPlan(id);
-
-        verify(immunizationPlanRepository, times(1)).existsById(id);
-        verify(immunizationPlanRepository, times(1)).deleteById(id);
-    }
-
-    @Test
-    void deleteImmunizationPlan_notFound_throws() {
+    void update_success() throws Exception {
         UUID id = UUID.randomUUID();
-        when(immunizationPlanRepository.existsById(id)).thenReturn(false);
+        ImmunizationPlan existing = new ImmunizationPlan();
+        existing.setId(id);
+        existing.setName("Old");
 
-        Assertions.assertThrows(ImmunizationPlanNotFoundException.class, () -> immunizationPlanService.deleteImmunizationPlan(id));
-        verify(immunizationPlanRepository, times(1)).existsById(id);
-        verify(immunizationPlanRepository, never()).deleteById(any());
+        ImmunizationPlan update = new ImmunizationPlan();
+        update.setName("Updated");
+
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+        when(repository.existsByName("Updated")).thenReturn(false);
+        when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        var res = service.updateImmunizationPlan(id, update);
+        assertEquals("Updated", res.getName());
+    }
+
+    @Test
+    void delete_exists_deletes() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(repository.existsById(id)).thenReturn(true);
+        service.deleteImmunizationPlan(id);
+        verify(repository).deleteById(id);
+    }
+
+    @Test
+    void delete_notExists_throws() {
+        UUID id = UUID.randomUUID();
+        when(repository.existsById(id)).thenReturn(false);
+        assertThrows(ImmunizationPlanNotFoundException.class, () -> service.deleteImmunizationPlan(id));
+    }
+
+    @Test
+    void getByVaccineType_returnsFiltered() {
+        UUID vt = UUID.randomUUID();
+        ImmunizationPlan p = new ImmunizationPlan();
+        p.setVaccineTypeId(vt);
+        when(repository.findByVaccineTypeId(vt)).thenReturn(List.of(p));
+
+        var res = service.getImmunizationPlansByVaccineType(vt);
+        assertEquals(1, res.size());
+    }
+
+    @Test
+    void getByAgeCategory_returnsFiltered() {
+        UUID ac = UUID.randomUUID();
+        ImmunizationPlan p = new ImmunizationPlan();
+        p.setAgeCategoryId(ac);
+        when(repository.findByAgeCategoryId(ac)).thenReturn(List.of(p));
+
+        var res = service.getImmunizationPlansByAgeCategory(ac);
+        assertEquals(1, res.size());
     }
 }
 

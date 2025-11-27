@@ -23,7 +23,7 @@ public interface ImmunizationRecordRepository extends JpaRepository<Immunization
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
     List<ImmunizationRecord> findByUserIdAndVaccineTypeId(UUID userId, UUID vaccineTypeId);
 
-    Void deleteByUserIdAndId(UUID userId, UUID id);
+    void deleteByUserIdAndId(UUID userId, UUID id);
 
     @Override
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})

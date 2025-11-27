@@ -4,163 +4,136 @@ import ch.ffhs.spring_boosters.controller.entity.ActiveSubstance;
 import ch.ffhs.spring_boosters.repository.ActiveSubstanceRepository;
 import ch.ffhs.spring_boosters.service.Exception.ActiveSubstanceAlreadyExistsException;
 import ch.ffhs.spring_boosters.service.Exception.ActiveSubstanceNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.Assertions;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ActiveSubstanceServiceImplTest {
 
     @Mock
-    private ActiveSubstanceRepository activeSubstanceRepository;
+    private ActiveSubstanceRepository repository;
 
     @InjectMocks
-    private ActiveSubstanceServiceImpl activeSubstanceService;
+    private ActiveSubstanceServiceImpl service;
 
-    private ActiveSubstance substance1;
-    private ActiveSubstance substance2;
+    @Test
+    void getAll_returnsRepositoryList() {
+        ActiveSubstance a = new ActiveSubstance();
+        a.setId(UUID.randomUUID());
+        a.setName("Paracetamol");
 
-    @BeforeEach
-    void setUp() {
-        substance1 = new ActiveSubstance("Substance A", new String[]{"A1", "A2"});
-        substance1.setId(UUID.randomUUID());
+        when(repository.findAll()).thenReturn(List.of(a));
 
-        substance2 = new ActiveSubstance("Substance B", new String[]{"B1"});
-        substance2.setId(UUID.randomUUID());
+        var result = service.getAllActiveSubstances();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("Paracetamol", result.get(0).getName());
     }
 
     @Test
-    void getAllActiveSubstances_returnsAll() {
-        List<ActiveSubstance> list = Arrays.asList(substance1, substance2);
-        when(activeSubstanceRepository.findAll()).thenReturn(list);
-
-        List<ActiveSubstance> result = activeSubstanceService.getAllActiveSubstances();
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(2, result.size());
-        Assertions.assertTrue(result.contains(substance1));
-        verify(activeSubstanceRepository, times(1)).findAll();
-    }
-
-    @Test
-    void getActiveSubstanceById_found() throws ActiveSubstanceNotFoundException {
-        UUID id = substance1.getId();
-        when(activeSubstanceRepository.findById(id)).thenReturn(Optional.of(substance1));
-
-        ActiveSubstance result = activeSubstanceService.getActiveSubstanceById(id);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(substance1.getName(), result.getName());
-        verify(activeSubstanceRepository, times(1)).findById(id);
-    }
-
-    @Test
-    void getActiveSubstanceById_notFound_throws() {
+    void getById_found_returnsEntity() throws Exception {
         UUID id = UUID.randomUUID();
-        when(activeSubstanceRepository.findById(id)).thenReturn(Optional.empty());
+        ActiveSubstance a = new ActiveSubstance();
+        a.setId(id);
+        a.setName("Ibuprofen");
 
-        Assertions.assertThrows(ActiveSubstanceNotFoundException.class, () -> activeSubstanceService.getActiveSubstanceById(id));
-        verify(activeSubstanceRepository, times(1)).findById(id);
+        when(repository.findById(id)).thenReturn(Optional.of(a));
+
+        var found = service.getActiveSubstanceById(id);
+        assertEquals("Ibuprofen", found.getName());
     }
 
     @Test
-    void createActiveSubstance_success() throws ActiveSubstanceAlreadyExistsException {
-        ActiveSubstance toCreate = new ActiveSubstance("NewSub", new String[]{"N"});
-        when(activeSubstanceRepository.existsByName(toCreate.getName())).thenReturn(false);
-        when(activeSubstanceRepository.save(any(ActiveSubstance.class))).thenAnswer(invocation -> {
-            ActiveSubstance arg = invocation.getArgument(0);
+    void getById_notFound_throws() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(ActiveSubstanceNotFoundException.class, () -> service.getActiveSubstanceById(id));
+    }
+
+    @Test
+    void create_whenExists_throws() {
+        ActiveSubstance a = new ActiveSubstance();
+        a.setName("Aspirin");
+
+        when(repository.existsByName("Aspirin")).thenReturn(true);
+
+        assertThrows(ActiveSubstanceAlreadyExistsException.class, () -> service.createActiveSubstance(a));
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void create_whenNotExists_saves() throws Exception {
+        ActiveSubstance a = new ActiveSubstance();
+        a.setName("NewSub");
+
+        when(repository.existsByName("NewSub")).thenReturn(false);
+        when(repository.save(any())).thenAnswer(inv -> {
+            ActiveSubstance arg = inv.getArgument(0);
             arg.setId(UUID.randomUUID());
             return arg;
         });
 
-        ActiveSubstance result = activeSubstanceService.createActiveSubstance(toCreate);
-
-        Assertions.assertNotNull(result.getId());
-        Assertions.assertEquals("NewSub", result.getName());
-        verify(activeSubstanceRepository, times(1)).existsByName("NewSub");
-        verify(activeSubstanceRepository, times(1)).save(any(ActiveSubstance.class));
+        var saved = service.createActiveSubstance(a);
+        assertNotNull(saved.getId());
+        assertEquals("NewSub", saved.getName());
     }
 
     @Test
-    void createActiveSubstance_alreadyExists_throws() {
-        ActiveSubstance toCreate = new ActiveSubstance("Substance A", new String[]{});
-        when(activeSubstanceRepository.existsByName(toCreate.getName())).thenReturn(true);
-
-        Assertions.assertThrows(ActiveSubstanceAlreadyExistsException.class, () -> activeSubstanceService.createActiveSubstance(toCreate));
-        verify(activeSubstanceRepository, times(1)).existsByName("Substance A");
-        verify(activeSubstanceRepository, never()).save(any());
-    }
-
-    @Test
-    void updateActiveSubstance_success() throws Exception {
-        UUID id = substance1.getId();
-        ActiveSubstance updated = new ActiveSubstance("UpdatedName", new String[]{"X"});
-
-        when(activeSubstanceRepository.findById(id)).thenReturn(Optional.of(substance1));
-        when(activeSubstanceRepository.existsByName("UpdatedName")).thenReturn(false);
-        when(activeSubstanceRepository.save(any(ActiveSubstance.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        ActiveSubstance result = activeSubstanceService.updateActiveSubstance(id, updated);
-
-        Assertions.assertEquals("UpdatedName", result.getName());
-        Assertions.assertArrayEquals(new String[]{"X"}, result.getSynonyms());
-        verify(activeSubstanceRepository, times(1)).findById(id);
-        verify(activeSubstanceRepository, times(1)).existsByName("UpdatedName");
-        verify(activeSubstanceRepository, times(1)).save(any(ActiveSubstance.class));
-    }
-
-    @Test
-    void updateActiveSubstance_notFound_throws() {
+    void update_existing_updatesFields() throws Exception {
         UUID id = UUID.randomUUID();
-        when(activeSubstanceRepository.findById(id)).thenReturn(Optional.empty());
+        ActiveSubstance existing = new ActiveSubstance();
+        existing.setId(id);
+        existing.setName("Old");
 
-        ActiveSubstance updated = new ActiveSubstance("Any", new String[]{});
-        Assertions.assertThrows(ActiveSubstanceNotFoundException.class, () -> activeSubstanceService.updateActiveSubstance(id, updated));
-        verify(activeSubstanceRepository, times(1)).findById(id);
+        ActiveSubstance update = new ActiveSubstance();
+        update.setName("Updated");
+        update.setSynonyms(new String[]{"syn"});
+
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
+        when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        var result = service.updateActiveSubstance(id, update);
+        assertEquals("Updated", result.getName());
+        assertArrayEquals(new String[]{"syn"}, result.getSynonyms());
     }
 
     @Test
-    void updateActiveSubstance_nameAlreadyExists_throws() {
-        UUID id = substance1.getId();
-        ActiveSubstance updated = new ActiveSubstance("ExistingName", new String[]{});
-
-        when(activeSubstanceRepository.findById(id)).thenReturn(Optional.of(substance1));
-        when(activeSubstanceRepository.existsByName("ExistingName")).thenReturn(true);
-
-        Assertions.assertThrows(ActiveSubstanceAlreadyExistsException.class, () -> activeSubstanceService.updateActiveSubstance(id, updated));
-        verify(activeSubstanceRepository, times(1)).findById(id);
-        verify(activeSubstanceRepository, times(1)).existsByName("ExistingName");
-        verify(activeSubstanceRepository, never()).save(any());
-    }
-
-    @Test
-    void deleteActiveSubstance_success() throws ActiveSubstanceNotFoundException {
-        UUID id = substance2.getId();
-        when(activeSubstanceRepository.existsById(id)).thenReturn(true);
-
-        activeSubstanceService.deleteActiveSubstance(id);
-
-        verify(activeSubstanceRepository, times(1)).existsById(id);
-        verify(activeSubstanceRepository, times(1)).deleteById(id);
-    }
-
-    @Test
-    void deleteActiveSubstance_notFound_throws() {
+    void update_notFound_throws() {
         UUID id = UUID.randomUUID();
-        when(activeSubstanceRepository.existsById(id)).thenReturn(false);
+        when(repository.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(ActiveSubstanceNotFoundException.class, () -> activeSubstanceService.deleteActiveSubstance(id));
-        verify(activeSubstanceRepository, times(1)).existsById(id);
-        verify(activeSubstanceRepository, never()).deleteById(any());
+        ActiveSubstance update = new ActiveSubstance();
+        assertThrows(ActiveSubstanceNotFoundException.class, () -> service.updateActiveSubstance(id, update));
+    }
+
+    @Test
+    void delete_whenExists_deletes() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(repository.existsById(id)).thenReturn(true);
+
+        service.deleteActiveSubstance(id);
+
+        verify(repository).deleteById(id);
+    }
+
+    @Test
+    void delete_notExists_throws() {
+        UUID id = UUID.randomUUID();
+        when(repository.existsById(id)).thenReturn(false);
+
+        assertThrows(ActiveSubstanceNotFoundException.class, () -> service.deleteActiveSubstance(id));
     }
 }

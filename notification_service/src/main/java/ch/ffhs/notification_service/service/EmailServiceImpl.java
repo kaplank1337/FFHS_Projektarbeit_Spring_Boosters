@@ -1,7 +1,7 @@
 package ch.ffhs.notification_service.service;
 
-import ch.ffhs.notification_service.dto.EmailRequestDto;
-import ch.ffhs.notification_service.dto.EmailResponseDto;
+import ch.ffhs.notification_service.controller.dto.EmailRequestDto;
+import ch.ffhs.notification_service.controller.dto.EmailResponseDto;
 import ch.ffhs.notification_service.entity.EmailLog;
 import ch.ffhs.notification_service.repository.EmailRepository;
 import jakarta.mail.MessagingException;
@@ -76,7 +76,7 @@ public class EmailServiceImpl implements EmailService {
                     LocalDateTime.now().toString()
             );
 
-        } catch (MessagingException | UnsupportedEncodingException e) {
+        } catch (MessagingException | UnsupportedEncodingException | org.springframework.mail.MailException e) {
             // Log failed email
             EmailLog log = new EmailLog(
                     emailRequest.recipientEmail(),
