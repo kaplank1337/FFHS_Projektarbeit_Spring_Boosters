@@ -1,7 +1,9 @@
 package ch.ffhs.spring_boosters.controller;
 
 import ch.ffhs.spring_boosters.config.JwtTokenReader;
-import ch.ffhs.spring_boosters.controller.dto.*;
+import ch.ffhs.spring_boosters.controller.dto.UserDto;
+import ch.ffhs.spring_boosters.controller.dto.UserLoginDto;
+import ch.ffhs.spring_boosters.controller.dto.UserRegistrationDto;
 import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.controller.exception.GlobalExceptionHandler;
 import ch.ffhs.spring_boosters.controller.mapper.UserMapper;
@@ -22,14 +24,10 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
