@@ -7,10 +7,10 @@ import ch.ffhs.spring_boosters.service.Exception.UserAlreadyExistException;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
 import java.util.UUID;

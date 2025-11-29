@@ -1,7 +1,7 @@
 package ch.ffhs.spring_boosters.service.implementation;
 
-import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
+import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationRecordRepository;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;

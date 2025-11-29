@@ -7,7 +7,6 @@ import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 

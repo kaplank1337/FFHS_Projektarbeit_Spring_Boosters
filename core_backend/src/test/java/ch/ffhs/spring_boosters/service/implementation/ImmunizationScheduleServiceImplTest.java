@@ -3,7 +3,6 @@ package ch.ffhs.spring_boosters.service.implementation;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationScheduleDto;
 import ch.ffhs.spring_boosters.controller.entity.AgeCategory;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
-import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.controller.entity.User;
 import ch.ffhs.spring_boosters.repository.AgeCategoryRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
@@ -21,8 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ImmunizationScheduleServiceImplTest {
