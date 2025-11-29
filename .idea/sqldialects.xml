@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/Frontend/spring-boosters-ui/supabase/migrations/20251008184642_47f51d04-257e-4ab6-b854-04d067499813.sql" dialect="GenericSQL" />
+  </component>
+</project>

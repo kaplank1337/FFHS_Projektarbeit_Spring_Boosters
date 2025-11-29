@@ -40,14 +40,14 @@ const VaccinationCard = ({ vaccination, status, onEdit, onDelete }: VaccinationC
         <div className="space-y-2">
           <div className="flex items-center text-sm">
             <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-            <span className="font-medium">Geimpft:</span>
-            <span className="ml-2">{format(new Date(vaccination.vaccination_date), "dd.MM.yyyy")}</span>
+            <span className="font-medium">Vaccinated:</span>
+            <span className="ml-2">{format(new Date(vaccination.vaccination_date), "MMM dd, yyyy")}</span>
           </div>
           {vaccination.next_due_date && (
             <div className="flex items-center text-sm">
               <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="font-medium">Nächste Fälligkeit:</span>
-              <span className="ml-2">{format(new Date(vaccination.next_due_date), "dd.MM.yyyy")}</span>
+              <span className="font-medium">Next due:</span>
+              <span className="ml-2">{format(new Date(vaccination.next_due_date), "MMM dd, yyyy")}</span>
             </div>
           )}
           {vaccination.notes && (
@@ -57,11 +57,11 @@ const VaccinationCard = ({ vaccination, status, onEdit, onDelete }: VaccinationC
         <div className="flex gap-2 mt-4">
           <Button variant="outline" size="sm" onClick={onEdit}>
             <Pencil className="h-3 w-3 mr-1" />
-            Bearbeiten
+            Edit
           </Button>
           <Button variant="outline" size="sm" onClick={onDelete}>
             <Trash2 className="h-3 w-3 mr-1" />
-            Löschen
+            Delete
           </Button>
         </div>
       </CardContent>

@@ -39,7 +39,7 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Fehler beim Laden der Impftypen",
+        title: "Error loading vaccination types",
         description: error.message,
       });
     } else {
@@ -56,8 +56,8 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
     if (!selectedType || !vaccinationDate) {
       toast({
         variant: "destructive",
-        title: "Fehlende Informationen",
-        description: "Bitte wählen Sie einen Impftyp und ein Datum aus.",
+        title: "Missing information",
+        description: "Please select a vaccination type and date.",
       });
       return;
     }
@@ -68,8 +68,8 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
     if (!user) {
       toast({
         variant: "destructive",
-        title: "Nicht authentifiziert",
-        description: "Bitte melden Sie sich an, um Impfungen hinzuzufügen.",
+        title: "Not authenticated",
+        description: "Please sign in to add vaccinations.",
       });
       setLoading(false);
       return;
@@ -96,13 +96,13 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Fehler beim Hinzufügen der Impfung",
+        title: "Error adding vaccination",
         description: error.message,
       });
     } else {
       toast({
-        title: "Impfung hinzugefügt",
-        description: "Ihre Impfaufzeichnung wurde gespeichert.",
+        title: "Vaccination added",
+        description: "Your vaccination record has been saved.",
       });
       setOpen(false);
       setSelectedType("");
@@ -117,19 +117,19 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Impfung hinzufügen
+          Add Vaccination
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Neue Impfung hinzufügen</DialogTitle>
+          <DialogTitle>Add New Vaccination</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="type">Impftyp</Label>
+            <Label htmlFor="type">Vaccination Type</Label>
             <Select value={selectedType} onValueChange={setSelectedType}>
               <SelectTrigger>
-                <SelectValue placeholder="Impftyp auswählen" />
+                <SelectValue placeholder="Select vaccination type" />
               </SelectTrigger>
               <SelectContent>
                 {vaccinationTypes.map((type) => (
@@ -142,7 +142,7 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label>Impfdatum</Label>
+            <Label>Vaccination Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -153,7 +153,7 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {vaccinationDate ? format(vaccinationDate, "dd.MM.yyyy") : "Datum auswählen"}
+                  {vaccinationDate ? format(vaccinationDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -169,10 +169,10 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notizen (Optional)</Label>
+            <Label htmlFor="notes">Notes (Optional)</Label>
             <Textarea
               id="notes"
-              placeholder="Fügen Sie Notizen zu dieser Impfung hinzu..."
+              placeholder="Add any notes about this vaccination..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
@@ -182,10 +182,10 @@ const AddVaccinationDialog = ({ onSuccess }: AddVaccinationDialogProps) => {
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Abbrechen
+            Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Wird hinzugefügt..." : "Impfung hinzufügen"}
+            {loading ? "Adding..." : "Add Vaccination"}
           </Button>
         </div>
       </DialogContent>

@@ -58,13 +58,13 @@ const Auth = () => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Registrierung fehlgeschlagen",
+        title: "Sign up failed",
         description: error.message,
       });
     } else {
       toast({
-        title: "Konto erstellt!",
-        description: "Sie können sich jetzt mit Ihren Zugangsdaten anmelden.",
+        title: "Account created!",
+        description: "You can now sign in with your credentials.",
       });
     }
   };
@@ -83,7 +83,7 @@ const Auth = () => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Anmeldung fehlgeschlagen",
+        title: "Sign in failed",
         description: error.message,
       });
     }
@@ -98,39 +98,39 @@ const Auth = () => {
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <Syringe className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold">Willkommen bei Spring Boosters</h1>
+            <h1 className="text-3xl font-bold">Welcome to Spring Boosters</h1>
             <p className="text-muted-foreground mt-2 text-center">
-              Verwalten Sie Ihre Impfaufzeichnungen sicher
+              Manage your vaccination records securely
             </p>
           </div>
 
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Anmelden</TabsTrigger>
-              <TabsTrigger value="signup">Registrieren</TabsTrigger>
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin">
               <Card>
                 <CardHeader>
-                  <CardTitle>Anmelden</CardTitle>
-                  <CardDescription>Geben Sie Ihre Zugangsdaten ein, um auf Ihr Konto zuzugreifen</CardDescription>
+                  <CardTitle>Sign In</CardTitle>
+                  <CardDescription>Enter your credentials to access your account</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signin-email">E-Mail</Label>
+                      <Label htmlFor="signin-email">Email</Label>
                       <Input
                         id="signin-email"
                         type="email"
-                        placeholder="ihre@email.ch"
+                        placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signin-password">Passwort</Label>
+                      <Label htmlFor="signin-password">Password</Label>
                       <Input
                         id="signin-password"
                         type="password"
@@ -140,7 +140,7 @@ const Auth = () => {
                       />
                     </div>
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Anmelden..." : "Anmelden"}
+                      {loading ? "Signing in..." : "Sign In"}
                     </Button>
                   </form>
                 </CardContent>
@@ -150,35 +150,35 @@ const Auth = () => {
             <TabsContent value="signup">
               <Card>
                 <CardHeader>
-                  <CardTitle>Konto erstellen</CardTitle>
-                  <CardDescription>Beginnen Sie mit der Verfolgung Ihrer Impfungen</CardDescription>
+                  <CardTitle>Create Account</CardTitle>
+                  <CardDescription>Get started with your vaccination tracking</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-name">Vollständiger Name</Label>
+                      <Label htmlFor="signup-name">Full Name</Label>
                       <Input
                         id="signup-name"
                         type="text"
-                        placeholder="Max Mustermann"
+                        placeholder="John Doe"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-email">E-Mail</Label>
+                      <Label htmlFor="signup-email">Email</Label>
                       <Input
                         id="signup-email"
                         type="email"
-                        placeholder="ihre@email.ch"
+                        placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-password">Passwort</Label>
+                      <Label htmlFor="signup-password">Password</Label>
                       <Input
                         id="signup-password"
                         type="password"
@@ -189,7 +189,7 @@ const Auth = () => {
                       />
                     </div>
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? "Konto wird erstellt..." : "Registrieren"}
+                      {loading ? "Creating account..." : "Sign Up"}
                     </Button>
                   </form>
                 </CardContent>

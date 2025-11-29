@@ -11,25 +11,25 @@ const StatusBadge = ({ status }: StatusBadgeProps) => {
   const statusConfig = {
     "up-to-date": {
       icon: CheckCircle,
-      label: "Aktuell",
+      label: "Up to date",
       variant: "default" as const,
       className: "bg-success text-success-foreground hover:bg-success/90",
     },
     "due-soon": {
       icon: AlertTriangle,
-      label: "Bald fällig",
+      label: "Due soon",
       variant: "default" as const,
       className: "bg-warning text-warning-foreground hover:bg-warning/90",
     },
     overdue: {
       icon: XCircle,
-      label: "Überfällig",
+      label: "Overdue",
       variant: "destructive" as const,
       className: "",
     },
     "no-date": {
       icon: Clock,
-      label: "Kein Fälligkeitsdatum",
+      label: "No due date",
       variant: "secondary" as const,
       className: "",
     },
