@@ -57,7 +57,7 @@ const Dashboard = () => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Fehler beim Laden der Impfungen",
+        title: "Error loading vaccinations",
         description: error.message,
       });
     } else {
@@ -85,12 +85,12 @@ const Dashboard = () => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Fehler beim Löschen der Impfung",
+        title: "Error deleting vaccination",
         description: error.message,
       });
     } else {
       toast({
-        title: "Impfung gelöscht",
+        title: "Vaccination deleted",
       });
       fetchVaccinations();
     }
@@ -108,9 +108,9 @@ const Dashboard = () => {
       <div className="container py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold">Impf-Dashboard</h1>
+            <h1 className="text-4xl font-bold">Vaccination Dashboard</h1>
             <p className="text-muted-foreground mt-2">
-              Verfolgen und verwalten Sie Ihre Impfaufzeichnungen
+              Track and manage your vaccination records
             </p>
           </div>
           <AddVaccinationDialog onSuccess={fetchVaccinations} />
@@ -120,53 +120,54 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Aktuell</CardTitle>
+              <CardTitle className="text-sm font-medium">Up to Date</CardTitle>
               <CheckCircle className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.upToDate}</div>
-              <p className="text-xs text-muted-foreground">Impfungen aktuell</p>
+              <p className="text-xs text-muted-foreground">Vaccinations current</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bald fällig</CardTitle>
+              <CardTitle className="text-sm font-medium">Due Soon</CardTitle>
               <AlertTriangle className="h-4 w-4 text-warning" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.dueSoon}</div>
-              <p className="text-xs text-muted-foreground">Innerhalb 30 Tage</p>
+              <p className="text-xs text-muted-foreground">Within 30 days</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Überfällig</CardTitle>
+              <CardTitle className="text-sm font-medium">Overdue</CardTitle>
               <XCircle className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.overdue}</div>
-              <p className="text-xs text-muted-foreground">Erfordert Aufmerksamkeit</p>
+              <p className="text-xs text-muted-foreground">Requires attention</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Vaccinations List */}
         <div>
-          <h2 className="text-2xl font-bold mb-4">Ihre Impfungen</h2>
+          <h2 className="text-2xl font-bold mb-4">Your Vaccinations</h2>
           {loading ? (
-            <p>Lade...</p>
+            <p className="text-muted-foreground">Loading vaccinations...</p>
           ) : vaccinations.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center">
-                <p className="text-muted-foreground">
-                  Noch keine Impfungen erfasst. Fügen Sie Ihre erste Impfung hinzu, um loszulegen!
+                <p className="text-muted-foreground">No vaccinations recorded yet.</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Click "Add Vaccination" to get started.
                 </p>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {vaccinations.map((vaccination) => (
                 <VaccinationCard
                   key={vaccination.id}

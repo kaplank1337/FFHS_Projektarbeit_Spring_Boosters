@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/core_backend/src/test/java/ch/ffhs/spring_boosters/test/TestExceptionHandler.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/core_backend/src/test/java/ch/ffhs/spring_boosters/test/TestExceptionHandler.java" />
+              <option name="updatedContent" value="package ch.ffhs.spring_boosters.test;&#10;&#10;import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;&#10;import jakarta.servlet.http.HttpServletRequest;&#10;import org.springframework.http.HttpStatus;&#10;import org.springframework.http.ResponseEntity;&#10;import org.springframework.http.converter.HttpMessageNotReadableException;&#10;// import org.springframework.web.bind.annotation.ExceptionHandler;&#10;// import org.springframework.web.bind.annotation.RestControllerAdvice;&#10;&#10;import java.time.LocalDateTime;&#10;&#10;// Note: This class is intentionally NOT annotated with @RestControllerAdvice anymore.&#10;// That keeps production code untouched and ensures tests reflect the actual behavior&#10;// of the application under test. If you want to re-enable, add @RestControllerAdvice back.&#10;public class TestExceptionHandler {&#10;&#10;    // The handlers are left in the file for reference, but are not active without @RestControllerAdvice.&#10;    //@ExceptionHandler(HttpMessageNotReadableException.class)&#10;    public ResponseEntity&lt;ExceptionMessageBodyDto&gt; handleBadJson(HttpMessageNotReadableException ex, HttpServletRequest request) {&#10;        ExceptionMessageBodyDto body = new ExceptionMessageBodyDto(&#10;                LocalDateTime.now(),&#10;                HttpStatus.BAD_REQUEST.value(),&#10;                &quot;Bad Request&quot;,&#10;                &quot;Malformed JSON request&quot;,&#10;                request.getRequestURI(),&#10;                ex.getClass().getSimpleName()&#10;        );&#10;        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);&#10;    }&#10;&#10;    //@ExceptionHandler(Exception.class)&#10;    public ResponseEntity&lt;ExceptionMessageBodyDto&gt; handleAny(Exception ex, HttpServletRequest request) {&#10;        ExceptionMessageBodyDto body = new ExceptionMessageBodyDto(&#10;                LocalDateTime.now(),&#10;                HttpStatus.BAD_REQUEST.value(),&#10;                &quot;Bad Request&quot;,&#10;                ex.getMessage() != null ? ex.getMessage() : &quot;Unexpected error&quot;,&#10;                request.getRequestURI(),&#10;                ex.getClass().getSimpleName()&#10;        );&#10;        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

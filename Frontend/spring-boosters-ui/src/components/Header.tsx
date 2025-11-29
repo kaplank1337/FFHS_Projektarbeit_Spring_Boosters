@@ -15,12 +15,12 @@ const Header = ({ user }: HeaderProps) => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "Fehler beim Abmelden",
+        title: "Error signing out",
         description: error.message,
       });
     } else {
       toast({
-        title: "Erfolgreich abgemeldet",
+        title: "Signed out successfully",
       });
     }
   };
@@ -44,12 +44,12 @@ const Header = ({ user }: HeaderProps) => {
               </Button>
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Abmelden
+                Sign Out
               </Button>
             </>
           ) : (
             <Button onClick={() => window.location.href = "/auth"}>
-              Anmelden
+              Sign In
             </Button>
           )}
         </nav>
