@@ -2,6 +2,7 @@ package ch.ffhs.authentification_service.security;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,13 @@ public class JwtAuthenticationFilter implements WebFilter {
         // Öffentliche Endpunkte überspringen
         if (checkIfPathExists(path)) {
             System.out.println("[JWT] Public endpoint – skipping token check");
+            return chain.filter(exchange);
+        }
+
+        HttpMethod method = exchange.getRequest().getMethod();
+        // 1. Preflight / OPTIONS immer durchlassen
+        if (HttpMethod.OPTIONS.equals(method)) {
+            System.out.println("[JWT] OPTIONS request – skipping token check");
             return chain.filter(exchange);
         }
 
