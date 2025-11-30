@@ -50,6 +50,7 @@ public class UserIntegrationTest {
         u.setFirstName("Test");
         u.setLastName("User");
         u.setBirthDate(LocalDate.of(1990, 1, 1));
+        u.setEmail(username + "@example.com");
         return u;
     }
 
@@ -180,8 +181,8 @@ public class UserIntegrationTest {
         // build JSON payload manually
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String body = String.format("{\"username\":\"%s\",\"password\":\"pass123\",\"firstName\":\"%s\",\"lastName\":\"%s\",\"birthDate\":\"1990-01-01\"}",
-                u.getUsername(), u.getFirstName(), u.getLastName());
+        String body = String.format("{\"username\":\"%s\",\"password\":\"pass123\",\"firstName\":\"%s\",\"lastName\":\"%s\",\"birthDate\":\"1990-01-01\",\"email\":\"%s\"}",
+                u.getUsername(), u.getFirstName(), u.getLastName(), u.getEmail());
         HttpEntity<String> req = new HttpEntity<>(body, headers);
 
         ResponseEntity<String> resp = restTemplate.postForEntity("/api/v1/auth/register", req, String.class);
@@ -274,7 +275,7 @@ public class UserIntegrationTest {
     void t20_registerThenLogin() {
         String uname = "tmp.test.endtoend";
         // register
-        String body = String.format("{\"username\":\"%s\",\"password\":\"pass123\",\"firstName\":\"A\",\"lastName\":\"B\",\"birthDate\":\"1990-01-01\"}", uname);
+        String body = String.format("{\"username\":\"%s\",\"password\":\"pass123\",\"firstName\":\"A\",\"lastName\":\"B\",\"birthDate\":\"1990-01-01\",\"email\":\"%s@example.com\"}", uname, uname);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         ResponseEntity<String> r = restTemplate.postForEntity("/api/v1/auth/register", new HttpEntity<>(body, headers), String.class);
@@ -296,7 +297,7 @@ public class UserIntegrationTest {
     @DisplayName("21. Register with extremely long username returns 4xx")
     void t21_register_longUsername() {
         String uname = "tmp.test." + "x".repeat(300);
-        String body = String.format("{\"username\":\"%s\",\"password\":\"p\",\"firstName\":\"A\",\"lastName\":\"B\",\"birthDate\":\"1990-01-01\"}", uname);
+        String body = String.format("{\"username\":\"%s\",\"password\":\"p\",\"firstName\":\"A\",\"lastName\":\"B\",\"birthDate\":\"1990-01-01\",\"email\":\"long@example.com\"}", uname);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         ResponseEntity<String> r = restTemplate.postForEntity("/api/v1/auth/register", new HttpEntity<>(body, headers), String.class);

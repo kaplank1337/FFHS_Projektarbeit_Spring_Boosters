@@ -7,6 +7,7 @@ Content-Type: application/json
   "firstName": "John",
   "lastName": "Doe",
   "birthDate": "1990-05-15",
+  "email": "john.doe@example.com",
   "password": "securePassword123"
 }
 
@@ -25,6 +26,7 @@ Content-Type: application/json
   "firstName": "John",
   "lastName": "Doe",
   "birthDate": "1990-05-15",
+  "email": "john.doe@example.com",
   "password": "securePassword123"
 }
 
@@ -53,6 +55,7 @@ Content-Type: application/json
   "username": "john.doe",
   "lastName": "Doe",
   "birthDate": "1990-05-15",
+  "email": "john.doe@example.com",
   "password": "securePassword123"
 }
 
@@ -79,6 +82,8 @@ Content-Type: application/json
   "username": "john.doe",
   "firstName": "John",
   "birthDate": "1990-05-15",
+  "email": "john.doe@example.com",
+  "email": "john.doe@example.com",
   "password": "securePassword123"
 }
 
@@ -104,6 +109,7 @@ Content-Type: application/json
   "username": "john.doe",
   "firstName": "John",
   "lastName" : "Doe",
+  "email": "john.doe@example.com",
   "password": "securePassword123"
 }
 
@@ -130,6 +136,7 @@ Content-Type: application/json
   "firstName": "John",
   "lastName" : "Doe",
   "birthDate": "1990-05-15",
+  "email": "john.doe@example.com",
   "password": "pass"
 }
 

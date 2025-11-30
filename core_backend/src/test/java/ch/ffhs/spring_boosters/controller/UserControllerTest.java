@@ -69,17 +69,18 @@ class UserControllerTest {
         u.setFirstName("First");
         u.setLastName("Last");
         u.setBirthDate(LocalDate.of(1990,1,1));
+        u.setEmail(username + "@example.com");
         return u;
     }
 
     private UserDto sampleUserDto(UUID id, String username) {
-        return new UserDto(id, username, "First", "Last", LocalDate.of(1990,1,1), "USER");
+        return new UserDto(id, username, username + "@example.com", "First", "Last", LocalDate.of(1990,1,1), "USER");
     }
 
     @Test
     void registerUser_success() throws Exception {
         UUID id = UUID.randomUUID();
-        UserRegistrationDto req = new UserRegistrationDto("alice", "Alice", "Doe", LocalDate.of(1990,1,1), "secret123");
+        UserRegistrationDto req = new UserRegistrationDto("alice", "Alice", "Doe", LocalDate.of(1990,1,1), "alice@example.com", "secret123");
         User entityFromDto = sampleUser(null, "alice");
         User created = sampleUser(id, "alice");
         UserDto responseDto = sampleUserDto(id, "alice");
@@ -98,7 +99,7 @@ class UserControllerTest {
 
     @Test
     void registerUser_alreadyExists_returnsBadRequest() throws Exception {
-        UserRegistrationDto req = new UserRegistrationDto("bob", "Bob", "Smith", LocalDate.of(1985,5,5), "pw12345");
+        UserRegistrationDto req = new UserRegistrationDto("bob", "Bob", "Smith", LocalDate.of(1985,5,5), "bob@example.com", "pw12345");
         User entityFromDto = sampleUser(null, "bob");
 
         when(userMapper.userDtoToUser(any(UserRegistrationDto.class))).thenReturn(entityFromDto);
@@ -115,7 +116,7 @@ class UserControllerTest {
     @Test
     void registerUser_validationFails_missingFields() throws Exception {
         // missing username and password
-        UserRegistrationDto req = new UserRegistrationDto("", "", "", null, "");
+        UserRegistrationDto req = new UserRegistrationDto("", "", "", null, "", "");
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType("application/json")
@@ -253,4 +254,3 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 }
-

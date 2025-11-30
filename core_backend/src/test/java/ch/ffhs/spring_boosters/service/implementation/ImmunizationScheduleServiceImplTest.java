@@ -56,6 +56,7 @@ class ImmunizationScheduleServiceImplTest {
         user.setId(u);
         user.setUsername("u1");
         user.setBirthDate(LocalDate.now().minusDays(100));
+        user.setEmail("u1@example.com");
 
         when(userRepository.findById(u)).thenReturn(Optional.of(user));
         when(recordRepository.findByUserId(u)).thenReturn(List.of());
@@ -73,6 +74,7 @@ class ImmunizationScheduleServiceImplTest {
         user.setId(u);
         user.setUsername("u1");
         user.setBirthDate(LocalDate.now().minusDays(10));
+        user.setEmail("u1@example.com");
 
         AgeCategory cat = new AgeCategory();
         cat.setId(UUID.randomUUID());
@@ -96,4 +98,3 @@ class ImmunizationScheduleServiceImplTest {
         assertEquals(u, dto.getUserId());
     }
 }
-

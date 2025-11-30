@@ -24,6 +24,7 @@ class UserRepositoryTest {
     void saveFindByUsernameAndExists() {
         User u = User.builder()
                 .username("jdoe")
+                .email("jdoe@jode.ch")
                 .passwordHash("pw")
                 .firstName("John")
                 .lastName("Doe")

@@ -7,6 +7,7 @@ Content-Type: application/json
   "firstName": "Immunization",
   "lastName": "Plan",
   "birthDate": "1990-05-15",
+  "email": "immunization.plan@example.com",
   "password": "securePassword123"
 }
 
@@ -78,6 +79,31 @@ Authorization: Bearer {{authToken}}
 
     client.log("Anzahl der Impfpläne: " + response.body.length);
 %}
+
+### Alterskategorien abrufen
+GET http://localhost:8000/api/v1/age-categories
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+
+    client.test("AgeCategories vorhanden", function() {
+        client.assert(Array.isArray(response.body) && response.body.length > 0, "Keine AgeCategories gefunden");
+    });
+
+    // Speichere erste beiden AgeCategory IDs
+    if (response.body.length > 0) {
+        client.global.set("ageCategoryId1", response.body[0].id);
+        client.log("AgeCategory 1: " + response.body[0].name + " (ID: " + response.body[0].id + ")");
+    }
+    if (response.body.length > 1) {
+        client.global.set("ageCategoryId2", response.body[1].id);
+        client.log("AgeCategory 2: " + response.body[1].name + " (ID: " + response.body[1].id + ")");
+    }
+%}
+
 
 ### Neuen Impfplan erstellen
 POST http://localhost:8000/api/v1/immunization-plans

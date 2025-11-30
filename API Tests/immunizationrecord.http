@@ -7,6 +7,7 @@ Content-Type: application/json
   "firstName": "Immunization",
   "lastName": "Record",
   "birthDate": "1990-05-15",
+  "email": "immunization.record@example.com",
   "password": "securePassword123"
 }
 

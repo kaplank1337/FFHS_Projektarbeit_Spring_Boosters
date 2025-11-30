@@ -35,6 +35,7 @@ class UserServiceImplTest {
         User u = new User();
         u.setUsername("john");
         u.setPasswordHash("pwd");
+        u.setEmail("john@example.com");
 
         when(repository.existsByUsername("john")).thenReturn(true);
         assertThrows(UserAlreadyExistException.class, () -> service.registerUser(u));
@@ -45,6 +46,7 @@ class UserServiceImplTest {
         User u = new User();
         u.setUsername("mike");
         u.setPasswordHash("secret");
+        u.setEmail("mike@example.com");
 
         when(repository.existsByUsername("mike")).thenReturn(false);
         when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
@@ -61,6 +63,7 @@ class UserServiceImplTest {
         u.setUsername("tom");
         String hashed = BCrypt.hashpw("pw", BCrypt.gensalt(10));
         u.setPasswordHash(hashed);
+        u.setEmail("tom@example.com");
 
         when(repository.findByUsername("tom")).thenReturn(Optional.of(u));
 
@@ -73,6 +76,7 @@ class UserServiceImplTest {
         User u = new User();
         u.setUsername("tom");
         u.setPasswordHash(BCrypt.hashpw("pw", BCrypt.gensalt(10)));
+        u.setEmail("tom@example.com");
 
         when(repository.findByUsername("tom")).thenReturn(Optional.of(u));
         assertThrows(UserNotFoundException.class, () -> service.findByUsernameAndPassword("tom", "wrong"));
@@ -95,6 +99,7 @@ class UserServiceImplTest {
         User u = new User();
         u.setId(UUID.randomUUID());
         u.setUsername("del");
+        u.setEmail("del@example.com");
 
         when(repository.findById(u.getId())).thenReturn(Optional.of(u));
         service.deleteUser(u.getId());
@@ -106,10 +111,10 @@ class UserServiceImplTest {
         User u = new User();
         u.setId(UUID.randomUUID());
         u.setUsername("g1");
+        u.setEmail("g1@example.com");
         when(jwtService.generateToken("g1", u.getId())).thenReturn("tok");
 
         var token = service.generateToken(u);
         assertEquals("tok", token);
     }
 }
-

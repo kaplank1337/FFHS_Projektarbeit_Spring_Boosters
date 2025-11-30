@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @ActiveProfiles("test")
-@TestPropertySource(properties = "spring.flyway.enabled=false")
+@TestPropertySource(properties = {"spring.flyway.enabled=false"})
 class ImmunizationRecordRepositoryTest {
 
     @Autowired

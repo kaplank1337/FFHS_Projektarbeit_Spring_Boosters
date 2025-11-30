@@ -18,6 +18,7 @@ public class UserMapper {
                 .lastName(dto.lastName())
                 .birthDate(dto.birthDate())
                 .passwordHash(dto.password())
+                .email(dto.email())
                 .build();
     }
 
@@ -28,6 +29,7 @@ public class UserMapper {
         return new UserDto(
                 user.getId(),
                 user.getUsername(),
+                user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBirthDate(),

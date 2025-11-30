@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "immunization_record")
+@Table(name = "immunization_record", schema = "spring_boosters")
 public class ImmunizationRecord {
 
     @Id

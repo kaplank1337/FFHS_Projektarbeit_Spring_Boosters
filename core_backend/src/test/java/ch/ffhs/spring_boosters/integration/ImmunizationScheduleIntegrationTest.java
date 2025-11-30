@@ -325,6 +325,7 @@ public class ImmunizationScheduleIntegrationTest {
         // create a new temporary user via repository directly using the correct entity class
         var u = userRepository.save(ch.ffhs.spring_boosters.controller.entity.User.builder()
                 .username("tmp.user.for.test")
+                .email("user@user.ch")
                 .passwordHash("x")
                 .firstName("Tmp")
                 .lastName("User")
