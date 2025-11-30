@@ -20,8 +20,7 @@ public class ImmunizationScheduleDto {
     private Integer currentAgeDays;
     private List<PendingImmunizationDto> pendingImmunizations;
     private Integer totalPending;
-    private Integer highPriority;
-    private Integer mediumPriority;
-    private Integer lowPriority;
+    private Integer overdueCount;          // Überfällig
+    private Integer dueSoonCount;           // Noch <= 30 Tage
+    private Integer upcomingDueCount;          // 31 - 90 Tage
 }
-

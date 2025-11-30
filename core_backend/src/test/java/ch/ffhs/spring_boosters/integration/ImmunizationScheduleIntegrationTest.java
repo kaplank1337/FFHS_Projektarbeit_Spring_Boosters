@@ -296,9 +296,9 @@ public class ImmunizationScheduleIntegrationTest {
         var user = userRepository.findByUsername(username).orElseThrow();
         var dto = scheduleService.getPendingImmunizations(user.getId());
         assertEquals(dto.getPendingImmunizations().size(), dto.getTotalPending());
-        int sum = (dto.getHighPriority() == null ? 0 : dto.getHighPriority())
-                + (dto.getMediumPriority() == null ? 0 : dto.getMediumPriority())
-                + (dto.getLowPriority() == null ? 0 : dto.getLowPriority());
+        int sum = (dto.getOverdueCount() == null ? 0 : dto.getOverdueCount())
+                + (dto.getDueSoonCount() == null ? 0 : dto.getDueSoonCount())
+                + (dto.getUpcomingDueCount() == null ? 0 : dto.getUpcomingDueCount());
         assertEquals(dto.getTotalPending(), sum);
     }
 

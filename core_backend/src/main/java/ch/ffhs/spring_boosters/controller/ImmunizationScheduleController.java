@@ -43,9 +43,9 @@ public class ImmunizationScheduleController {
             ImmunizationRecordScheduleSummaryDto summary = new ImmunizationRecordScheduleSummaryDto(
                 schedule.getUsername(),
                 schedule.getTotalPending(),
-                schedule.getHighPriority(),
-                schedule.getMediumPriority(),
-                schedule.getLowPriority(),
+                schedule.getOverdueCount(),
+                schedule.getDueSoonCount(),
+                schedule.getUpcomingDueCount(),
                 schedule.getCurrentAgeDays()
             );
             return ResponseEntity.ok(summary);

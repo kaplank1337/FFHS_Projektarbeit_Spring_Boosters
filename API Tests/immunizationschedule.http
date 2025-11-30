@@ -146,9 +146,9 @@ Authorization: Bearer {{authToken}}
         client.assert(response.body.currentAgeDays !== undefined, "currentAgeDays fehlt");
         client.assert(response.body.pendingImmunizations !== undefined, "pendingImmunizations fehlt");
         client.assert(response.body.totalPending !== undefined, "totalPending fehlt");
-        client.assert(response.body.highPriority !== undefined, "highPriority fehlt");
-        client.assert(response.body.mediumPriority !== undefined, "mediumPriority fehlt");
-        client.assert(response.body.lowPriority !== undefined, "lowPriority fehlt");
+        client.assert(response.body.overdueCount !== undefined, "overdueCount fehlt");
+        client.assert(response.body.dueSoonCount !== undefined, "dueSoonCount fehlt");
+        client.assert(response.body.upcomingDueCount !== undefined, "upcomingDueCount fehlt");
     });
 
     client.test("Username korrekt", function() {
@@ -172,14 +172,14 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Priority Counters ergeben TotalPending", function() {
-        var sum = response.body.highPriority + response.body.mediumPriority + response.body.lowPriority;
+        var sum = response.body.overdueCount + response.body.dueSoonCount + response.body.upcomingDueCount;
         client.assert(sum === response.body.totalPending, "Summe der Prioritäten stimmt nicht mit totalPending überein");
     });
 
     client.log("Total Pending: " + response.body.totalPending);
-    client.log("High Priority: " + response.body.highPriority);
-    client.log("Medium Priority: " + response.body.mediumPriority);
-    client.log("Low Priority: " + response.body.lowPriority);
+    client.log("High Priority: " + response.body.overdueCount);
+    client.log("Medium Priority: " + response.body.dueSoonCount);
+    client.log("Low Priority: " + response.body.dueSoonCount);
     client.log("Current Age (Days): " + response.body.currentAgeDays);
     client.log("Pending Immunizations: " + response.body.pendingImmunizations.length);
 %}
