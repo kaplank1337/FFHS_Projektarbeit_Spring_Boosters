@@ -41,7 +41,6 @@ public class ImmunizationRecordController {
     public ResponseEntity<List<ImmunizationRecordDto>> getAllImmunizationRecords(
             @RequestHeader(value = "Authorization", required = false) String authToken
     ) {
-
         List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getAllImmunizationRecords(getUserIdFromToken(authToken));
         List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
         return ResponseEntity.ok(immunizationRecordDtos);

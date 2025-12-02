@@ -285,6 +285,37 @@ Authorization: Bearer {{authToken}}
     });
 %}
 
+### Kaan Pending Immunizations - eigene Daten prüfen auf Prriority
+GET http://localhost:8000/api/v1/immunization-schedule/pending/overdue
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+%}
+
+### Kaan Pending Immunizations - eigene Daten prüfen auf Prriority
+GET http://localhost:8000/api/v1/immunization-schedule/pending/due-soon
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+%}
+
+### Kaan Pending Immunizations - eigene Daten prüfen auf Prriority
+GET http://localhost:8000/api/v1/immunization-schedule/pending/upcoming
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+%}
+
+
 ### Pending ohne Authorization (Fehlerfall)
 GET http://localhost:8000/api/v1/immunization-schedule/pending
 
