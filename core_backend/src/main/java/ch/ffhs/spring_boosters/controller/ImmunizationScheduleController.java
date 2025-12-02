@@ -24,7 +24,6 @@ public class ImmunizationScheduleController {
     private final UserService userService;
     private final JwtTokenReader jwtTokenReader;
 
-    //TODO: Kaan --> Dieser Endpunkt sollte den vollen Plan zurückliefern, welche Imfpungen ausstehen, inklusive Details.
     @GetMapping("/pending")
     public ResponseEntity<ImmunizationScheduleDto> getOwnPendingImmunizations(@RequestHeader("Authorization") String authToken) throws UserNotFoundException {
         String username = extractUsernameFromJwt(authToken);
