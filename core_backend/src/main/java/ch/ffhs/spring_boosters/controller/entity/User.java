@@ -1,5 +1,6 @@
 package ch.ffhs.spring_boosters.controller.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,6 +72,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ImmunizationRecord> immunizationRecords;
 
+    @Transient
+    @JsonProperty("ageYears")
+    public Integer getAgeYears() {
+        LocalDate bd = this.getBirthDate(); // oder directly: this.birthDate
+        if (bd == null) {
+            return null;
+        }
+        return Period.between(bd, LocalDate.now()).getYears();
+    }
 
     public String getPassword() {
         return passwordHash;

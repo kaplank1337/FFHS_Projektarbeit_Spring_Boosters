@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -35,29 +36,29 @@ public class ImmunizationRecordMapper {
                 .toList();
     }
 
-    public ImmunizationRecord fromCreateDto(ImmunizationRecordCreateDto dto) {
+    public ImmunizationRecord fromCreateDto(ImmunizationRecordCreateDto dto, UUID userId) {
         if (dto == null) {
             return null;
         }
         ImmunizationRecord record = new ImmunizationRecord(
-                dto.userId(),
+                userId,
                 dto.vaccineTypeId(),
-                dto.ageCategoryId(),
                 dto.administeredOn()
         );
         record.setDoseOrderClaimed(dto.doseOrderClaimed());
         return record;
     }
 
-    public ImmunizationRecord fromUpdateDto(ImmunizationRecordUpdateDto dto) {
+    public ImmunizationRecord fromUpdateDto(ImmunizationRecordUpdateDto dto, UUID userId) {
         if (dto == null) {
             return null;
         }
         ImmunizationRecord record = new ImmunizationRecord(
-                dto.userId(),
+                userId,
+                dto.id(),
                 dto.vaccineTypeId(),
-                dto.immunizationPlanId(),
-                dto.administeredOn()
+                dto.administeredOn(),
+                dto.doseOrderClaimed()
         );
         record.setDoseOrderClaimed(dto.doseOrderClaimed());
         return record;

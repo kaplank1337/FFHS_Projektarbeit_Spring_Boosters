@@ -60,11 +60,18 @@ public class ImmunizationRecord {
     // Constructors
     public ImmunizationRecord() {}
 
-    public ImmunizationRecord(UUID userId, UUID vaccineTypeId, UUID immunizationPlanId, LocalDate administeredOn) {
+    public ImmunizationRecord(UUID userId, UUID vaccineTypeId, LocalDate administeredOn) {
         this.userId = userId;
         this.vaccineTypeId = vaccineTypeId;
-        this.immunizationPlanId = immunizationPlanId;
         this.administeredOn = administeredOn;
+    }
+
+    public ImmunizationRecord(UUID userId, UUID recordId, UUID vaccineTypeId, LocalDate administeredOn, Integer doseOrderClaimed) {
+        this.userId = userId;
+        this.id = recordId;
+        this.vaccineTypeId = vaccineTypeId;
+        this.administeredOn = administeredOn;
+        this.doseOrderClaimed = doseOrderClaimed;
     }
 
     // Getters and Setters

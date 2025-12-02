@@ -1,9 +1,12 @@
 package ch.ffhs.spring_boosters.service.implementation;
 
+import ch.ffhs.spring_boosters.controller.entity.AgeCategory;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
+import ch.ffhs.spring_boosters.repository.AgeCategoryRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationRecordRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
+import ch.ffhs.spring_boosters.repository.UserRepository;
 import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
 import lombok.AllArgsConstructor;
@@ -19,10 +22,12 @@ public class ImmunizationRecordServiceImpl implements ImmunizationRecordService 
 
     private final ImmunizationRecordRepository immunizationRecordRepository;
     private final ImmunizationPlanRepository immunizationPlanRepository;
+    private final UserRepository userRepository;
+    private final AgeCategoryRepository ageCategoryRepository;
 
     @Override
-    public List<ImmunizationRecord> getAllImmunizationRecords() {
-        return immunizationRecordRepository.findAll();
+    public List<ImmunizationRecord> getAllImmunizationRecords(UUID userId) {
+        return immunizationRecordRepository.findAllByUserId(userId);
     }
 
     @Override
@@ -33,15 +38,11 @@ public class ImmunizationRecordServiceImpl implements ImmunizationRecordService 
 
     @Override
     public ImmunizationRecord createImmunizationRecord(ImmunizationRecord immunizationRecord) {
-        // Erwartet: immunizationRecord hat userId, vaccineTypeId, administeredOn; PlanId noch null.
-        // Wir benötigen zusätzlich ageCategoryId aus dem Kontext. Diese ist aktuell nicht im Entity vorhanden.
-        // Annahme: Temporär wird ageCategoryId über doseOrderClaimed missbraucht? -> Besser: später Entity erweitern.
-        // Da CreateDto jetzt ageCategoryId liefert, muss dies hier durchgereicht werden. Lösung: erweitere Entity oder verwende einen ThreadLocal/ temporären Ansatz.
-        // Vereinfachung: Wir setzen Plan basierend auf erstem Plan mit vaccineTypeId UND AgeCategory passend (findByVaccineTypeId -> filtern).
 
-        List<ImmunizationPlan> plans = immunizationPlanRepository.findByVaccineTypeId(immunizationRecord.getVaccineTypeId());
+        AgeCategory ageCategoryOfVaccination = calcAgeOfUserWhenVaccination(immunizationRecord);
+
+        List<ImmunizationPlan> plans = immunizationPlanRepository.findByVaccineTypeIdAndAgeCategoryId(immunizationRecord.getVaccineTypeId(), ageCategoryOfVaccination.getId());
         ImmunizationPlan matched = plans.stream()
-                .filter(p -> p.getAgeCategoryId() != null) // rudimentäre Filterung; genaue AgeCategory muss übergeben werden -> TODO
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Kein passender ImmunizationPlan für vaccineTypeId=" + immunizationRecord.getVaccineTypeId()));
 
@@ -51,11 +52,9 @@ public class ImmunizationRecordServiceImpl implements ImmunizationRecordService 
 
     @Override
     public ImmunizationRecord updateImmunizationRecord(UUID id, ImmunizationRecord immunizationRecord) throws ImmunizationRecordNotFoundException {
-        ImmunizationRecord existingRecord = getImmunizationRecordById(id);
+        ImmunizationRecord existingRecord = getImmunizationRecordById(immunizationRecord.getId());
 
-        existingRecord.setUserId(immunizationRecord.getUserId());
         existingRecord.setVaccineTypeId(immunizationRecord.getVaccineTypeId());
-        existingRecord.setImmunizationPlanId(immunizationRecord.getImmunizationPlanId());
         existingRecord.setAdministeredOn(immunizationRecord.getAdministeredOn());
         existingRecord.setDoseOrderClaimed(immunizationRecord.getDoseOrderClaimed());
 
@@ -86,5 +85,33 @@ public class ImmunizationRecordServiceImpl implements ImmunizationRecordService 
     @Override
     public List<ImmunizationRecord> getImmunizationRecordsByUserAndVaccineType(UUID userId, UUID vaccineTypeId) {
         return immunizationRecordRepository.findByUserIdAndVaccineTypeId(userId, vaccineTypeId);
+    }
+
+    private AgeCategory calcAgeOfUserWhenVaccination(ImmunizationRecord immunizationRecord) {
+
+        if (immunizationRecord.getAdministeredOn() == null) {
+            throw new IllegalArgumentException("administeredOn ist null für immunizationRecord id=" + immunizationRecord.getId());
+        }
+
+        var user = userRepository.findById(immunizationRecord.getUserId())
+                .orElseThrow(() -> new IllegalStateException("Kein User gefunden mit id=" + immunizationRecord.getUserId()));
+
+        if (user.getBirthDate() == null) {
+            throw new IllegalStateException("Geburtsdatum fehlt für user id=" + user.getId());
+        }
+
+        long ageDaysLong = java.time.temporal.ChronoUnit.DAYS.between(user.getBirthDate(), immunizationRecord.getAdministeredOn());
+
+        if (ageDaysLong < 0) {
+            throw new IllegalArgumentException("Alter in Tagen darf nicht negativ sein: " + ageDaysLong);
+        }
+
+        int ageDays = Math.toIntExact(ageDaysLong);
+
+        return ageCategoryRepository.findAll().stream()
+                .filter(cat -> ageDays >= cat.getAgeMinDays()
+                        && (cat.getAgeMaxDays() == null || ageDays <= cat.getAgeMaxDays()))
+                .findFirst()
+                .orElse(null);
     }
 }

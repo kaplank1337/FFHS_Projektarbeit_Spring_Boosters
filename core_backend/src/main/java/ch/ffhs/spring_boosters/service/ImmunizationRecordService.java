@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ImmunizationRecordService {
-    List<ImmunizationRecord> getAllImmunizationRecords();
+    List<ImmunizationRecord> getAllImmunizationRecords(UUID id);
     ImmunizationRecord getImmunizationRecordById(UUID id) throws ImmunizationRecordNotFoundException;
     ImmunizationRecord createImmunizationRecord(ImmunizationRecord immunizationRecord);
     ImmunizationRecord updateImmunizationRecord(UUID id, ImmunizationRecord immunizationRecord) throws ImmunizationRecordNotFoundException;

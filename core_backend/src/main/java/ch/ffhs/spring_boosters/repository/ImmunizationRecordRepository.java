@@ -1,6 +1,7 @@
 package ch.ffhs.spring_boosters.repository;
 
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
+import ch.ffhs.spring_boosters.controller.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -29,9 +30,14 @@ public interface ImmunizationRecordRepository extends JpaRepository<Immunization
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
     List<ImmunizationRecord> findAll();
 
+    @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
+    List<ImmunizationRecord> findAllByUserId(UUID userId);
+
     @Override
     @EntityGraph(attributePaths = {"user", "vaccineType", "immunizationPlan"})
     Optional<ImmunizationRecord> findById(UUID id);
 
     boolean existsByUserIdAndId(UUID userId, UUID id);
+
+    UUID user(User user);
 }
