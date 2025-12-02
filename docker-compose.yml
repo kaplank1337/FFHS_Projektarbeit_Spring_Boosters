@@ -99,6 +99,19 @@ services:
     networks:
       - spring_network
 
+  # Frontend Service (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: docker/Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - authentification_service
+    networks:
+      - spring_network
+
 volumes:
   postgres_data:
     driver: local
