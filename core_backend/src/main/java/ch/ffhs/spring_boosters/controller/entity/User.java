@@ -1,6 +1,8 @@
 package ch.ffhs.spring_boosters.controller.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -10,11 +12,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "spring_boosters")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -47,6 +50,12 @@ public class User {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
+    @NotBlank
+    @Email
+    @Size(max = 254)
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
     @Builder.Default
     @Column(name = "role")
     private String role = "USER";
@@ -63,6 +72,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ImmunizationRecord> immunizationRecords;
 
+    @Transient
+    @JsonProperty("ageYears")
+    public Integer getAgeYears() {
+        LocalDate bd = this.getBirthDate(); // oder directly: this.birthDate
+        if (bd == null) {
+            return null;
+        }
+        return Period.between(bd, LocalDate.now()).getYears();
+    }
 
     public String getPassword() {
         return passwordHash;

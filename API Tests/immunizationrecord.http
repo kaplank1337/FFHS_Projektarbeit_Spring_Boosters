@@ -7,6 +7,7 @@ Content-Type: application/json
   "firstName": "Immunization",
   "lastName": "Record",
   "birthDate": "1990-05-15",
+  "email": "immunization.record@example.com",
   "password": "securePassword123"
 }
 
@@ -107,9 +108,7 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "userId": "{{currentUserId}}",
   "vaccineTypeId": "{{vaccineTypeId1}}",
-  "ageCategoryId": "{{ageCategoryId1}}",
   "administeredOn": "2024-01-15",
   "doseOrderClaimed": 1
 }
@@ -307,10 +306,9 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "userId": "{{currentUserId}}",
+  "id" : "{{immunizationRecordId1}}",
   "vaccineTypeId": "{{vaccineTypeId1}}",
-  "immunizationPlanId": "{{immunizationPlanId}}",
-  "administeredOn": "2024-01-20",
+  "administeredOn": "2005-01-20",
   "doseOrderClaimed": 1
 }
 
@@ -320,7 +318,7 @@ Content-Type: application/json
     });
 
     client.test("Datum wurde aktualisiert", function() {
-        client.assert(response.body.administeredOn === "2024-01-20", "Datum wurde nicht aktualisiert");
+        client.assert(response.body.administeredOn === "2005-01-20", "Datum wurde nicht aktualisiert");
     });
 
     client.test("UpdatedAt wurde aktualisiert", function() {
@@ -338,7 +336,7 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Update wurde persistiert", function() {
-        client.assert(response.body.administeredOn === "2024-01-20", "Update wurde nicht gespeichert");
+        client.assert(response.body.administeredOn === "2005-01-20", "Update wurde nicht gespeichert");
     });
 %}
 
@@ -393,12 +391,8 @@ Content-Type: application/json
 }
 
 > {%
-    client.test("Status ist 400", function() {
-        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
-    });
-
-    client.test("Fehlermeldung enthält 'userId'", function() {
-        client.assert(response.body.message.toLowerCase().includes("userid"), "Fehlermeldung sollte 'userId' enthalten");
+    client.test("Status ist 201", function() {
+        client.assert(response.status === 201, "Erwartet: 201, Erhalten: " + response.status);
     });
 %}
 
@@ -421,28 +415,6 @@ Content-Type: application/json
 
     client.test("Fehlermeldung enthält 'vaccineTypeId'", function() {
         client.assert(response.body.message.toLowerCase().includes("vaccinetypeid"), "Fehlermeldung sollte 'vaccineTypeId' enthalten");
-    });
-%}
-
-### Impfeintrag ohne ageCategoryId erstellen (Validierungsfehler)
-POST http://localhost:8000/api/v1/immunization-records
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-
-{
-  "userId": "{{currentUserId}}",
-  "vaccineTypeId": "{{vaccineTypeId1}}",
-  "administeredOn": "2024-01-15",
-  "doseOrderClaimed": 1
-}
-
-> {%
-    client.test("Status ist 400", function() {
-        client.assert(response.status === 400, "Erwartet: 400, Erhalten: " + response.status);
-    });
-
-    client.test("Fehlermeldung enthält 'ageCategoryId'", function() {
-        client.assert(response.body.message.toLowerCase().includes("agecategoryid"), "Fehlermeldung sollte 'ageCategoryId' enthalten");
     });
 %}
 
@@ -497,9 +469,8 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "userId": "{{currentUserId}}",
+  "id": "{{currentUserId}}",
   "vaccineTypeId": "{{vaccineTypeId1}}",
-  "immunizationPlanId": "{{immunizationPlanId}}",
   "administeredOn": "2024-01-20",
   "doseOrderClaimed": 1
 }

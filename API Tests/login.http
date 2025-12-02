@@ -7,6 +7,7 @@ Content-Type: application/json
   "firstName": "Bruce",
   "lastName": "Wayne",
   "birthDate": "1993-03-02",
+  "email": "bruce.wayne@example.com",
   "password": "securePassword123"
 }
 

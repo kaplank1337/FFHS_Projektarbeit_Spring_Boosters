@@ -1,11 +1,14 @@
 package ch.ffhs.spring_boosters.service.implementation;
 
+import ch.ffhs.spring_boosters.controller.dto.ImmunizationSchedulRecordSortedByPriorityDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationScheduleDto;
 import ch.ffhs.spring_boosters.controller.dto.PendingImmunizationDto;
+import ch.ffhs.spring_boosters.controller.dto.VaccinationNameDto;
 import ch.ffhs.spring_boosters.controller.entity.*;
 import ch.ffhs.spring_boosters.repository.*;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
 import ch.ffhs.spring_boosters.service.ImmunizationScheduleService;
+import ch.ffhs.spring_boosters.service.implementation.enumerator.PriorityEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,29 +30,44 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
     @Override
     @Transactional(readOnly = true)
     public ImmunizationScheduleDto getPendingImmunizations(UUID userId) throws UserNotFoundException {
-        // 1. Benutzer laden
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Benutzer mit ID " + userId + " nicht gefunden"));
 
-        // 2. Alter in Tagen berechnen
         LocalDate birthDate = user.getBirthDate();
         int currentAgeDays = (int) ChronoUnit.DAYS.between(birthDate, LocalDate.now());
 
-        // 3. Bereits erfasste Impfungen des Benutzers laden
         List<ImmunizationRecord> existingRecords = immunizationRecordRepository.findByUserId(userId);
 
-        // Gruppiere nach Impfplan-ID und zähle Dosen
+        if (existingRecords.isEmpty()) {
+            return ImmunizationScheduleDto.builder()
+                    .userId(user.getId())
+                    .username(user.getUsername())
+                    .birthDate(user.getBirthDate())
+                    .currentAgeDays(currentAgeDays)
+                    .pendingImmunizations(List.of())
+                    .totalPending(0)
+                    .overdueCount(0)
+                    .dueSoonCount(0)
+                    .upcomingDueCount(0)
+                    .build();
+        }
+
+        Set<UUID> startedPlanIds = existingRecords.stream()
+                .map(ImmunizationRecord::getImmunizationPlanId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
         Map<UUID, Long> completedDosesByPlan = existingRecords.stream()
+                .filter(r -> r.getImmunizationPlanId() != null)
                 .collect(Collectors.groupingBy(
                         ImmunizationRecord::getImmunizationPlanId,
                         Collectors.counting()
                 ));
 
+        List<ImmunizationPlan> allPlans = immunizationPlanRepository.findAll().stream()
+                .filter(p -> startedPlanIds.contains(p.getId()))
+                .toList();
 
-        // 4. Alle Impfpläne laden
-        List<ImmunizationPlan> allPlans = immunizationPlanRepository.findAll();
-
-        // 5. Relevante Alterskategorien finden
         List<AgeCategory> relevantAgeCategories = ageCategoryRepository.findAll().stream()
                 .filter(cat -> isAgeCategoryRelevant(cat, currentAgeDays))
                 .toList();
@@ -58,30 +76,25 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
                 .map(AgeCategory::getId)
                 .collect(Collectors.toSet());
 
-        // 6. Ausstehende Impfungen berechnen
         List<PendingImmunizationDto> pendingImmunizations = new ArrayList<>();
 
         for (ImmunizationPlan plan : allPlans) {
-            // Prüfe ob Plan für aktuelles Alter relevant ist
             if (!relevantAgeCategoryIds.contains(plan.getAgeCategoryId())) {
                 continue;
             }
 
-            // Prüfe ob bereits vollständig geimpft
             long completedDoses = completedDosesByPlan.getOrDefault(plan.getId(), 0L);
 
-            // Ermittle erforderliche Dosen aus Series
             int requiredDoses = plan.getImmunizationPlanSeries() != null
                     ? plan.getImmunizationPlanSeries().stream()
-                            .mapToInt(ImmunizationPlanSeries::getRequiredDoses)
-                            .sum()
-                    : 1; // Default: 1 Dosis
+                    .mapToInt(ImmunizationPlanSeries::getRequiredDoses)
+                    .sum()
+                    : 1;
 
             if (completedDoses >= requiredDoses) {
-                continue; // Bereits vollständig geimpft
+                continue;
             }
 
-            // Erstelle PendingImmunizationDto
             AgeCategory ageCategory = relevantAgeCategories.stream()
                     .filter(cat -> cat.getId().equals(plan.getAgeCategoryId()))
                     .findFirst()
@@ -109,15 +122,13 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
             pendingImmunizations.add(pending);
         }
 
-        // 7. Nach Priorität sortieren
         pendingImmunizations.sort(Comparator
                 .comparing((PendingImmunizationDto p) -> getPriorityOrder(p.getPriority()))
                 .thenComparing(PendingImmunizationDto::getAgeMinDays, Comparator.nullsLast(Comparator.naturalOrder())));
 
-        // 8. Zusammenfassung erstellen
-        long highPriority = pendingImmunizations.stream().filter(p -> "HIGH".equals(p.getPriority())).count();
-        long mediumPriority = pendingImmunizations.stream().filter(p -> "MEDIUM".equals(p.getPriority())).count();
-        long lowPriority = pendingImmunizations.stream().filter(p -> "LOW".equals(p.getPriority())).count();
+        long ueberfaellig = pendingImmunizations.stream().filter(p -> "Überfällig".equals(p.getPriority())).count();
+        long terminVereinbaren = pendingImmunizations.stream().filter(p -> "Termin vereinbaren".equals(p.getPriority())).count();
+        long baldFaellig = pendingImmunizations.stream().filter(p -> "Bald fällig".equals(p.getPriority())).count();
 
         return ImmunizationScheduleDto.builder()
                 .userId(user.getId())
@@ -126,10 +137,38 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
                 .currentAgeDays(currentAgeDays)
                 .pendingImmunizations(pendingImmunizations)
                 .totalPending(pendingImmunizations.size())
-                .highPriority((int) highPriority)
-                .mediumPriority((int) mediumPriority)
-                .lowPriority((int) lowPriority)
+                .overdueCount((int) ueberfaellig)
+                .dueSoonCount((int) terminVereinbaren)
+                .upcomingDueCount((int) baldFaellig)
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ImmunizationSchedulRecordSortedByPriorityDto getImmunizationRecordsByUserIdAndFilterByDueStatus(
+            UUID userId,
+            PriorityEnum priorityEnum
+    ) {
+        try {
+            ImmunizationScheduleDto schedule = getPendingImmunizations(userId);
+
+            String targetPriority = switch (priorityEnum) {
+                case OVERDUE -> "Überfällig";
+                case DUE_SOON -> "Termin vereinbaren";
+                case UPCOMING -> "Bald fällig";
+            };
+
+            // Gefilterte Pending-Immunizations -> VaccinationNameDto mappen
+            List<String> vaccinationNames = schedule.getPendingImmunizations().stream()
+                    .filter(p -> targetPriority.equals(p.getPriority()))
+                    .map(PendingImmunizationDto::getVaccineTypeName
+                    )
+                    .toList();
+
+            return new ImmunizationSchedulRecordSortedByPriorityDto(vaccinationNames);
+        } catch (UserNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean isAgeCategoryRelevant(AgeCategory category, int currentAgeDays) {
@@ -166,33 +205,48 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
     }
 
     private String determinePriority(AgeCategory category, int currentAgeDays, long completedDoses, int requiredDoses) {
-        // Überfällig = HIGH
+        // Überfällig
         if (isOverdue(category, currentAgeDays)) {
-            return "HIGH";
+            return "Überfällig";
         }
 
-        // Grundimmunisierung noch nicht begonnen = HIGH
-        if (completedDoses == 0 && currentAgeDays >= category.getAgeMinDays()) {
-            return "HIGH";
+        // Ermittle Tage bis zur nächsten fälligen Dosis (vereinfachte Annahme)
+        Integer nextDueAgeDays = null;
+        if (category != null) {
+            if (completedDoses == 0) {
+                nextDueAgeDays = category.getAgeMinDays();
+            } else {
+                // Wenn bereits Dosen vorhanden: wir verwenden das Min-Alter als nächstes Ziel (vereinfachung)
+                nextDueAgeDays = category.getAgeMinDays();
+            }
         }
 
-        // In aktuellem Altersfenster = MEDIUM
-        if (currentAgeDays >= category.getAgeMinDays() &&
-            (category.getAgeMaxDays() == null || currentAgeDays <= category.getAgeMaxDays())) {
-            return "MEDIUM";
+        if (nextDueAgeDays == null) {
+            return "Bald fällig"; // Fallback
         }
 
-        // Zukünftig = LOW
-        return "LOW";
+        int daysUntil = nextDueAgeDays - currentAgeDays;
+
+        // Noch <= 30 Tage -> Termin vereinbaren
+        if (daysUntil <= 30) {
+            return "Termin vereinbaren";
+        }
+
+        // 31 - 90 Tage -> Bald fällig
+        if (daysUntil <= 90) {
+            return "Bald fällig";
+        }
+
+        // Standardmäßig "Bald fällig" (sollte durch isAgeCategoryRelevant bereits eingegrenzt sein)
+        return "Bald fällig";
     }
 
     private int getPriorityOrder(String priority) {
         return switch (priority) {
-            case "HIGH" -> 1;
-            case "MEDIUM" -> 2;
-            case "LOW" -> 3;
+            case "Überfällig" -> 1;
+            case "Termin vereinbaren" -> 2;
+            case "Bald fällig" -> 3;
             default -> 4;
         };
     }
 }
-

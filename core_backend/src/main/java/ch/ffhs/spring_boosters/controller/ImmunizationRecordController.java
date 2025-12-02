@@ -38,51 +38,17 @@ public class ImmunizationRecordController {
     private final JwtTokenReader jwtTokenReader;
 
     @GetMapping
-    @Operation(
-        summary = "Alle Impfungen abrufen",
-        description = "Gibt eine Liste aller Impfungen zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Liste der Impfungen erfolgreich abgerufen",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        )
-    })
-    public ResponseEntity<List<ImmunizationRecordDto>> getAllImmunizationRecords() {
-        List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getAllImmunizationRecords();
+    public ResponseEntity<List<ImmunizationRecordDto>> getAllImmunizationRecords(
+            @RequestHeader(value = "Authorization", required = false) String authToken
+    ) {
+        List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getAllImmunizationRecords(getUserIdFromToken(authToken));
         List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
         return ResponseEntity.ok(immunizationRecordDtos);
     }
 
+
+
     @GetMapping("/{id}")
-    @Operation(
-        summary = "Impfung nach ID abrufen",
-        description = "Gibt eine spezifische Impfung anhand ihrer ID zurück",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Impfung erfolgreich gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Impfung nicht gefunden",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ImmunizationRecordDto> getImmunizationRecordById(
         @PathVariable UUID id) throws ImmunizationRecordNotFoundException {
         ImmunizationRecord immunizationRecord = immunizationRecordService.getImmunizationRecordById(id);
@@ -91,32 +57,10 @@ public class ImmunizationRecordController {
     }
 
     @PostMapping
-    @Operation(
-        summary = "Neue Impfung erstellen",
-        description = "Erstellt eine neue Impfung im System",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Impfung erfolgreich erstellt",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ImmunizationRecordDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Ungültige Eingabedaten",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ExceptionMessageBodyDto.class)
-            )
-        )
-    })
     public ResponseEntity<ImmunizationRecordDto> createImmunizationRecord(
-        @Valid @RequestBody ImmunizationRecordCreateDto createDto) {
-        ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromCreateDto(createDto);
+        @Valid @RequestBody ImmunizationRecordCreateDto createDto,
+        @RequestHeader("Authorization") String authToken) {
+        ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromCreateDto(createDto, getUserIdFromToken(authToken));
         ImmunizationRecord createdImmunizationRecord = immunizationRecordService.createImmunizationRecord(immunizationRecord);
         ImmunizationRecordDto immunizationRecordDto = immunizationRecordMapper.toDto(createdImmunizationRecord);
         return ResponseEntity.status(HttpStatus.CREATED).body(immunizationRecordDto);
@@ -125,8 +69,9 @@ public class ImmunizationRecordController {
     @PatchMapping("/{id}")
     public ResponseEntity<ImmunizationRecordDto> updateImmunizationRecord(
         @PathVariable UUID id,
-        @Valid @RequestBody ImmunizationRecordUpdateDto updateDto) throws ImmunizationRecordNotFoundException {
-        ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromUpdateDto(updateDto);
+        @Valid @RequestBody ImmunizationRecordUpdateDto updateDto,
+        @RequestHeader("Authorization") String authToken) throws ImmunizationRecordNotFoundException {
+        ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromUpdateDto(updateDto, getUserIdFromToken(authToken));
         ImmunizationRecord updatedImmunizationRecord = immunizationRecordService.updateImmunizationRecord(id, immunizationRecord);
         ImmunizationRecordDto immunizationRecordDto = immunizationRecordMapper.toDto(updatedImmunizationRecord);
         return ResponseEntity.ok(immunizationRecordDto);

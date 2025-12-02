@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "vaccine_type")
+@Table(name = "vaccine_type", schema = "spring_boosters")
 public class VaccineType {
 
     @Id

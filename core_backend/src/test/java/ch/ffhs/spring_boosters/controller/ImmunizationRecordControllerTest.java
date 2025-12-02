@@ -96,7 +96,7 @@ class ImmunizationRecordControllerTest {
         ImmunizationRecord entity = sampleEntity(id, userId, vt, plan, LocalDate.now(), 1);
         ImmunizationRecordDto dto = sampleDto(id, LocalDate.now(), 1);
 
-        when(immunizationRecordService.getAllImmunizationRecords()).thenReturn(List.of(entity));
+        when(immunizationRecordService.getAllImmunizationRecords(any(UUID.class))).thenReturn(List.of(entity));
         when(immunizationRecordMapper.toDtoList(List.of(entity))).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/v1/immunization-records"))

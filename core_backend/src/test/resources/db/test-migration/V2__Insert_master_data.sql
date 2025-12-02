@@ -131,19 +131,20 @@ FROM immunization_plan ip
 WHERE ip.name LIKE '6-fach Impfung%' OR ip.name LIKE 'MMR Impfung%';
 
 -- Insert a sample admin user (password: admin123 - 12 Runden bcrypt)
-INSERT INTO users (id, username, password_hash, first_name, last_name, birth_date, role) VALUES
-    (RANDOM_UUID(), 'admin',
+-- NOTE: column list includes `email` and values are provided in the same order
+INSERT INTO users (id, username, email, password_hash, first_name, last_name, birth_date, role) VALUES
+    (RANDOM_UUID(), 'admin', 'admin@admin.ch',
      '$2a$12$kLzgXVPlkELs.4p/dYS7n.xzt9C8zUA3EmbFwilJyQa9jyVEtCaiC',
      'System', 'Administrator', DATE '1990-01-01', 'ADMIN');
 
 -- Insert sample test users (password: user123 - 12 Runden bcrypt)
-INSERT INTO users (id, username, password_hash, first_name, last_name, birth_date, role) VALUES
-                                                                                             (RANDOM_UUID(), 'john.doe',
-                                                                                              '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6',
-                                                                                              'John', 'Doe', DATE '1985-05-15', 'USER'),
-                                                                                             (RANDOM_UUID(), 'jane.smith',
-                                                                                              '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6',
-                                                                                              'Jane', 'Smith', DATE '1992-03-22', 'USER'),
-                                                                                             (RANDOM_UUID(), 'max.mustermann',
-                                                                                              '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6',
-                                                                                              'Max', 'Mustermann', DATE '1978-11-08', 'USER');
+INSERT INTO users (id, username, email, password_hash, first_name, last_name, birth_date, role) VALUES
+    (RANDOM_UUID(), 'john.doe', 'john.doe@example.com',
+     '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6',
+     'John', 'Doe', DATE '1985-05-15', 'USER'),
+    (RANDOM_UUID(), 'jane.smith', 'jane.smith@example.com',
+     '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6',
+     'Jane', 'Smith', DATE '1992-03-22', 'USER'),
+    (RANDOM_UUID(), 'max.mustermann', 'max.mustermann@example.com',
+     '$2a$12$rKOaaufhZ0W6zB0Ic6gqwuvufTLJqZSbgkMKt7EaaKZADTvCR7Rb6',
+     'Max', 'Mustermann', DATE '1978-11-08', 'USER');

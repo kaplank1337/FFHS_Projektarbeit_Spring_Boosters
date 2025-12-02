@@ -10,6 +10,7 @@ CREATE TABLE active_substance (
 CREATE TABLE users (
   id UUID PRIMARY KEY,
   username VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(254) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   first_name VARCHAR(255),
   last_name VARCHAR(255),
@@ -55,4 +56,3 @@ CREATE TABLE immunization_record (
     user_id VARCHAR(36),
     vaccine_type_id VARCHAR(36)
     );
-

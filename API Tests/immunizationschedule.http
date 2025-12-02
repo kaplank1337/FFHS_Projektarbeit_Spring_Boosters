@@ -7,6 +7,7 @@ Content-Type: application/json
   "firstName": "Immunization",
   "lastName": "Schedule",
   "birthDate": "1990-05-15",
+  "email": "immunization.schedule@example.com",
   "password": "securePassword123"
 }
 
@@ -145,9 +146,9 @@ Authorization: Bearer {{authToken}}
         client.assert(response.body.currentAgeDays !== undefined, "currentAgeDays fehlt");
         client.assert(response.body.pendingImmunizations !== undefined, "pendingImmunizations fehlt");
         client.assert(response.body.totalPending !== undefined, "totalPending fehlt");
-        client.assert(response.body.highPriority !== undefined, "highPriority fehlt");
-        client.assert(response.body.mediumPriority !== undefined, "mediumPriority fehlt");
-        client.assert(response.body.lowPriority !== undefined, "lowPriority fehlt");
+        client.assert(response.body.overdueCount !== undefined, "overdueCount fehlt");
+        client.assert(response.body.dueSoonCount !== undefined, "dueSoonCount fehlt");
+        client.assert(response.body.upcomingDueCount !== undefined, "upcomingDueCount fehlt");
     });
 
     client.test("Username korrekt", function() {
@@ -171,14 +172,14 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Priority Counters ergeben TotalPending", function() {
-        var sum = response.body.highPriority + response.body.mediumPriority + response.body.lowPriority;
+        var sum = response.body.overdueCount + response.body.dueSoonCount + response.body.upcomingDueCount;
         client.assert(sum === response.body.totalPending, "Summe der Prioritäten stimmt nicht mit totalPending überein");
     });
 
     client.log("Total Pending: " + response.body.totalPending);
-    client.log("High Priority: " + response.body.highPriority);
-    client.log("Medium Priority: " + response.body.mediumPriority);
-    client.log("Low Priority: " + response.body.lowPriority);
+    client.log("High Priority: " + response.body.overdueCount);
+    client.log("Medium Priority: " + response.body.dueSoonCount);
+    client.log("Low Priority: " + response.body.dueSoonCount);
     client.log("Current Age (Days): " + response.body.currentAgeDays);
     client.log("Pending Immunizations: " + response.body.pendingImmunizations.length);
 %}
@@ -193,16 +194,11 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Summary hat alle erforderlichen Felder", function() {
-        client.assert(response.body.username !== undefined, "username fehlt");
         client.assert(response.body.totalPending !== undefined, "totalPending fehlt");
-        client.assert(response.body.highPriority !== undefined, "highPriority fehlt");
-        client.assert(response.body.mediumPriority !== undefined, "mediumPriority fehlt");
-        client.assert(response.body.lowPriority !== undefined, "lowPriority fehlt");
+        client.assert(response.body.overdueCount !== undefined, "highPriority fehlt");
+        client.assert(response.body.dueSoonCount !== undefined, "mediumPriority fehlt");
+        client.assert(response.body.upcomingDueCount !== undefined, "lowPriority fehlt");
         client.assert(response.body.currentAgeDays !== undefined, "currentAgeDays fehlt");
-    });
-
-    client.test("Username korrekt", function() {
-        client.assert(response.body.username === "immunization.schedule", "Username nicht korrekt");
     });
 
     client.test("TotalPending ist >= 0", function() {
@@ -210,9 +206,9 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Priority Counters sind numerisch", function() {
-        client.assert(typeof response.body.highPriority === "number", "highPriority ist keine Zahl");
-        client.assert(typeof response.body.mediumPriority === "number", "mediumPriority ist keine Zahl");
-        client.assert(typeof response.body.lowPriority === "number", "lowPriority ist keine Zahl");
+        client.assert(typeof response.body.overdueCount === "number", "highPriority ist keine Zahl");
+        client.assert(typeof response.body.dueSoonCount === "number", "mediumPriority ist keine Zahl");
+        client.assert(typeof response.body.upcomingDueCount === "number", "lowPriority ist keine Zahl");
     });
 
     client.test("CurrentAgeDays ist positiv", function() {
@@ -272,7 +268,7 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Summary konsistent nach Update", function() {
-        var sum = response.body.highPriority + response.body.mediumPriority + response.body.lowPriority;
+        var sum = response.body.overdueCount + response.body.dueSoonCount + response.body.upcomingDueCount;
         client.assert(sum === response.body.totalPending, "Summe der Prioritäten stimmt nicht mit totalPending überein");
     });
 
@@ -288,6 +284,37 @@ Authorization: Bearer {{authToken}}
         client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
     });
 %}
+
+### Kaan Pending Immunizations - eigene Daten prüfen auf Prriority
+GET http://localhost:8000/api/v1/immunization-schedule/pending/overdue
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+%}
+
+### Kaan Pending Immunizations - eigene Daten prüfen auf Prriority
+GET http://localhost:8000/api/v1/immunization-schedule/pending/due-soon
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+%}
+
+### Kaan Pending Immunizations - eigene Daten prüfen auf Prriority
+GET http://localhost:8000/api/v1/immunization-schedule/pending/upcoming
+Authorization: Bearer {{authToken}}
+
+> {%
+    client.test("Status ist 200", function() {
+        client.assert(response.status === 200, "Erwartet: 200, Erhalten: " + response.status);
+    });
+%}
+
 
 ### Pending ohne Authorization (Fehlerfall)
 GET http://localhost:8000/api/v1/immunization-schedule/pending
@@ -350,12 +377,10 @@ Authorization: Bearer {{authToken}}
     });
 
     client.test("Summary vollständig", function() {
-        client.assert(response.body.username === "immunization.schedule", "Username inkonsistent");
         client.assert(response.body.totalPending >= 0, "totalPending ungültig");
     });
 
     client.log("=== FINAL SUMMARY ===");
-    client.log("Username: " + response.body.username);
     client.log("Total Pending: " + response.body.totalPending);
     client.log("Current Age (Days): " + response.body.currentAgeDays);
 %}

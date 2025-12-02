@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "vaccine_type_active_substance")
+@Table(name = "vaccine_type_active_substance", schema = "spring_boosters")
 @IdClass(VaccineTypeActiveSubstanceId.class)
 public class VaccineTypeActiveSubstance {
 

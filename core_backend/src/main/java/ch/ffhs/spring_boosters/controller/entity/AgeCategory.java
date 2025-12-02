@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "age_category")
+@Table(name = "age_category", schema = "spring_boosters")
 public class AgeCategory {
 
     @Id

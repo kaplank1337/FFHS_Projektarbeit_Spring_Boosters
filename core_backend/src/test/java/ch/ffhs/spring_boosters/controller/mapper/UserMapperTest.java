@@ -28,7 +28,7 @@ class UserMapperTest {
 
     @Test
     void userDtoToUser_mapsFields_correctly() {
-        UserRegistrationDto dto = new UserRegistrationDto("alice", "Alice", "Doe", LocalDate.of(1990,1,1), "secret");
+        UserRegistrationDto dto = new UserRegistrationDto("alice", "Alice", "Doe", LocalDate.of(1990,1,1), "alice@example.com", "secret");
         User entity = mapper.userDtoToUser(dto);
 
         assertNotNull(entity);
@@ -38,6 +38,7 @@ class UserMapperTest {
         assertEquals("Doe", entity.getLastName());
         assertEquals(LocalDate.of(1990,1,1), entity.getBirthDate());
         assertEquals("secret", entity.getPassword());
+        assertEquals("alice@example.com", entity.getEmail());
     }
 
     @Test
@@ -57,6 +58,7 @@ class UserMapperTest {
                 .lastName("Builder")
                 .birthDate(LocalDate.of(1980,12,12))
                 .role("USER")
+                .email("bob@example.com")
                 .build();
 
         UserDto dto = mapper.userToDto(user);
@@ -67,6 +69,6 @@ class UserMapperTest {
         assertEquals("Builder", dto.lastName());
         assertEquals(LocalDate.of(1980,12,12), dto.birthDate());
         assertEquals("USER", dto.role());
+        assertEquals("bob@example.com", dto.email());
     }
 }
-

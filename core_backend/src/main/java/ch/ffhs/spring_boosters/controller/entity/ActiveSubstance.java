@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "active_substance")
+@Table(name = "active_substance", schema = "spring_boosters")
 public class ActiveSubstance {
 
     @Id

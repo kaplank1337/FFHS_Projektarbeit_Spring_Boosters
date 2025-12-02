@@ -11,3 +11,8 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/**
+
+logging:
+  level:
+    ch.ffhs.authentification_service.security: DEBUG
+    root: INFO

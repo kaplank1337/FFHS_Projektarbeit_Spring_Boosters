@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "follow_up_rule")
+@Table(name = "follow_up_rule", schema = "spring_boosters")
 public class FollowUpRule {
 
     @Id

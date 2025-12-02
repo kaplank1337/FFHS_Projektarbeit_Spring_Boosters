@@ -39,7 +39,7 @@ class ImmunizationRecordServiceImplTest {
 
         when(recordRepository.findAll()).thenReturn(List.of(r));
 
-        var res = service.getAllImmunizationRecords();
+        var res = service.getAllImmunizationRecords(UUID.randomUUID());
         assertEquals(1, res.size());
     }
 

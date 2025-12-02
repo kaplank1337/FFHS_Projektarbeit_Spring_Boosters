@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Syringe, LogOut } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageSelector from "./LanguageSelector";
 
 interface HeaderProps {
   user?: any;
@@ -9,27 +11,23 @@ interface HeaderProps {
 
 const Header = ({ user }: HeaderProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useLanguage();
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error signing out",
-        description: error.message,
-      });
-    } else {
-      toast({
-        title: "Signed out successfully",
-      });
-    }
+  const handleLogout = () => {
+    // Clear the authentication token
+    localStorage.removeItem("auth_token");
+    
+    // Redirect to landing page
+    navigate("/");
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <button 
-          onClick={() => window.location.href = "/"} 
+          onClick={() => navigate("/")} 
           className="flex items-center space-x-2 cursor-pointer bg-transparent border-none"
         >
           <Syringe className="h-6 w-6 text-primary" />
@@ -37,20 +35,19 @@ const Header = ({ user }: HeaderProps) => {
         </button>
         
         <nav className="flex items-center space-x-4">
-          {user ? (
+          <LanguageSelector />
+          {user && (
             <>
-              <Button variant="ghost" onClick={() => window.location.href = "/dashboard"}>
-                Dashboard
-              </Button>
+              {location.pathname !== "/dashboard" && (
+                <Button variant="ghost" onClick={() => navigate("/dashboard")}>
+                  {t("header.dashboard")}
+                </Button>
+              )}
               <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
+                {t("header.signOut")}
               </Button>
             </>
-          ) : (
-            <Button onClick={() => window.location.href = "/auth"}>
-              Sign In
-            </Button>
           )}
         </nav>
       </div>
