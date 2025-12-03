@@ -29,7 +29,7 @@ class ImmunizationRecordRepositoryTest {
         UUID vt = UUID.randomUUID();
         UUID plan = UUID.randomUUID();
 
-        ImmunizationRecord rec = new ImmunizationRecord(userId, vt, plan, LocalDate.now());
+        ImmunizationRecord rec = new ImmunizationRecord(userId, vt, LocalDate.now());
         ImmunizationRecord saved = repository.save(rec);
 
         assertNotNull(saved.getId());

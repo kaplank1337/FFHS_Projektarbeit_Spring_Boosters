@@ -14,14 +14,16 @@ public class TestFlywayInitializer implements ApplicationContextInitializer<Conf
         String user = env.getProperty("spring.datasource.username");
         String pass = env.getProperty("spring.datasource.password");
         String locations = env.getProperty("spring.flyway.locations", "classpath:db/test-migration");
+        String schema = env.getProperty("spring.flyway.default-schema", "spring_boosters");
 
         Flyway flyway = Flyway.configure()
                 .dataSource(url, user, pass)
                 .locations(locations)
                 .cleanDisabled(false)
+                .defaultSchema(schema)
+                .schemas(schema)
                 .load();
 
-        // Clean and migrate to ensure test database matches expectations
         flyway.clean();
         flyway.migrate();
     }

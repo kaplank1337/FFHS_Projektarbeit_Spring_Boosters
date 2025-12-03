@@ -6,16 +6,20 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
-        default_schema: PUBLIC
-    # Defer JPA initialization so Flyway migrations run first and create the tables
+        dialect: org.hibernate.dialect.H2Dialect
+        default_schema: spring_boosters
     defer-datasource-initialization: true
   flyway:
     enabled: false
     locations: classpath:db/test-migration
     clean-disabled: false
+    default-schema: spring_boosters
   sql:
     init:
       mode: never
+
+jwt:
+  secret: testSecretKeyForIntegrationTestingWith32Chars

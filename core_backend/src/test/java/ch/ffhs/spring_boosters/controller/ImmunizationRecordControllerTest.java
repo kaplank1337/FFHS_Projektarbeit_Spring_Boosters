@@ -80,11 +80,11 @@ class ImmunizationRecordControllerTest {
     }
 
     private ImmunizationRecordCreateDto sampleCreateDto(UUID userId, UUID vaccineTypeId, UUID ageCategoryId, LocalDate administeredOn, Integer doseOrder) {
-        return new ImmunizationRecordCreateDto(userId, vaccineTypeId, ageCategoryId, administeredOn, doseOrder);
+        return new ImmunizationRecordCreateDto(userId, administeredOn, doseOrder);
     }
 
     private ImmunizationRecordUpdateDto sampleUpdateDto(UUID userId, UUID vaccineTypeId, UUID planId, LocalDate administeredOn, Integer doseOrder) {
-        return new ImmunizationRecordUpdateDto(userId, vaccineTypeId, planId, administeredOn, doseOrder);
+        return new ImmunizationRecordUpdateDto(userId, vaccineTypeId, administeredOn, doseOrder);
     }
 
     @Test
@@ -143,7 +143,7 @@ class ImmunizationRecordControllerTest {
         ImmunizationRecord createdEntity = sampleEntity(id, userId, vt, UUID.randomUUID(), date, 1);
         ImmunizationRecordDto responseDto = sampleDto(id, date, 1);
 
-        when(immunizationRecordMapper.fromCreateDto(any(ImmunizationRecordCreateDto.class))).thenReturn(entityFromDto);
+        when(immunizationRecordMapper.fromCreateDto(any(ImmunizationRecordCreateDto.class), any(UUID.class))).thenReturn(entityFromDto);
         when(immunizationRecordService.createImmunizationRecord(entityFromDto)).thenReturn(createdEntity);
         when(immunizationRecordMapper.toDto(createdEntity)).thenReturn(responseDto);
 
@@ -157,7 +157,7 @@ class ImmunizationRecordControllerTest {
     @Test
     void createImmunizationRecord_validationFails_missingFields() throws Exception {
         // missing userId -> validation fails
-        ImmunizationRecordCreateDto createDto = new ImmunizationRecordCreateDto(null, null, null, null, null);
+        ImmunizationRecordCreateDto createDto = new ImmunizationRecordCreateDto(null, null, null);
 
         mockMvc.perform(post("/api/v1/immunization-records")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -178,7 +178,7 @@ class ImmunizationRecordControllerTest {
         ImmunizationRecord updatedEntity = sampleEntity(id, userId, vt, plan, date, 2);
         ImmunizationRecordDto responseDto = sampleDto(id, date, 2);
 
-        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class))).thenReturn(entityFromDto);
+        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), any(UUID.class))).thenReturn(entityFromDto);
         when(immunizationRecordService.updateImmunizationRecord(eq(id), eq(entityFromDto))).thenReturn(updatedEntity);
         when(immunizationRecordMapper.toDto(updatedEntity)).thenReturn(responseDto);
 
@@ -195,7 +195,7 @@ class ImmunizationRecordControllerTest {
         ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
         ImmunizationRecord entityFromDto = sampleEntity(null, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
 
-        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class))).thenReturn(entityFromDto);
+        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), any(UUID.class))).thenReturn(entityFromDto);
         when(immunizationRecordService.updateImmunizationRecord(eq(id), eq(entityFromDto)))
                 .thenThrow(new ImmunizationRecordNotFoundException("Not found"));
 
@@ -210,7 +210,7 @@ class ImmunizationRecordControllerTest {
     @Test
     void updateImmunizationRecord_validationFails() throws Exception {
         UUID id = UUID.randomUUID();
-        ImmunizationRecordUpdateDto updateDto = new ImmunizationRecordUpdateDto(null, null, null, null, null);
+        ImmunizationRecordUpdateDto updateDto = new ImmunizationRecordUpdateDto(null, null, null, null);
 
         mockMvc.perform(patch("/api/v1/immunization-records/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
