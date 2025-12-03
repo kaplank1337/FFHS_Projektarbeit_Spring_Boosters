@@ -334,6 +334,6 @@ public class ImmunizationScheduleIntegrationTest {
 
         var dto = scheduleService.getPendingImmunizations(u.getId());
         assertNotNull(dto);
-        assertFalse(dto.getPendingImmunizations().isEmpty(), "New user without records should have empty pending list");
+        assertTrue(dto.getPendingImmunizations().isEmpty(), "New user without records should have empty pending list");
     }
 }

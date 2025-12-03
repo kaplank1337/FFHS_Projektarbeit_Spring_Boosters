@@ -10,8 +10,8 @@
 ------------------------------------------------------------
 -- COVID-19 vaccinations for john.doe (Moderna, age 40-49)
 ------------------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS spring_boosters;
-SET SCHEMA spring_boosters;
+CREATE SCHEMA IF NOT EXISTS SPRING_BOOSTERS;
+SET SCHEMA SPRING_BOOSTERS;
 
 INSERT INTO immunization_record (id, user_id, vaccine_type_id, immunization_plan_id, administered_on, dose_order_claimed)
 SELECT

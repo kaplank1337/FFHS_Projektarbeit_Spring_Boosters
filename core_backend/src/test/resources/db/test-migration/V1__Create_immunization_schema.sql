@@ -1,8 +1,8 @@
 -- H2-compatible version of V1__Create_immunization_schema.sql
 
 -- Schema für H2 anlegen
-CREATE SCHEMA IF NOT EXISTS spring_boosters;
-SET SCHEMA spring_boosters;
+CREATE SCHEMA IF NOT EXISTS SPRING_BOOSTERS;
+SET SCHEMA SPRING_BOOSTERS;
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (

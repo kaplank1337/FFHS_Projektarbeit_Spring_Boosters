@@ -1,7 +1,7 @@
 -- H2-compatible version of V2__Insert_master_data.sql
 
-CREATE SCHEMA IF NOT EXISTS spring_boosters;
-SET SCHEMA spring_boosters;
+CREATE SCHEMA IF NOT EXISTS SPRING_BOOSTERS;
+SET SCHEMA SPRING_BOOSTERS;
 
 -- Insert default active substances
 INSERT INTO active_substance (id, name, synonyms) VALUES

@@ -1,9 +1,13 @@
 package ch.ffhs.spring_boosters.service.implementation;
 
+import ch.ffhs.spring_boosters.controller.entity.AgeCategory;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
+import ch.ffhs.spring_boosters.controller.entity.User;
+import ch.ffhs.spring_boosters.repository.AgeCategoryRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationRecordRepository;
+import ch.ffhs.spring_boosters.repository.UserRepository;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,19 +32,26 @@ class ImmunizationRecordServiceImplTest {
     @Mock
     private ImmunizationPlanRepository planRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private AgeCategoryRepository ageCategoryRepository;
+
     @InjectMocks
     private ImmunizationRecordServiceImpl service;
 
     @Test
     void getAll_returnsAll() {
+        UUID userId = UUID.randomUUID();
         ImmunizationRecord r = new ImmunizationRecord();
         r.setId(UUID.randomUUID());
-        r.setUserId(UUID.randomUUID());
+        r.setUserId(userId);
 
-        when(recordRepository.findAll()).thenReturn(List.of(r));
+        when(recordRepository.findAllByUserId(userId)).thenReturn(List.of(r));
 
-        var res = service.getAllImmunizationRecords(UUID.randomUUID());
-        assertEquals(1, res.size());
+        var res = service.getAllImmunizationRecords(userId);
+        assertEquals(1, res.size(), "Should return 1 record");
     }
 
     @Test
@@ -63,18 +74,32 @@ class ImmunizationRecordServiceImplTest {
 
     @Test
     void create_findsPlan_and_saves() {
+        UUID userId = UUID.randomUUID();
         UUID vt = UUID.randomUUID();
+        UUID ageCategoryId = UUID.randomUUID();
+
+        User user = new User();
+        user.setId(userId);
+        user.setBirthDate(LocalDate.of(1990, 1, 1));
+
+        AgeCategory ageCategory = new AgeCategory();
+        ageCategory.setId(ageCategoryId);
+        ageCategory.setAgeMinDays(10000);
+        ageCategory.setAgeMaxDays(15000);
+
         ImmunizationRecord rec = new ImmunizationRecord();
         rec.setVaccineTypeId(vt);
-        rec.setUserId(UUID.randomUUID());
-        rec.setAdministeredOn(LocalDate.now());
+        rec.setUserId(userId);
+        rec.setAdministeredOn(LocalDate.of(2020, 6, 15));
 
         ImmunizationPlan plan = new ImmunizationPlan();
         plan.setId(UUID.randomUUID());
         plan.setVaccineTypeId(vt);
-        plan.setAgeCategoryId(UUID.randomUUID());
+        plan.setAgeCategoryId(ageCategoryId);
 
-        when(planRepository.findByVaccineTypeId(vt)).thenReturn(List.of(plan));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(ageCategoryRepository.findAll()).thenReturn(List.of(ageCategory));
+        when(planRepository.findByVaccineTypeIdAndAgeCategoryId(vt, ageCategoryId)).thenReturn(List.of(plan));
         when(recordRepository.save(any())).thenAnswer(i -> {
             ImmunizationRecord arg = i.getArgument(0);
             arg.setId(UUID.randomUUID());
@@ -82,20 +107,36 @@ class ImmunizationRecordServiceImplTest {
         });
 
         var saved = service.createImmunizationRecord(rec);
-        assertNotNull(saved.getId());
-        assertEquals(plan.getId(), saved.getImmunizationPlanId());
+        assertNotNull(saved.getId(), "Saved record should have an ID");
+        assertEquals(plan.getId(), saved.getImmunizationPlanId(), "Should set immunizationPlanId");
     }
 
     @Test
     void create_noPlan_throws() {
+        UUID userId = UUID.randomUUID();
         UUID vt = UUID.randomUUID();
+        UUID ageCategoryId = UUID.randomUUID();
+
+        User user = new User();
+        user.setId(userId);
+        user.setBirthDate(LocalDate.of(1990, 1, 1));
+
+        AgeCategory ageCategory = new AgeCategory();
+        ageCategory.setId(ageCategoryId);
+        ageCategory.setAgeMinDays(10000);
+        ageCategory.setAgeMaxDays(15000);
+
         ImmunizationRecord rec = new ImmunizationRecord();
         rec.setVaccineTypeId(vt);
-        rec.setUserId(UUID.randomUUID());
-        rec.setAdministeredOn(LocalDate.now());
+        rec.setUserId(userId);
+        rec.setAdministeredOn(LocalDate.of(2020, 6, 15));
 
-        when(planRepository.findByVaccineTypeId(vt)).thenReturn(List.of());
-        assertThrows(IllegalStateException.class, () -> service.createImmunizationRecord(rec));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(ageCategoryRepository.findAll()).thenReturn(List.of(ageCategory));
+        when(planRepository.findByVaccineTypeIdAndAgeCategoryId(vt, ageCategoryId)).thenReturn(List.of());
+
+        assertThrows(IllegalStateException.class, () -> service.createImmunizationRecord(rec),
+            "Should throw IllegalStateException when no plan is found");
     }
 
     @Test
@@ -106,6 +147,7 @@ class ImmunizationRecordServiceImplTest {
         existing.setDoseOrderClaimed(1);
 
         ImmunizationRecord update = new ImmunizationRecord();
+        update.setId(id);
         update.setDoseOrderClaimed(2);
         update.setAdministeredOn(LocalDate.now());
 
@@ -113,7 +155,7 @@ class ImmunizationRecordServiceImplTest {
         when(recordRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
         var res = service.updateImmunizationRecord(id, update);
-        assertEquals(2, res.getDoseOrderClaimed());
+        assertEquals(2, res.getDoseOrderClaimed(), "Dose order should be updated to 2");
     }
 
     @Test

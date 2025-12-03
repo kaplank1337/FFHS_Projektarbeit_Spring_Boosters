@@ -30,27 +30,28 @@ class ImmunizationRecordRepositoryTest {
         UUID plan = UUID.randomUUID();
 
         ImmunizationRecord rec = new ImmunizationRecord(userId, vt, LocalDate.now());
+        rec.setImmunizationPlanId(plan);
         ImmunizationRecord saved = repository.save(rec);
 
         assertNotNull(saved.getId());
 
         List<ImmunizationRecord> byUser = repository.findByUserId(userId);
-        assertFalse(byUser.isEmpty());
+        assertFalse(byUser.isEmpty(), "Should find record by userId");
 
         List<ImmunizationRecord> byVt = repository.findByVaccineTypeId(vt);
-        assertFalse(byVt.isEmpty());
+        assertFalse(byVt.isEmpty(), "Should find record by vaccineTypeId");
 
         List<ImmunizationRecord> byPlan = repository.findByImmunizationPlanId(plan);
-        assertFalse(byPlan.isEmpty());
+        assertFalse(byPlan.isEmpty(), "Should find record by immunizationPlanId");
 
         List<ImmunizationRecord> byUserAndVt = repository.findByUserIdAndVaccineTypeId(userId, vt);
-        assertFalse(byUserAndVt.isEmpty());
+        assertFalse(byUserAndVt.isEmpty(), "Should find record by userId and vaccineTypeId");
 
         boolean exists = repository.existsByUserIdAndId(userId, saved.getId());
-        assertTrue(exists);
+        assertTrue(exists, "Record should exist");
 
         repository.deleteByUserIdAndId(userId, saved.getId());
         boolean existsAfter = repository.existsByUserIdAndId(userId, saved.getId());
-        assertFalse(existsAfter);
+        assertFalse(existsAfter, "Record should be deleted");
     }
 }
