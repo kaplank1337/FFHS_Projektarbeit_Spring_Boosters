@@ -1,10 +1,7 @@
 package ch.ffhs.spring_boosters.controller;
 
 import ch.ffhs.spring_boosters.config.JwtTokenReader;
-import ch.ffhs.spring_boosters.controller.dto.ExceptionMessageBodyDto;
-import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordCreateDto;
-import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
-import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordUpdateDto;
+import ch.ffhs.spring_boosters.controller.dto.*;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.controller.mapper.ImmunizationRecordMapper;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
@@ -38,15 +35,13 @@ public class ImmunizationRecordController {
     private final JwtTokenReader jwtTokenReader;
 
     @GetMapping
-    public ResponseEntity<List<ImmunizationRecordDto>> getAllImmunizationRecords(
+    public ResponseEntity<List<ImmunizationRecordWithNameRecordDto>> getAllImmunizationRecords(
             @RequestHeader(value = "Authorization", required = false) String authToken
     ) {
         List<ImmunizationRecord> immunizationRecords = immunizationRecordService.getAllImmunizationRecords(getUserIdFromToken(authToken));
-        List<ImmunizationRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoList(immunizationRecords);
+        List<ImmunizationRecordWithNameRecordDto> immunizationRecordDtos = immunizationRecordMapper.toDtoListWithName(immunizationRecords);
         return ResponseEntity.ok(immunizationRecordDtos);
     }
-
-
 
     @GetMapping("/{id}")
     public ResponseEntity<ImmunizationRecordDto> getImmunizationRecordById(
