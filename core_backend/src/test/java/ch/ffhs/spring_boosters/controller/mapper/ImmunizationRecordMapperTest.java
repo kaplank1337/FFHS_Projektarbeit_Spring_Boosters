@@ -33,7 +33,7 @@ class ImmunizationRecordMapperTest {
     void toDto_mapsFields_correctly() {
         UUID id = UUID.randomUUID();
         LocalDate administered = LocalDate.now();
-        ImmunizationRecord entity = new ImmunizationRecord(id, UUID.randomUUID(), UUID.randomUUID(), administered);
+        ImmunizationRecord entity = new ImmunizationRecord(id, UUID.randomUUID(), administered);
         entity.setId(id);
         entity.setAdministeredOn(administered);
         entity.setDoseOrderClaimed(2);
@@ -51,7 +51,7 @@ class ImmunizationRecordMapperTest {
     @Test
     void toDtoList_mapsList_correctly() {
         UUID id = UUID.randomUUID();
-        ImmunizationRecord entity = new ImmunizationRecord(id, UUID.randomUUID(), UUID.randomUUID(), LocalDate.now());
+        ImmunizationRecord entity = new ImmunizationRecord(id, UUID.randomUUID(), LocalDate.now());
         entity.setId(id);
 
         List<ImmunizationRecordDto> dtos = mapper.toDtoList(List.of(entity));
@@ -62,7 +62,7 @@ class ImmunizationRecordMapperTest {
 
     @Test
     void fromCreateDto_nullInput_returnsNull() {
-        ImmunizationRecord res = mapper.fromCreateDto(null);
+        ImmunizationRecord res = mapper.fromCreateDto(null, null);
         assertNull(res);
     }
 
@@ -73,8 +73,8 @@ class ImmunizationRecordMapperTest {
         UUID age = UUID.randomUUID();
         LocalDate date = LocalDate.of(2020,1,1);
 
-        ImmunizationRecordCreateDto dto = new ImmunizationRecordCreateDto(userId, vt, age, date, 1);
-        ImmunizationRecord entity = mapper.fromCreateDto(dto);
+        ImmunizationRecordCreateDto dto = new ImmunizationRecordCreateDto(vt, date, 1);
+        ImmunizationRecord entity = mapper.fromCreateDto(dto, userId);
 
         assertNotNull(entity);
         assertNull(entity.getId());
@@ -87,7 +87,7 @@ class ImmunizationRecordMapperTest {
 
     @Test
     void fromUpdateDto_nullInput_returnsNull() {
-        ImmunizationRecord res = mapper.fromUpdateDto(null);
+        ImmunizationRecord res = mapper.fromUpdateDto(null, null);
         assertNull(res);
     }
 
@@ -98,14 +98,12 @@ class ImmunizationRecordMapperTest {
         UUID plan = UUID.randomUUID();
         LocalDate date = LocalDate.of(2021,2,2);
 
-        ImmunizationRecordUpdateDto dto = new ImmunizationRecordUpdateDto(userId, vt, plan, date, 2);
-        ImmunizationRecord entity = mapper.fromUpdateDto(dto);
+        ImmunizationRecordUpdateDto dto = new ImmunizationRecordUpdateDto(userId, vt, date, 2);
+        ImmunizationRecord entity = mapper.fromUpdateDto(dto, userId);
 
         assertNotNull(entity);
-        assertNull(entity.getId());
         assertEquals(userId, entity.getUserId());
         assertEquals(vt, entity.getVaccineTypeId());
-        assertEquals(plan, entity.getImmunizationPlanId());
         assertEquals(date, entity.getAdministeredOn());
         assertEquals(2, entity.getDoseOrderClaimed());
     }

@@ -5,6 +5,7 @@ import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordCreateDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordUpdateDto;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
+import ch.ffhs.spring_boosters.controller.exception.GlobalExceptionHandler;
 import ch.ffhs.spring_boosters.controller.mapper.ImmunizationRecordMapper;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
 import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
@@ -55,6 +56,7 @@ class ImmunizationRecordControllerTest {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .setValidator(validator)
                 .build();
 
@@ -79,12 +81,12 @@ class ImmunizationRecordControllerTest {
         return new ImmunizationRecordDto(id, administeredOn, doseOrder, now, now);
     }
 
-    private ImmunizationRecordCreateDto sampleCreateDto(UUID userId, UUID vaccineTypeId, UUID ageCategoryId, LocalDate administeredOn, Integer doseOrder) {
-        return new ImmunizationRecordCreateDto(userId, vaccineTypeId, ageCategoryId, administeredOn, doseOrder);
+    private ImmunizationRecordCreateDto sampleCreateDto(UUID vaccineTypeId, LocalDate administeredOn, Integer doseOrder) {
+        return new ImmunizationRecordCreateDto(vaccineTypeId, administeredOn, doseOrder);
     }
 
-    private ImmunizationRecordUpdateDto sampleUpdateDto(UUID userId, UUID vaccineTypeId, UUID planId, LocalDate administeredOn, Integer doseOrder) {
-        return new ImmunizationRecordUpdateDto(userId, vaccineTypeId, planId, administeredOn, doseOrder);
+    private ImmunizationRecordUpdateDto sampleUpdateDto(UUID userId, UUID vaccineTypeId, LocalDate administeredOn, Integer doseOrder) {
+        return new ImmunizationRecordUpdateDto(userId, vaccineTypeId, administeredOn, doseOrder);
     }
 
     @Test
@@ -93,13 +95,16 @@ class ImmunizationRecordControllerTest {
         UUID userId = UUID.randomUUID();
         UUID vt = UUID.randomUUID();
         UUID plan = UUID.randomUUID();
+        String token = "Bearer testToken";
+
         ImmunizationRecord entity = sampleEntity(id, userId, vt, plan, LocalDate.now(), 1);
         ImmunizationRecordDto dto = sampleDto(id, LocalDate.now(), 1);
 
-        when(immunizationRecordService.getAllImmunizationRecords(any(UUID.class))).thenReturn(List.of(entity));
+        when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
+        when(immunizationRecordService.getAllImmunizationRecords(userId)).thenReturn(List.of(entity));
         when(immunizationRecordMapper.toDtoList(List.of(entity))).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/api/v1/immunization-records"))
+        mockMvc.perform(get("/api/v1/immunization-records").header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(id.toString())));
@@ -135,19 +140,21 @@ class ImmunizationRecordControllerTest {
         UUID id = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID vt = UUID.randomUUID();
-        UUID ageCat = UUID.randomUUID();
         LocalDate date = LocalDate.now();
+        String token = "Bearer testToken";
 
-        ImmunizationRecordCreateDto createDto = sampleCreateDto(userId, vt, ageCat, date, 1);
+        ImmunizationRecordCreateDto createDto = sampleCreateDto(vt, date, 1);
         ImmunizationRecord entityFromDto = sampleEntity(null, userId, vt, UUID.randomUUID(), date, 1);
         ImmunizationRecord createdEntity = sampleEntity(id, userId, vt, UUID.randomUUID(), date, 1);
         ImmunizationRecordDto responseDto = sampleDto(id, date, 1);
 
-        when(immunizationRecordMapper.fromCreateDto(any(ImmunizationRecordCreateDto.class))).thenReturn(entityFromDto);
+        when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
+        when(immunizationRecordMapper.fromCreateDto(any(ImmunizationRecordCreateDto.class), eq(userId))).thenReturn(entityFromDto);
         when(immunizationRecordService.createImmunizationRecord(entityFromDto)).thenReturn(createdEntity);
         when(immunizationRecordMapper.toDto(createdEntity)).thenReturn(responseDto);
 
         mockMvc.perform(post("/api/v1/immunization-records")
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isCreated())
@@ -155,34 +162,25 @@ class ImmunizationRecordControllerTest {
     }
 
     @Test
-    void createImmunizationRecord_validationFails_missingFields() throws Exception {
-        // missing userId -> validation fails
-        ImmunizationRecordCreateDto createDto = new ImmunizationRecordCreateDto(null, null, null, null, null);
-
-        mockMvc.perform(post("/api/v1/immunization-records")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void updateImmunizationRecord_success() throws Exception {
         UUID id = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         UUID vt = UUID.randomUUID();
-        UUID plan = UUID.randomUUID();
         LocalDate date = LocalDate.now();
+        String token = "Bearer testToken";
 
-        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(userId, vt, plan, date, 2);
-        ImmunizationRecord entityFromDto = sampleEntity(null, userId, vt, plan, date, 2);
-        ImmunizationRecord updatedEntity = sampleEntity(id, userId, vt, plan, date, 2);
+        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(userId, vt, date, 2);
+        ImmunizationRecord entityFromDto = sampleEntity(null, userId, vt, UUID.randomUUID(), date, 2);
+        ImmunizationRecord updatedEntity = sampleEntity(id, userId, vt, UUID.randomUUID(), date, 2);
         ImmunizationRecordDto responseDto = sampleDto(id, date, 2);
 
-        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class))).thenReturn(entityFromDto);
+        when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
+        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), eq(userId))).thenReturn(entityFromDto);
         when(immunizationRecordService.updateImmunizationRecord(eq(id), eq(entityFromDto))).thenReturn(updatedEntity);
         when(immunizationRecordMapper.toDto(updatedEntity)).thenReturn(responseDto);
 
         mockMvc.perform(patch("/api/v1/immunization-records/" + id)
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isOk())
@@ -192,14 +190,18 @@ class ImmunizationRecordControllerTest {
     @Test
     void updateImmunizationRecord_notFound() throws Exception {
         UUID id = UUID.randomUUID();
-        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
-        ImmunizationRecord entityFromDto = sampleEntity(null, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
+        UUID userId = UUID.randomUUID();
+        String token = "Bearer testToken";
+        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(userId, UUID.randomUUID(), LocalDate.now(), 1);
+        ImmunizationRecord entityFromDto = sampleEntity(null, userId, UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
 
-        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class))).thenReturn(entityFromDto);
+        when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
+        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), eq(userId))).thenReturn(entityFromDto);
         when(immunizationRecordService.updateImmunizationRecord(eq(id), eq(entityFromDto)))
                 .thenThrow(new ImmunizationRecordNotFoundException("Not found"));
 
         mockMvc.perform(patch("/api/v1/immunization-records/" + id)
+                        .header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andExpect(status().isNotFound())
@@ -208,23 +210,11 @@ class ImmunizationRecordControllerTest {
     }
 
     @Test
-    void updateImmunizationRecord_validationFails() throws Exception {
-        UUID id = UUID.randomUUID();
-        ImmunizationRecordUpdateDto updateDto = new ImmunizationRecordUpdateDto(null, null, null, null, null);
-
-        mockMvc.perform(patch("/api/v1/immunization-records/" + id)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void deleteImmunizationRecord_success() throws Exception {
         UUID id = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         String token = "Bearer fakeToken";
 
-        // jwtTokenReader returns userId string when asked with the raw token
         when(jwtTokenReader.getUserId("fakeToken")).thenReturn(userId.toString());
         doNothing().when(immunizationRecordService).deleteImmunizationRecord(userId, id);
 

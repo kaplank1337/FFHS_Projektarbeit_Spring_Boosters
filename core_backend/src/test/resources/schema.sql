@@ -1,4 +1,9 @@
 -- H2-compatible schema for tests (Postgres MODE compatibility)
+
+CREATE SCHEMA IF NOT EXISTS SPRING_BOOSTERS;
+SET SCHEMA SPRING_BOOSTERS;
+
+
 CREATE TABLE active_substance (
   id UUID PRIMARY KEY,
   name VARCHAR(255) NOT NULL,

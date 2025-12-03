@@ -26,7 +26,6 @@ public class ImmunizationScheduleController {
 
     private final ImmunizationScheduleService immunizationScheduleService;
     private final UserService userService;
-    private final StringToPriorityRequestDtoConverter stringToPriorityRequestDtoConverter;
     private final JwtTokenReader jwtTokenReader;
 
     @GetMapping("/pending")

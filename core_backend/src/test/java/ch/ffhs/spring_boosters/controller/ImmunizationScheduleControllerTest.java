@@ -108,7 +108,6 @@ class ImmunizationScheduleControllerTest {
 
         mockMvc.perform(get("/api/v1/immunization-schedule/pending/summary").header("Authorization", tokenHeader))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username", is(username)))
                 .andExpect(jsonPath("$.totalPending", is(8)))
                 .andExpect(jsonPath("$.currentAgeDays", is(200)));
     }

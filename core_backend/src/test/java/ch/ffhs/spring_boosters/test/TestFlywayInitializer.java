@@ -19,9 +19,10 @@ public class TestFlywayInitializer implements ApplicationContextInitializer<Conf
                 .dataSource(url, user, pass)
                 .locations(locations)
                 .cleanDisabled(false)
+                .defaultSchema("SPRING_BOOSTERS")
+                .schemas("SPRING_BOOSTERS")
                 .load();
 
-        // Clean and migrate to ensure test database matches expectations
         flyway.clean();
         flyway.migrate();
     }
