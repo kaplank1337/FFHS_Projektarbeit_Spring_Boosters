@@ -101,15 +101,6 @@ export const VaccinationTypesProvider = ({ children }: { children: ReactNode }) 
     }
   };
 
-  useEffect(() => {
-    // Auto-fetch if token exists
-    const token = localStorage.getItem("auth_token");
-    if (token && vaccinationTypes.length === 0) {
-      fetchVaccinationTypes();
-      fetchImmunizationPlans();
-    }
-  }, []);
-
   return (
     <VaccinationTypesContext.Provider value={{ vaccinationTypes, immunizationPlans, loading, fetchVaccinationTypes, fetchImmunizationPlans }}>
       {children}

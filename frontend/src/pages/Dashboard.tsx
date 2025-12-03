@@ -4,10 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import AddVaccinationDialog from "@/components/AddVaccinationDialog";
+import EditVaccinationDialog from "@/components/EditVaccinationDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, AlertTriangle, XCircle, Trash2, Circle } from "lucide-react";
+import { CheckCircle, AlertTriangle, XCircle, Trash2, Circle, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import {
   AlertDialog,
@@ -44,6 +45,8 @@ const Dashboard = () => {
   const [pendingVaccinations, setPendingVaccinations] = useState<string[]>([]);
   const [pendingPriority, setPendingPriority] = useState<string>("");
   const [loadingPending, setLoadingPending] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [vaccinationToEdit, setVaccinationToEdit] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -158,9 +161,15 @@ const Dashboard = () => {
   };
 
 
-  const openDeleteDialog = (vaccination: any) => {
+  const openDeleteDialog = (vaccination: any, e: React.MouseEvent) => {
+    e.stopPropagation();
     setVaccinationToDelete(vaccination);
     setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (vaccination: any) => {
+    setVaccinationToEdit(vaccination);
+    setEditDialogOpen(true);
   };
 
   const handleDelete = async () => {
@@ -185,6 +194,8 @@ const Dashboard = () => {
           title: t("dashboard.vaccinationDeleted"),
         });
         fetchVaccinations();
+        const token = localStorage.getItem("auth_token");
+        if (token) fetchDashboardData(token);
       } else {
         toast({
           variant: "destructive",
@@ -265,7 +276,11 @@ const Dashboard = () => {
               {t("dashboard.subtitle")}
             </p>
           </div>
-          <AddVaccinationDialog onSuccess={fetchVaccinations} />
+          <AddVaccinationDialog onSuccess={() => {
+            fetchVaccinations();
+            const token = localStorage.getItem("auth_token");
+            if (token) fetchDashboardData(token);
+          }} />
         </div>
 
         {/* Stats Cards */}
@@ -331,6 +346,7 @@ const Dashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[100px]">{t("dashboard.table.status")}</TableHead>
+                      <TableHead>{t("dashboard.table.vaccine")}</TableHead>
                       <TableHead>{t("dashboard.table.date")}</TableHead>
                       <TableHead>{t("dashboard.table.dose")}</TableHead>
                       <TableHead>{t("dashboard.table.created")}</TableHead>
@@ -339,11 +355,18 @@ const Dashboard = () => {
                   </TableHeader>
                   <TableBody>
                     {vaccinations.map((vaccination) => (
-                      <TableRow key={vaccination.id}>
+                      <TableRow 
+                        key={vaccination.id} 
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => openEditDialog(vaccination)}
+                      >
                         <TableCell>
                           <Circle className="h-5 w-5 fill-success text-success" />
                         </TableCell>
                         <TableCell className="font-medium">
+                          {vaccination.vaccineName || "-"}
+                        </TableCell>
+                        <TableCell>
                           {format(new Date(vaccination.administeredOn), "MMM dd, yyyy")}
                         </TableCell>
                         <TableCell>
@@ -356,7 +379,17 @@ const Dashboard = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => openDeleteDialog(vaccination)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditDialog(vaccination);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => openDeleteDialog(vaccination, e)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -425,6 +458,18 @@ const Dashboard = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Edit Vaccination Dialog */}
+      <EditVaccinationDialog
+        vaccination={vaccinationToEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={() => {
+          fetchVaccinations();
+          const token = localStorage.getItem("auth_token");
+          if (token) fetchDashboardData(token);
+        }}
+      />
     </div>
   );
 };

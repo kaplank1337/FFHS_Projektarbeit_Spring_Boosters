@@ -71,6 +71,7 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.empty": "Noch keine Impfungen erfasst.",
     "dashboard.empty.hint": "Klicken Sie auf \"Impfung hinzufügen\", um zu beginnen.",
     "dashboard.table.status": "Status",
+    "dashboard.table.vaccine": "Impfstoff",
     "dashboard.table.date": "Verabreicht am",
     "dashboard.table.dose": "Dosis",
     "dashboard.table.created": "Erstellt am",
@@ -97,6 +98,21 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.button": "Impfung hinzufügen",
     "addVaccination.saving": "Wird gespeichert...",
     "addVaccination.cancel": "Abbrechen",
+    
+    // Edit vaccination dialog
+    "editVaccination.title": "Impfung bearbeiten",
+    "editVaccination.vaccineName": "Impfstoff",
+    "editVaccination.save": "Speichern",
+    "editVaccination.saving": "Wird gespeichert...",
+    "editVaccination.success": "Impfung aktualisiert",
+    "editVaccination.error.missingInfo": "Fehlende Informationen",
+    "editVaccination.error.missingInfoDesc": "Bitte füllen Sie alle erforderlichen Felder aus.",
+    "editVaccination.error.invalidDose": "Ungültige Dosisnummer",
+    "editVaccination.error.invalidDoseDesc": "Die Dosisnummer muss eine positive Ganzzahl sein.",
+    "editVaccination.error.notAuth": "Nicht authentifiziert",
+    "editVaccination.error.notAuthDesc": "Bitte melden Sie sich an.",
+    "editVaccination.error.failed": "Fehler beim Aktualisieren",
+    "editVaccination.error.failedDesc": "Die Impfung konnte nicht aktualisiert werden.",
   },
   en: {
     // Landing page
@@ -160,6 +176,7 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.empty": "No vaccinations recorded yet.",
     "dashboard.empty.hint": "Click \"Add Vaccination\" to get started.",
     "dashboard.table.status": "Status",
+    "dashboard.table.vaccine": "Vaccine",
     "dashboard.table.date": "Administered Date",
     "dashboard.table.dose": "Dose Number",
     "dashboard.table.created": "Created At",
@@ -186,6 +203,21 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.button": "Add Vaccination",
     "addVaccination.saving": "Saving...",
     "addVaccination.cancel": "Cancel",
+    
+    // Edit vaccination dialog
+    "editVaccination.title": "Edit Vaccination",
+    "editVaccination.vaccineName": "Vaccine Name",
+    "editVaccination.save": "Save",
+    "editVaccination.saving": "Saving...",
+    "editVaccination.success": "Vaccination updated",
+    "editVaccination.error.missingInfo": "Missing information",
+    "editVaccination.error.missingInfoDesc": "Please fill in all required fields.",
+    "editVaccination.error.invalidDose": "Invalid dose number",
+    "editVaccination.error.invalidDoseDesc": "Dose number must be a positive integer.",
+    "editVaccination.error.notAuth": "Not authenticated",
+    "editVaccination.error.notAuthDesc": "Please sign in.",
+    "editVaccination.error.failed": "Error updating",
+    "editVaccination.error.failedDesc": "Could not update vaccination record.",
   },
   fr: {
     // Landing page
@@ -249,6 +281,7 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.empty": "Aucune vaccination enregistrée.",
     "dashboard.empty.hint": "Cliquez sur \"Ajouter une vaccination\" pour commencer.",
     "dashboard.table.status": "Statut",
+    "dashboard.table.vaccine": "Vaccin",
     "dashboard.table.date": "Date d'administration",
     "dashboard.table.dose": "Numéro de dose",
     "dashboard.table.created": "Créé le",
@@ -275,6 +308,21 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.button": "Ajouter la vaccination",
     "addVaccination.saving": "Enregistrement...",
     "addVaccination.cancel": "Annuler",
+    
+    // Edit vaccination dialog
+    "editVaccination.title": "Modifier la vaccination",
+    "editVaccination.vaccineName": "Nom du vaccin",
+    "editVaccination.save": "Enregistrer",
+    "editVaccination.saving": "Enregistrement...",
+    "editVaccination.success": "Vaccination mise à jour",
+    "editVaccination.error.missingInfo": "Informations manquantes",
+    "editVaccination.error.missingInfoDesc": "Veuillez remplir tous les champs requis.",
+    "editVaccination.error.invalidDose": "Numéro de dose invalide",
+    "editVaccination.error.invalidDoseDesc": "Le numéro de dose doit être un entier positif.",
+    "editVaccination.error.notAuth": "Non authentifié",
+    "editVaccination.error.notAuthDesc": "Veuillez vous connecter.",
+    "editVaccination.error.failed": "Erreur de mise à jour",
+    "editVaccination.error.failedDesc": "Impossible de mettre à jour la vaccination.",
   },
 };
 

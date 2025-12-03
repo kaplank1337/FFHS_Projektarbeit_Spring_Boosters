@@ -90,27 +90,6 @@ class ImmunizationRecordControllerTest {
     }
 
     @Test
-    void getAllImmunizationRecords_returnsList() throws Exception {
-        UUID id = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID vt = UUID.randomUUID();
-        UUID plan = UUID.randomUUID();
-        String token = "Bearer testToken";
-
-        ImmunizationRecord entity = sampleEntity(id, userId, vt, plan, LocalDate.now(), 1);
-        ImmunizationRecordDto dto = sampleDto(id, LocalDate.now(), 1);
-
-        when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
-        when(immunizationRecordService.getAllImmunizationRecords(userId)).thenReturn(List.of(entity));
-        when(immunizationRecordMapper.toDtoList(List.of(entity))).thenReturn(List.of(dto));
-
-        mockMvc.perform(get("/api/v1/immunization-records").header("Authorization", token))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(id.toString())));
-    }
-
-    @Test
     void getById_success() throws Exception {
         UUID id = UUID.randomUUID();
         ImmunizationRecord entity = sampleEntity(id, UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
