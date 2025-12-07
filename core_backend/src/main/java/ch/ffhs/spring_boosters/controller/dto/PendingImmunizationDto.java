@@ -20,12 +20,12 @@ public class PendingImmunizationDto {
     private String ageCategoryName;
     private Integer ageMinDays;
     private Integer ageMaxDays;
-    private String reason; // z.B. "Grundimmunisierung", "Auffrischung", "Follow-up"
+    private String reason;
     private Integer recommendedDoses;
     private Integer completedDoses;
     private Integer missingDoses;
     private Integer preferredAgeDays;
     private boolean isOverdue;
-    private String priority; // "HIGH", "MEDIUM", "LOW"
+    private String priority;
 }
 
