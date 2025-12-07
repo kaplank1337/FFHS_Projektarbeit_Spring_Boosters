@@ -1,203 +1,154 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useVaccinationTypes } from "@/contexts/VaccinationTypesContext";
-
-interface Vaccination {
-  id: string;
-  administeredOn: string;
-  doseOrderClaimed: number | null;
-  vaccineName?: string;
-  createdAt: string;
-}
+import { useVaccineTypes } from "@/hooks/useVaccineTypes";
+import { useUpdateVaccination } from "@/hooks/useVaccinations";
+import { formatDate } from "@/lib/date-utils";
 
 interface EditVaccinationDialogProps {
-  vaccination: Vaccination | null;
+  vaccination: any;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }
 
-const EditVaccinationDialog = ({ vaccination, open, onOpenChange, onSuccess }: EditVaccinationDialogProps) => {
+const EditVaccinationDialog = ({
+  vaccination,
+  open,
+  onOpenChange,
+  onSuccess,
+}: EditVaccinationDialogProps) => {
   const { t } = useLanguage();
-  const { vaccinationTypes } = useVaccinationTypes();
-  const [vaccinationDate, setVaccinationDate] = useState<Date>();
-  const [doseOrderClaimed, setDoseOrderClaimed] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [vaccineTypeId, setVaccineTypeId] = useState("");
+  const [administeredOn, setAdministeredOn] = useState("");
+  const [doseOrderClaimed, setDoseOrderClaimed] = useState("");
+
+  const { data: vaccineTypes, isLoading } = useVaccineTypes();
+  const updateMutation = useUpdateVaccination();
 
   useEffect(() => {
     if (vaccination) {
-      setVaccinationDate(new Date(vaccination.administeredOn));
-      setDoseOrderClaimed(vaccination.doseOrderClaimed?.toString() || "");
+      setVaccineTypeId(vaccination.vaccineTypeId || "");
+      setAdministeredOn(
+        vaccination.administeredOn
+          ? formatDate(new Date(vaccination.administeredOn), "yyyy-MM-dd")
+          : ""
+      );
+      setDoseOrderClaimed(
+        vaccination.doseOrderClaimed?.toString() || ""
+      );
     }
   }, [vaccination]);
 
-  const handleSubmit = async () => {
-    if (!vaccination || !vaccinationDate) {
-      toast({
-        variant: "destructive",
-        title: t("editVaccination.error.missingInfo"),
-        description: t("editVaccination.error.missingInfoDesc"),
-      });
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    const doseNumber = doseOrderClaimed ? parseInt(doseOrderClaimed, 10) : null;
-    if (doseOrderClaimed && (isNaN(doseNumber!) || doseNumber! < 1)) {
-      toast({
-        variant: "destructive",
-        title: t("editVaccination.error.invalidDose"),
-        description: t("editVaccination.error.invalidDoseDesc"),
-      });
-      return;
-    }
+    if (!vaccination?.id) return;
 
-    setLoading(true);
-    
-    const token = localStorage.getItem("auth_token");
-    if (!token) {
-      toast({
-        variant: "destructive",
-        title: t("editVaccination.error.notAuth"),
-        description: t("editVaccination.error.notAuthDesc"),
-      });
-      setLoading(false);
-      return;
-    }
-
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-    
-    // Find vaccineTypeId from vaccine types based on vaccine name
-    const vaccineType = vaccinationTypes.find(vt => vt.name === vaccination.vaccineName);
-    if (!vaccineType) {
-      toast({
-        variant: "destructive",
-        title: t("editVaccination.error.failed"),
-        description: t("editVaccination.error.failedDesc"),
-      });
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      const response = await fetch(`${apiBaseUrl}/api/v1/immunization-records/${vaccination.id}`, {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+    updateMutation.mutate(
+      {
+        id: vaccination.id,
+        data: {
+          vaccineTypeId: vaccineTypeId || undefined,
+          administeredOn: administeredOn || undefined,
+          doseOrderClaimed: doseOrderClaimed ? parseInt(doseOrderClaimed) : undefined,
         },
-        body: JSON.stringify({
-          id: vaccination.id,
-          vaccineTypeId: vaccineType.id,
-          administeredOn: format(vaccinationDate, "yyyy-MM-dd"),
-          doseOrderClaimed: doseNumber,
-        }),
-      });
-
-      setLoading(false);
-
-      if (response.ok) {
-        toast({
-          title: t("editVaccination.success"),
-        });
-        onOpenChange(false);
-        onSuccess?.();
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        toast({
-          variant: "destructive",
-          title: t("editVaccination.error.failed"),
-          description: errorData.message || t("editVaccination.error.failedDesc"),
-        });
+      },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          onSuccess?.();
+        },
       }
-    } catch (error) {
-      setLoading(false);
-      toast({
-        variant: "destructive",
-        title: t("editVaccination.error.failed"),
-        description: error instanceof Error ? error.message : t("editVaccination.error.failedDesc"),
-      });
-    }
+    );
   };
+
+  if (!vaccination) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("editVaccination.title")}</DialogTitle>
+          <DialogTitle>{t("dashboard.editVaccination")}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          {vaccination?.vaccineName && (
-            <div className="space-y-2">
-              <Label>{t("editVaccination.vaccineName")}</Label>
-              <p className="text-sm font-medium p-2 bg-muted rounded-md">{vaccination.vaccineName}</p>
-            </div>
-          )}
-
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label>{t("addVaccination.date")}</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !vaccinationDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {vaccinationDate ? format(vaccinationDate, "PPP") : t("addVaccination.date")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={vaccinationDate}
-                  onSelect={setVaccinationDate}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
+            <Label htmlFor="edit-vaccine-type">{t("dashboard.vaccineType")}</Label>
+            <Select value={vaccineTypeId} onValueChange={setVaccineTypeId}>
+              <SelectTrigger>
+                <SelectValue placeholder={t("dashboard.selectVaccineType")} />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoading ? (
+                  <div className="p-2 text-sm text-muted-foreground">
+                    {t("dashboard.loading")}
+                  </div>
+                ) : (
+                  vaccineTypes?.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dose">{t("addVaccination.dose")}</Label>
+            <Label htmlFor="edit-administered-on">
+              {t("dashboard.administeredOn")}
+            </Label>
             <Input
-              id="dose"
-              type="number"
-              min="1"
-              step="1"
-              placeholder={t("addVaccination.dose.placeholder")}
-              value={doseOrderClaimed}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || /^\d+$/.test(value)) {
-                  setDoseOrderClaimed(value);
-                }
-              }}
+              id="edit-administered-on"
+              type="date"
+              value={administeredOn}
+              onChange={(e) => setAdministeredOn(e.target.value)}
+              required
             />
           </div>
-        </div>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("addVaccination.cancel")}
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? t("editVaccination.saving") : t("editVaccination.save")}
-          </Button>
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-dose-order">{t("dashboard.doseOrder")}</Label>
+            <Input
+              id="edit-dose-order"
+              type="number"
+              min="1"
+              value={doseOrderClaimed}
+              onChange={(e) => setDoseOrderClaimed(e.target.value)}
+              placeholder={t("dashboard.optional")}
+            />
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              {t("dashboard.cancel")}
+            </Button>
+            <Button type="submit" disabled={updateMutation.isPending}>
+              {updateMutation.isPending
+                ? t("dashboard.saving")
+                : t("dashboard.save")}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

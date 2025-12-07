@@ -1,108 +1,59 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useToast } from "@/hooks/use-toast";
-
-interface VaccineTypeActiveSubstance {
-  vaccineTypeId: string;
-  activeSubstanceId: string;
-  qualitativeAmount: string;
-}
-
-interface VaccinationType {
-  id: string;
-  name: string;
-  code: string;
-  vaccineTypeActiveSubstances: VaccineTypeActiveSubstance[];
-}
-
-interface ImmunizationPlan {
-  id: string;
-  name: string;
-  description: string | null;
-  vaccineTypeId: string;
-  ageCategoryId: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { createContext, useContext, type ReactNode } from "react";
+import { useVaccineTypes, useImmunizationPlans } from "@/hooks/useVaccineTypes";
+import type {
+  VaccineType,
+  ImmunizationPlan,
+} from "@/services/vaccine-types.service";
 
 interface VaccinationTypesContextType {
-  vaccinationTypes: VaccinationType[];
+  vaccinationTypes: VaccineType[];
   immunizationPlans: ImmunizationPlan[];
   loading: boolean;
   fetchVaccinationTypes: () => Promise<void>;
   fetchImmunizationPlans: () => Promise<void>;
 }
 
-const VaccinationTypesContext = createContext<VaccinationTypesContextType | undefined>(undefined);
+const VaccinationTypesContext = createContext<
+  VaccinationTypesContextType | undefined
+>(undefined);
 
-export const VaccinationTypesProvider = ({ children }: { children: ReactNode }) => {
-  const [vaccinationTypes, setVaccinationTypes] = useState<VaccinationType[]>([]);
-  const [immunizationPlans, setImmunizationPlans] = useState<ImmunizationPlan[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+export const VaccinationTypesProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const {
+    data: vaccinationTypes = [],
+    isLoading: loadingTypes,
+    refetch: refetchTypes,
+  } = useVaccineTypes();
+
+  const {
+    data: immunizationPlans = [],
+    isLoading: loadingPlans,
+    refetch: refetchPlans,
+  } = useImmunizationPlans();
+
+  const loading = loadingTypes || loadingPlans;
 
   const fetchVaccinationTypes = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        return;
-      }
-
-      const response = await fetch("http://localhost:8000/api/v1/vaccine-types", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch vaccination types");
-      }
-
-      const data = await response.json();
-      setVaccinationTypes(data.vaccineTypeDtoList || []);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error loading vaccination types",
-        description: error instanceof Error ? error.message : "Unknown error",
-      });
-    } finally {
-      setLoading(false);
-    }
+    await refetchTypes();
   };
 
   const fetchImmunizationPlans = async () => {
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        return;
-      }
-
-      const response = await fetch("http://localhost:8000/api/v1/immunization-plans", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch immunization plans");
-      }
-
-      const data = await response.json();
-      setImmunizationPlans(data || []);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error loading immunization plans",
-        description: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+    await refetchPlans();
   };
 
   return (
-    <VaccinationTypesContext.Provider value={{ vaccinationTypes, immunizationPlans, loading, fetchVaccinationTypes, fetchImmunizationPlans }}>
+    <VaccinationTypesContext.Provider
+      value={{
+        vaccinationTypes,
+        immunizationPlans,
+        loading,
+        fetchVaccinationTypes,
+        fetchImmunizationPlans,
+      }}
+    >
       {children}
     </VaccinationTypesContext.Provider>
   );
@@ -111,7 +62,9 @@ export const VaccinationTypesProvider = ({ children }: { children: ReactNode }) 
 export const useVaccinationTypes = () => {
   const context = useContext(VaccinationTypesContext);
   if (context === undefined) {
-    throw new Error("useVaccinationTypes must be used within a VaccinationTypesProvider");
+    throw new Error(
+      "useVaccinationTypes must be used within a VaccinationTypesProvider"
+    );
   }
   return context;
 };

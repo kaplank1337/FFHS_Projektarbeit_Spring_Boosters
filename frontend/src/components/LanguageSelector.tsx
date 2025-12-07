@@ -1,40 +1,50 @@
-import { useLanguage, Language } from "@/contexts/LanguageContext";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { useLanguage, type Language } from "@/contexts/LanguageContext";
+import { Check } from "lucide-react";
 
-const languages: { code: Language; name: string; flag: string }[] = [
-  { code: "de", name: "Deutsch", flag: "🇩🇪" },
-  { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "fr", name: "Français", flag: "🇫🇷" },
+const languageOptions = [
+  { code: "de" as Language, label: "Deutsch", flag: "🇩🇪" },
+  { code: "en" as Language, label: "English", flag: "🇬🇧" },
+  { code: "fr" as Language, label: "Français", flag: "🇫🇷" },
 ];
 
 const LanguageSelector = () => {
   const { language, setLanguage } = useLanguage();
-  
-  const currentLanguage = languages.find((l) => l.code === language) || languages[0];
+
+  const currentLanguage = languageOptions.find(
+    (lang) => lang.code === language
+  );
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
-          <span className="text-lg">{currentLanguage.flag}</span>
-          <span className="hidden sm:inline">{currentLanguage.name}</span>
+        <Button variant="ghost" className="gap-2">
+          <span className="hidden sm:inline">
+            {currentLanguage?.flag} {currentLanguage?.label}
+          </span>
+          <span className="sm:hidden">{currentLanguage?.flag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-background border z-50">
-        {languages.map((lang) => (
+      <DropdownMenuContent align="end" className="w-48">
+        {languageOptions.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
-            className={`cursor-pointer gap-2 ${language === lang.code ? "bg-accent" : ""}`}
+            className="flex items-center justify-between cursor-pointer"
           >
-            <span className="text-lg">{lang.flag}</span>
-            <span>{lang.name}</span>
+            <span className="flex items-center gap-2">
+              <span className="text-lg">{lang.flag}</span>
+              <span>{lang.label}</span>
+            </span>
+            {language === lang.code && (
+              <Check className="h-4 w-4 text-primary" />
+            )}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

@@ -1,154 +1,105 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate, useSearchParams } from "react-router";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useVaccinationTypes } from "@/contexts/VaccinationTypesContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import { Syringe } from "lucide-react";
+import { useLogin, useRegister } from "@/hooks/useAuth";
+import {
+  useVaccineTypes as useVaccineTypesQuery,
+  useImmunizationPlans,
+} from "@/hooks/useVaccineTypes";
 
 const Auth = () => {
-  const { fetchVaccinationTypes, fetchImmunizationPlans } = useVaccinationTypes();
   const { t } = useLanguage();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  // Sign in state
   const [signinUsername, setSigninUsername] = useState("");
   const [signinPassword, setSigninPassword] = useState("");
+
+  // Sign up state
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "signup" ? "signup" : "signin");
-  const navigate = useNavigate();
-  const { toast } = useToast();
+
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get("tab") === "signup" ? "signup" : "signin"
+  );
+
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
+
+  const { refetch: refetchVaccineTypes } = useVaccineTypesQuery();
+  const { refetch: refetchImmunizationPlans } = useImmunizationPlans();
 
   useEffect(() => {
-    // Check if user is already logged in with local auth token
     const token = localStorage.getItem("auth_token");
     if (token) {
       navigate("/dashboard");
     }
   }, [navigate]);
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-    
-    try {
-      const response = await fetch(`${apiBaseUrl}/api/v1/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          firstName,
-          lastName,
-          birthDate,
-          email: signupEmail,
-          password: signupPassword,
-        }),
-      });
-
-      if (response.ok) {
-        // Success - 2xx status code
-        toast({
-          title: "Account created!",
-          description: "You can now sign in with your credentials.",
-        });
-        
-        // Reset form
-        setUsername("");
-        setFirstName("");
-        setLastName("");
-        setBirthDate("");
-        setSignupEmail("");
-        setSignupPassword("");
-        
-        // Redirect to sign in tab
-        setActiveTab("signin");
-      } else {
-        // Non-2xx status code
-        const data = await response.json();
-        throw new Error(data.message || "Could not create account");
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Could not create account",
-        description: error instanceof Error ? error.message : "An error occurred during registration",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
-    
-    try {
-      const response = await fetch(`${apiBaseUrl}/api/v1/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    loginMutation.mutate(
+      {
+        username: signinUsername,
+        password: signinPassword,
+      },
+      {
+        onSuccess: async () => {
+          await Promise.all([
+            refetchVaccineTypes(),
+            refetchImmunizationPlans(),
+          ]);
         },
-        body: JSON.stringify({
-          username: signinUsername,
-          password: signinPassword,
-        }),
-      });
-
-      if (response.ok) {
-        // Success - 2xx status code
-        const data = await response.json();
-        
-        // Store the authentication token - try different possible field names
-        const token = data.token || data.accessToken || data.jwt;
-        if (token) {
-          localStorage.setItem("auth_token", token);
-          console.log("Token stored successfully");
-        } else {
-          console.error("No token found in response:", data);
-          toast({
-            variant: "destructive",
-            title: "Authentication error",
-            description: "No token received from server",
-          });
-          setLoading(false);
-          return;
-        }
-        
-        // Fetch vaccination types and immunization plans after successful login
-        await Promise.all([fetchVaccinationTypes(), fetchImmunizationPlans()]);
-        
-        // Redirect to dashboard
-        navigate("/dashboard");
-      } else {
-        // Non-2xx status code
-        const data = await response.json();
-        throw new Error(data.message || "Sign in failed");
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Sign in failed",
-        description: error instanceof Error ? error.message : "An error occurred during sign in",
-      });
-    } finally {
-      setLoading(false);
-    }
+    );
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    registerMutation.mutate(
+      {
+        username,
+        firstName,
+        lastName,
+        birthDate,
+        email: signupEmail,
+        password: signupPassword,
+      },
+      {
+        onSuccess: () => {
+          // Reset form
+          setUsername("");
+          setFirstName("");
+          setLastName("");
+          setBirthDate("");
+          setSignupEmail("");
+          setSignupPassword("");
+
+          // Switch to sign in tab
+          setActiveTab("signin");
+        },
+      }
+    );
   };
 
   return (
@@ -160,13 +111,15 @@ const Auth = () => {
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <Syringe className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold whitespace-nowrap">{t("auth.welcome")}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold whitespace-nowrap">
+              {t("auth.welcome")}
+            </h1>
             <p className="text-muted-foreground mt-2 text-center">
               {t("auth.subtitle")}
             </p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">{t("auth.signin")}</TabsTrigger>
               <TabsTrigger value="signup">{t("auth.signup")}</TabsTrigger>
@@ -176,12 +129,16 @@ const Auth = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>{t("auth.signin.title")}</CardTitle>
-                  <CardDescription>{t("auth.signin.description")}</CardDescription>
+                  <CardDescription>
+                    {t("auth.signin.description")}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signin-username">{t("auth.username")}</Label>
+                      <Label htmlFor="signin-username">
+                        {t("auth.username")}
+                      </Label>
                       <Input
                         id="signin-username"
                         type="text"
@@ -192,7 +149,9 @@ const Auth = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signin-password">{t("auth.password")}</Label>
+                      <Label htmlFor="signin-password">
+                        {t("auth.password")}
+                      </Label>
                       <Input
                         id="signin-password"
                         type="password"
@@ -201,8 +160,14 @@ const Auth = () => {
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? t("auth.signin.loading") : t("auth.signin.button")}
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending
+                        ? t("auth.signin.loading")
+                        : t("auth.signin.button")}
                     </Button>
                   </form>
                 </CardContent>
@@ -213,12 +178,16 @@ const Auth = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>{t("auth.signup.title")}</CardTitle>
-                  <CardDescription>{t("auth.signup.description")}</CardDescription>
+                  <CardDescription>
+                    {t("auth.signup.description")}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signup-username">{t("auth.username")}</Label>
+                      <Label htmlFor="signup-username">
+                        {t("auth.username")}
+                      </Label>
                       <Input
                         id="signup-username"
                         type="text"
@@ -230,7 +199,9 @@ const Auth = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="signup-firstname">{t("auth.firstName")}</Label>
+                        <Label htmlFor="signup-firstname">
+                          {t("auth.firstName")}
+                        </Label>
                         <Input
                           id="signup-firstname"
                           type="text"
@@ -241,7 +212,9 @@ const Auth = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="signup-lastname">{t("auth.lastName")}</Label>
+                        <Label htmlFor="signup-lastname">
+                          {t("auth.lastName")}
+                        </Label>
                         <Input
                           id="signup-lastname"
                           type="text"
@@ -253,7 +226,9 @@ const Auth = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-birthdate">{t("auth.birthDate")}</Label>
+                      <Label htmlFor="signup-birthdate">
+                        {t("auth.birthDate")}
+                      </Label>
                       <Input
                         id="signup-birthdate"
                         type="date"
@@ -274,7 +249,9 @@ const Auth = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-password">{t("auth.password")}</Label>
+                      <Label htmlFor="signup-password">
+                        {t("auth.password")}
+                      </Label>
                       <Input
                         id="signup-password"
                         type="password"
@@ -284,8 +261,14 @@ const Auth = () => {
                         minLength={6}
                       />
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? t("auth.signup.loading") : t("auth.signup.button")}
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={registerMutation.isPending}
+                    >
+                      {registerMutation.isPending
+                        ? t("auth.signup.loading")
+                        : t("auth.signup.button")}
                     </Button>
                   </form>
                 </CardContent>
