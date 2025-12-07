@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -26,6 +27,7 @@ public class PendingImmunizationDto {
     private Integer missingDoses;
     private Integer preferredAgeDays;
     private boolean isOverdue;
+    private LocalDate dueDate;
     private String priority;
 }
 

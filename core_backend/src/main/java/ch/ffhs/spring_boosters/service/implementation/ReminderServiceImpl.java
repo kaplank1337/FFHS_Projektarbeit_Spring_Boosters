@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -99,13 +98,7 @@ public class ReminderServiceImpl implements ReminderService {
     private NotificationVaccinationDto mapToNotificationVaccination(PendingImmunizationDto pending) {
 
         String vaccineName = pending.getVaccineTypeName();
-        String dueDate = null;
-
-        if (pending.getPreferredAgeDays() != null) {
-            LocalDate calculatedDueDate = LocalDate.now().plusDays(pending.getPreferredAgeDays());
-            dueDate = calculatedDueDate.format(DATE_FORMATTER);
-        }
-
+        String dueDate = pending.getDueDate().toString();
         String status = pending.getPriority();
         String description = pending.getReason();
 
