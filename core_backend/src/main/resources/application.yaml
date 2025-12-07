@@ -33,6 +33,10 @@ notification:
     port: ${NOTIFICATION_SERVICE_PORT:8082}
     path: /api/v1/email/send
 
+reminder:
+  cron:
+    expression: ${REMINDER_CRON_EXPRESSION:0 0 10 ? * SUN}
+
 # OpenAPI
 springdoc:
   api-docs:
@@ -57,7 +61,3 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
     org.flywaydb: debug
-
-server:
-  port: ${SERVER_PORT:8081}
-

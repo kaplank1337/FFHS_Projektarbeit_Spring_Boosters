@@ -5,3 +5,7 @@ spring:
 notification:
   service:
     host: ${NOTIFICATION_SERVICE_HOST:localhost}
+
+reminder:
+  cron:
+    expression: ${REMINDER_CRON_EXPRESSION:0 0 10 ? * SUN}

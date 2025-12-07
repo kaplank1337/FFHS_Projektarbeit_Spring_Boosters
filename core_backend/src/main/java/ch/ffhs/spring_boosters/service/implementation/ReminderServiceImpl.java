@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -29,6 +30,8 @@ public class ReminderServiceImpl implements ReminderService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
+    @Value("${reminder.cron.expression:0 0 10 ? * SUN}")
+    private String reminderCronExpression;
 
     public ReminderServiceImpl(
             UserRepository userRepository,
@@ -45,7 +48,7 @@ public class ReminderServiceImpl implements ReminderService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 10 ? * SUN") // Jeden Sonntag um 10:00 Uhr
+    @Scheduled(cron = "${reminder.cron.expression:0 0 10 ? * SUN}")
     public void sendReminders() throws UserNotFoundException {
 
         List<User> users = userRepository.findAllByRole("USER")
@@ -97,6 +100,12 @@ public class ReminderServiceImpl implements ReminderService {
 
         String vaccineName = pending.getVaccineTypeName();
         String dueDate = null;
+
+        if (pending.getPreferredAgeDays() != null) {
+            LocalDate calculatedDueDate = LocalDate.now().plusDays(pending.getPreferredAgeDays());
+            dueDate = calculatedDueDate.format(DATE_FORMATTER);
+        }
+
         String status = pending.getPriority();
         String description = pending.getReason();
 
