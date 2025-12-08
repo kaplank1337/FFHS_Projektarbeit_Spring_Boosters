@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Component
 @Order(-100) // Früh ausführen
+@Slf4j
 public class JwtAuthenticationFilter implements WebFilter {
 
     private final JwtValidator jwtValidator;
@@ -41,31 +43,31 @@ public class JwtAuthenticationFilter implements WebFilter {
         var path = exchange.getRequest().getPath().value();
         // Öffentliche Endpunkte überspringen
         if (checkIfPathExists(path)) {
-            System.out.println("[JWT] Public endpoint – skipping token check");
+            log.info("[JWT] Public endpoint – skipping token check");
             return chain.filter(exchange);
         }
 
         HttpMethod method = exchange.getRequest().getMethod();
         // 1. Preflight / OPTIONS immer durchlassen
         if (HttpMethod.OPTIONS.equals(method)) {
-            System.out.println("[JWT] OPTIONS request – skipping token check");
+            log.info("[JWT] OPTIONS request – skipping token check");
             return chain.filter(exchange);
         }
 
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("[JWT] Missing or invalid Authorization header");
+            log.info("[JWT] Missing or invalid Authorization header");
             return unauthorized(exchange); // Kein Token vorhanden
         }
 
         String token = authHeader.substring(7);
         if (!jwtValidator.isValid(token)) {
-            System.out.println("[JWT] Token invalid");
+            log.info("[JWT] Token invalid");
             return unauthorized(exchange); // Ungültiger Token
         }
 
         String username = jwtValidator.extractUsername(token);
-        System.out.println("[JWT] Token valid for user=" + username);
+        log.info("[JWT] Token valid for user=" + username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 username,
                 null,

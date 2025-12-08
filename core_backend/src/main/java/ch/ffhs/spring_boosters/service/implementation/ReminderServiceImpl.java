@@ -29,9 +29,6 @@ public class ReminderServiceImpl implements ReminderService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
-    @Value("${reminder.cron.expression:0 0 10 ? * SUN}")
-    private String reminderCronExpression;
-
     public ReminderServiceImpl(
             UserRepository userRepository,
             ImmunizationScheduleServiceImpl immunizationScheduleService,
