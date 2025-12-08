@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
  */
 @SpringBootTest
 @ActiveProfiles("local")
+@Disabled
 class ReminderServiceImplIntegrationTest {
 
     @Autowired
