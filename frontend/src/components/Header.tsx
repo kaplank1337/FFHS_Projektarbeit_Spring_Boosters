@@ -29,7 +29,7 @@ const Header = ({ user }: HeaderProps) => {
           <LanguageSelector />
 
           {user && (
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
+            <Button variant="ghost" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">{t("header.logout")}</span>
             </Button>

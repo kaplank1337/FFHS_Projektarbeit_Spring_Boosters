@@ -28,7 +28,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <VaccinationTypesProvider>
-        <Toaster />
+        <Toaster richColors closeButton expand={true} />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />

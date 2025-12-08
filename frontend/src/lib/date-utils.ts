@@ -1,24 +1,20 @@
-export const formatDate = (date: Date | string, formatStr: string = "MMM dd, yyyy"): string => {
-  const d = typeof date === "string" ? new Date(date) : date;
+import { format, isValid, parseISO } from "date-fns";
 
-  const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ];
+export const formatDate = (
+  date: Date | string | null | undefined,
+  formatStr = "dd.MM.yyyy"
+): string => {
+  if (!date) return "";
 
-  const day = d.getDate();
-  const month = months[d.getMonth()];
-  const year = d.getFullYear();
+  try {
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
 
-  if (formatStr === "MMM dd, yyyy") {
-    return `${month} ${day.toString().padStart(2, '0')}, ${year}`;
+    if (!(dateObj instanceof Date) || !isValid(dateObj)) {
+      return "";
+    }
+
+    return format(dateObj, formatStr);
+  } catch {
+    return "";
   }
-
-  if (formatStr === "yyyy-MM-dd") {
-    const monthNum = (d.getMonth() + 1).toString().padStart(2, '0');
-    const dayNum = day.toString().padStart(2, '0');
-    return `${year}-${monthNum}-${dayNum}`;
-  }
-
-  return d.toLocaleDateString();
 };
