@@ -33,7 +33,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SERVER_PORT: 8081
-      NOTIFICATION_SERVICE_HOST: notification_service
+      NOTIFICATION_SERVICE_HOST: notification-service
       NOTIFICATION_SERVICE_PORT: 8082
       JWT_SECRET: f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51
       JWT_EXPIRATION_SECONDS: 3600
@@ -67,7 +67,7 @@ services:
     build:
       context: ./notification_service
       dockerfile: Dockerfile
-    container_name: notification_service
+    container_name: notification-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/spring_booster_db?currentSchema=notification_service
       SPRING_DATASOURCE_USERNAME: postgres
@@ -75,8 +75,8 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       MAIL_HOST: smtp.gmail.com
       MAIL_PORT: 587
-      MAIL_USERNAME: ${MAIL_USERNAME:-your-email@gmail.com}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-your-app-password}
+      MAIL_USERNAME: noreply.springboosters@gmail.com
+      #MAIL_PASSWORD: <Password hier einsetzen> -- Falls man den NOTIFICATION Service benutzen möchte. Bitte Betriebsanleitung anschauen.
       SERVER_PORT: 8082
       JAVA_OPTS: "-Xmx512m -Xms256m"
     expose:
@@ -98,7 +98,7 @@ services:
       SERVER_PORT: 8000
       CORE_BACKEND_HOST: corebackend
       CORE_BACKEND_PORT: 8081
-      NOTIFICATION_SERVICE_HOST: notification_service
+      NOTIFICATION_SERVICE_HOST: notification-service
       NOTIFICATION_SERVICE_PORT: 8082
       JWT_SECRET: f79ca3e9583d0451b249e87d8b1c3ead2bf190dd55c6a95e0f884713b89f109a1d217ad1e76accb3cdafb96c09bed2fe27762f347e53a1596ddc88a4973bcb51
       JWT_EXPIRATION_SECONDS: 3600

@@ -117,6 +117,9 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
                     .missingDoses(requiredDoses - (int) completedDoses)
                     .isOverdue(isOverdue(ageCategory, currentAgeDays))
                     .priority(determinePriority(ageCategory, currentAgeDays, completedDoses, requiredDoses))
+                    .dueDate(ageCategory != null && ageCategory.getAgeMinDays() != null
+                            ? birthDate.plusDays(ageCategory.getAgeMinDays())
+                            : null)
                     .build();
 
             pendingImmunizations.add(pending);
