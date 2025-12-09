@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
-import AddVaccinationDialog from "@/components/AddVaccinationDialog";
+import AddImmunizationRecord from "@/components/AddImmunizationRecord";
 import EditVaccinationDialog from "@/components/EditVaccinationDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -38,7 +38,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useDashboardStats, usePendingVaccinations } from "@/hooks/useDashboard";
+import {
+  useDashboardStats,
+  usePendingVaccinations,
+} from "@/hooks/useDashboard";
 import { useVaccinations, useDeleteVaccination } from "@/hooks/useVaccinations";
 import type { PendingPriority } from "@/services/dashboard.service";
 import type { Vaccination } from "@/services/vaccinations.service";
@@ -50,13 +53,11 @@ const Dashboard = () => {
   const [vaccinationToDelete, setVaccinationToDelete] =
     useState<Vaccination | null>(null);
   const [pendingDialogOpen, setPendingDialogOpen] = useState(false);
-  const [pendingPriority, setPendingPriority] = useState<PendingPriority | null>(
-    null
-  );
+  const [pendingPriority, setPendingPriority] =
+    useState<PendingPriority | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [vaccinationToEdit, setVaccinationToEdit] = useState<Vaccination | null>(
-    null
-  );
+  const [vaccinationToEdit, setVaccinationToEdit] =
+    useState<Vaccination | null>(null);
 
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -133,7 +134,7 @@ const Dashboard = () => {
               {t("dashboard.subtitle")}
             </p>
           </div>
-          <AddVaccinationDialog />
+          <AddImmunizationRecord />
         </div>
 
         {/* Stats Cards */}

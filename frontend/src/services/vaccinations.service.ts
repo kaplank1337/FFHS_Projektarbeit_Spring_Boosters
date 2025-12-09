@@ -9,16 +9,17 @@ export interface Vaccination {
   updatedAt?: string;
 }
 
-export interface CreateVaccinationRequest {
+export interface ImmunizationRecordCreateDto {
   vaccineTypeId: string;
-  administeredOn: string;
-  doseOrderClaimed?: number;
+  administeredOn: Date;
+  doseOrderClaimed: number;
 }
 
 export interface UpdateVaccinationRequest {
-  vaccineTypeId?: string;
-  administeredOn?: string;
-  doseOrderClaimed?: number;
+  id: string;
+  vaccineTypeId: string;
+  administeredOn: Date;
+  doseOrderClaimed: number;
 }
 
 export const vaccinationsService = {
@@ -30,12 +31,18 @@ export const vaccinationsService = {
     return apiClient.get<Vaccination>(`/api/v1/immunization-records/${id}`);
   },
 
-  create: async (data: CreateVaccinationRequest): Promise<Vaccination> => {
+  create: async (data: ImmunizationRecordCreateDto): Promise<Vaccination> => {
     return apiClient.post<Vaccination>("/api/v1/immunization-records", data);
   },
 
-  update: async (id: string, data: UpdateVaccinationRequest): Promise<Vaccination> => {
-    return apiClient.put<Vaccination>(`/api/v1/immunization-records/${id}`, data);
+  update: async (
+    id: string,
+    data: UpdateVaccinationRequest
+  ): Promise<Vaccination> => {
+    return apiClient.put<Vaccination>(
+      `/api/v1/immunization-records/${id}`,
+      data
+    );
   },
 
   delete: async (id: string): Promise<void> => {

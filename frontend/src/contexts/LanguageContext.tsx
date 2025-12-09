@@ -137,6 +137,12 @@ const translations: Record<Language, Record<string, string>> = {
     "editVaccination.error.failed": "Fehler beim Aktualisieren",
     "editVaccination.error.failedDesc":
       "Die Impfung konnte nicht aktualisiert werden.",
+
+    // Validation
+    "validation.required": "Pflichtfeld",
+    "validation.invalidDate": "Datum muss in der Vergangenheit liegen",
+    "validation.invalidDoseNumber": "Ungültige Dosisnummer",
+    "validation.positiveNumber": "Muss eine positive Zahl sein",
   },
   en: {
     // Landing page
