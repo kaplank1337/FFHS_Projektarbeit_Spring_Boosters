@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Field,
   FieldError,
@@ -37,12 +38,11 @@ interface AddImmunizationRecordDialogProps {
 
 const formSchema = z.object({
   vaccineTypeId: z.string("validation.required"),
-  administeredOn: z.string("validation.required").refine(
+  administeredOn: z.date("validation.required").refine(
     (date) => {
-      const selectedDate = new Date(date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      return selectedDate <= today;
+      return date <= today;
     },
     { message: "validation.invalidDate" }
   ),
@@ -69,7 +69,7 @@ const AddImmunizationRecord = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       vaccineTypeId: undefined,
-      administeredOn: formatDate(new Date()),
+      administeredOn: new Date(),
       doseOrderClaimed: undefined,
     },
   });
@@ -78,7 +78,7 @@ const AddImmunizationRecord = ({
     createMutation.mutate(
       {
         vaccineTypeId: data.vaccineTypeId,
-        administeredOn: data.administeredOn,
+        administeredOn: formatDate(data.administeredOn, "yyyy-MM-dd"),
         doseOrderClaimed: data.doseOrderClaimed
           ? parseInt(data.doseOrderClaimed)
           : undefined,
@@ -158,10 +158,10 @@ const AddImmunizationRecord = ({
                   <FieldLabel htmlFor="administered-on">
                     {t("dashboard.administeredOn")} <RequiredIndicator />
                   </FieldLabel>
-                  <Input
-                    {...field}
-                    id="administered-on"
-                    type="date"
+                  <DatePicker
+                    date={field.value}
+                    onSelect={field.onChange}
+                    placeholder={t("dashboard.selectDate")}
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
