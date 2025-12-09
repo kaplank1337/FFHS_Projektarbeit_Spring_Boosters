@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 export interface ApiError {
   message: string;
@@ -24,10 +25,7 @@ class ApiClient {
         };
   }
 
-  async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     const headers = this.getAuthHeader();
 
@@ -50,7 +48,8 @@ class ApiClient {
 
       if (!response.ok) {
         const error: ApiError = {
-          message: data?.message || `HTTP ${response.status}: ${response.statusText}`,
+          message:
+            data?.message || `HTTP ${response.status}: ${response.statusText}`,
           status: response.status,
         };
         throw error;
@@ -63,7 +62,8 @@ class ApiClient {
       }
 
       const apiError: ApiError = {
-        message: error instanceof Error ? error.message : "Network error occurred",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
       };
       throw apiError;
     }
@@ -73,7 +73,11 @@ class ApiClient {
     return this.request<T>(endpoint, { ...options, method: "GET" });
   }
 
-  async post<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<T> {
+  async post<T>(
+    endpoint: string,
+    body?: unknown,
+    options?: RequestInit
+  ): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
       method: "POST",
@@ -81,10 +85,14 @@ class ApiClient {
     });
   }
 
-  async put<T>(endpoint: string, body?: unknown, options?: RequestInit): Promise<T> {
+  async put<T>(
+    endpoint: string,
+    body?: unknown,
+    options?: RequestInit
+  ): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
-      method: "PUT",
+      method: "PATCH",
       body: body ? JSON.stringify(body) : undefined,
     });
   }

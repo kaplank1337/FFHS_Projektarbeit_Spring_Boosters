@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 
-export interface DashboardStats {
+export interface DashboardStatsDto {
   overdueCount: number;
   dueSoonCount: number;
   upcomingDueCount: number;
@@ -14,11 +14,15 @@ export interface PendingVaccinationsResponse {
 export type PendingPriority = "overdue" | "due-soon" | "upcoming";
 
 export const dashboardService = {
-  getStats: async (): Promise<DashboardStats> => {
-    return apiClient.get<DashboardStats>("/api/v1/immunization-schedule/pending/summary");
+  getStats: async (): Promise<DashboardStatsDto> => {
+    return apiClient.get<DashboardStatsDto>(
+      "/api/v1/immunization-schedule/pending/summary"
+    );
   },
 
-  getPendingByPriority: async (priority: PendingPriority): Promise<PendingVaccinationsResponse> => {
+  getPendingByPriority: async (
+    priority: PendingPriority
+  ): Promise<PendingVaccinationsResponse> => {
     return apiClient.get<PendingVaccinationsResponse>(
       `/api/v1/immunization-schedule/pending/${priority}`
     );

@@ -119,13 +119,14 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.button": "Impfung hinzufügen",
     "addVaccination.saving": "Wird gespeichert...",
     "addVaccination.cancel": "Abbrechen",
+    "addVaccination.success": "Impfung erfolgreich hinzugefügt",
 
     // Edit vaccination dialog
     "editVaccination.title": "Impfung bearbeiten",
     "editVaccination.vaccineName": "Impfstoff",
     "editVaccination.save": "Speichern",
     "editVaccination.saving": "Wird gespeichert...",
-    "editVaccination.success": "Impfung aktualisiert",
+    "editVaccination.success": "Impfung erfolgreich aktualisiert",
     "editVaccination.error.missingInfo": "Fehlende Informationen",
     "editVaccination.error.missingInfoDesc":
       "Bitte füllen Sie alle erforderlichen Felder aus.",
@@ -137,6 +138,8 @@ const translations: Record<Language, Record<string, string>> = {
     "editVaccination.error.failed": "Fehler beim Aktualisieren",
     "editVaccination.error.failedDesc":
       "Die Impfung konnte nicht aktualisiert werden.",
+
+    "deleteVaccination.success": "Impfung erfolgreich gelöscht",
 
     // Validation
     "validation.required": "Pflichtfeld",

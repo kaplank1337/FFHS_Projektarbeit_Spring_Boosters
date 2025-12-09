@@ -11,6 +11,11 @@ const Index = () => {
     window.location.href = path;
   };
 
+  const token = localStorage.getItem("auth_token");
+  if (token) {
+    navigate("/dashboard");
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

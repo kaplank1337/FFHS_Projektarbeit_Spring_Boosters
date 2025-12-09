@@ -46,17 +46,12 @@ const formSchema = z.object({
     },
     { message: "validation.invalidDate" }
   ),
-  doseOrderClaimed: z.string("validation.required").refine(
-    (val) => {
-      if (!val) return true;
-      const num = parseInt(val);
-      return num > 0;
-    },
-    { message: "validation.positiveNumber" }
-  ),
+  doseOrderClaimed: z.coerce
+    .number("validation.required")
+    .min(1, "validation.positiveNumber"),
 });
 
-const AddImmunizationRecord = ({
+const AddImmunizationRecordDialog = ({
   onSuccess,
 }: AddImmunizationRecordDialogProps) => {
   const { t } = useLanguage();
@@ -78,10 +73,8 @@ const AddImmunizationRecord = ({
     createMutation.mutate(
       {
         vaccineTypeId: data.vaccineTypeId,
-        administeredOn: formatDate(data.administeredOn, "yyyy-MM-dd"),
-        doseOrderClaimed: data.doseOrderClaimed
-          ? parseInt(data.doseOrderClaimed)
-          : undefined,
+        administeredOn: data.administeredOn,
+        doseOrderClaimed: parseInt(data.doseOrderClaimed),
       },
       {
         onSuccess: () => {
@@ -221,4 +214,4 @@ const AddImmunizationRecord = ({
   );
 };
 
-export default AddImmunizationRecord;
+export default AddImmunizationRecordDialog;

@@ -1,10 +1,10 @@
 import { apiClient } from "@/lib/api-client";
 
-export interface Vaccination {
+export interface ImmunizationRecordDto {
   id: string;
   vaccineName: string;
-  administeredOn: string;
-  doseOrderClaimed?: number;
+  administeredOn: Date;
+  doseOrderClaimed: number;
   createdAt: string;
   updatedAt?: string;
 }
@@ -15,7 +15,7 @@ export interface ImmunizationRecordCreateDto {
   doseOrderClaimed: number;
 }
 
-export interface UpdateVaccinationRequest {
+export interface ImmunizationRecordUpdateDto {
   id: string;
   vaccineTypeId: string;
   administeredOn: Date;
@@ -23,23 +23,32 @@ export interface UpdateVaccinationRequest {
 }
 
 export const vaccinationsService = {
-  getAll: async (): Promise<Vaccination[]> => {
-    return apiClient.get<Vaccination[]>("/api/v1/immunization-records");
+  getAll: async (): Promise<ImmunizationRecordDto[]> => {
+    return apiClient.get<ImmunizationRecordDto[]>(
+      "/api/v1/immunization-records"
+    );
   },
 
-  getById: async (id: string): Promise<Vaccination> => {
-    return apiClient.get<Vaccination>(`/api/v1/immunization-records/${id}`);
+  getById: async (id: string): Promise<ImmunizationRecordDto> => {
+    return apiClient.get<ImmunizationRecordDto>(
+      `/api/v1/immunization-records/${id}`
+    );
   },
 
-  create: async (data: ImmunizationRecordCreateDto): Promise<Vaccination> => {
-    return apiClient.post<Vaccination>("/api/v1/immunization-records", data);
+  create: async (
+    data: ImmunizationRecordCreateDto
+  ): Promise<ImmunizationRecordDto> => {
+    return apiClient.post<ImmunizationRecordDto>(
+      "/api/v1/immunization-records",
+      data
+    );
   },
 
   update: async (
     id: string,
-    data: UpdateVaccinationRequest
-  ): Promise<Vaccination> => {
-    return apiClient.put<Vaccination>(
+    data: ImmunizationRecordUpdateDto
+  ): Promise<ImmunizationRecordDto> => {
+    return apiClient.put<ImmunizationRecordDto>(
       `/api/v1/immunization-records/${id}`,
       data
     );

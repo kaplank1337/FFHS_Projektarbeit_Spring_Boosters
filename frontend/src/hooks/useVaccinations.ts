@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   vaccinationsService,
-  type CreateVaccinationRequest,
-  type UpdateVaccinationRequest,
+  type ImmunizationRecordCreateDto,
+  type ImmunizationRecordUpdateDto,
 } from "@/services/vaccinations.service";
 import { successToast, apiErrorToast } from "@/lib/toast-extension";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const VACCINATIONS_QUERY_KEY = ["vaccinations"];
 
@@ -25,14 +26,16 @@ export const useVaccination = (id: string) => {
 };
 
 export const useCreateVaccination = () => {
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateVaccinationRequest) => vaccinationsService.create(data),
+    mutationFn: (data: ImmunizationRecordCreateDto) =>
+      vaccinationsService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      successToast("Impfung erfolgreich hinzugefügt!");
+      successToast(t("addVaccination.success"));
     },
     onError: (error) => {
       apiErrorToast(error);
@@ -41,15 +44,21 @@ export const useCreateVaccination = () => {
 };
 
 export const useUpdateVaccination = () => {
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateVaccinationRequest }) =>
-      vaccinationsService.update(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: ImmunizationRecordUpdateDto;
+    }) => vaccinationsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      successToast("Impfung erfolgreich aktualisiert!");
+      successToast(t("editVaccination.success"));
     },
     onError: (error) => {
       apiErrorToast(error);
@@ -58,6 +67,7 @@ export const useUpdateVaccination = () => {
 };
 
 export const useDeleteVaccination = () => {
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -65,7 +75,7 @@ export const useDeleteVaccination = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-      successToast("Impfung erfolgreich gelöscht!");
+      successToast(t("deleteVaccination.success"));
     },
     onError: (error) => {
       apiErrorToast(error);
