@@ -28,7 +28,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useVaccineTypes } from "@/hooks/useVaccineTypes";
 import { useCreateVaccination } from "@/hooks/useVaccinations";
 import { Plus } from "lucide-react";
-import { formatDate } from "@/lib/date-utils";
 import RequiredIndicator from "./form/required-indicator";
 import { LoadingButton } from "./form/loading-button";
 
@@ -74,7 +73,7 @@ const AddImmunizationRecordDialog = ({
       {
         vaccineTypeId: data.vaccineTypeId,
         administeredOn: data.administeredOn,
-        doseOrderClaimed: parseInt(data.doseOrderClaimed),
+        doseOrderClaimed: data.doseOrderClaimed,
       },
       {
         onSuccess: () => {
