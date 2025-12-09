@@ -40,9 +40,11 @@ const formSchema = z.object({
   immunizationPlanId: z.string().min(1, "validation.required"),
   administeredOn: z.date("validation.required").refine(
     (date) => {
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      return date <= today;
+      return selectedDate <= today;
     },
     { message: "validation.invalidDate" }
   ),

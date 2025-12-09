@@ -95,7 +95,7 @@ export function VaccinationsTable({
   }
 
   return (
-    <Card>
+    <Card className="px-0 py-1">
       <CardContent className="p-0">
         <Table>
           <TableHeader>
