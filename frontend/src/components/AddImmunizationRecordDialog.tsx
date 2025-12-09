@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useVaccineTypes } from "@/hooks/useVaccineTypes";
+import { useVaccineTypes, useImmunizationPlans } from "@/hooks/useVaccineTypes";
 import { useCreateVaccination } from "@/hooks/useVaccinations";
 import { Plus } from "lucide-react";
 import RequiredIndicator from "./form/required-indicator";
@@ -36,7 +36,8 @@ interface AddImmunizationRecordDialogProps {
 }
 
 const formSchema = z.object({
-  vaccineTypeId: z.string("validation.required"),
+  vaccineTypeId: z.string().min(1, "validation.required"),
+  immunizationPlanId: z.string().min(1, "validation.required"),
   administeredOn: z.date("validation.required").refine(
     (date) => {
       const today = new Date();
@@ -50,28 +51,48 @@ const formSchema = z.object({
     .min(1, "validation.positiveNumber"),
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 const AddImmunizationRecordDialog = ({
   onSuccess,
 }: AddImmunizationRecordDialogProps) => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
 
-  const { data: vaccineTypes, isLoading } = useVaccineTypes();
+  const { data: vaccineTypes, isLoading: isLoadingVaccineTypes } =
+    useVaccineTypes();
+  const { data: immunizationPlans, isLoading: isLoadingPlans } =
+    useImmunizationPlans();
   const createMutation = useCreateVaccination();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       vaccineTypeId: undefined,
+      immunizationPlanId: undefined,
       administeredOn: new Date(),
       doseOrderClaimed: undefined,
     },
   });
 
-  function handleSubmit(data: z.infer<typeof formSchema>) {
+  const selectedVaccineTypeId = form.watch("vaccineTypeId");
+  const filteredImmunizationPlans = useMemo(() => {
+    if (!selectedVaccineTypeId || !immunizationPlans) return [];
+    return immunizationPlans.filter(
+      (plan) => plan.vaccineTypeId === selectedVaccineTypeId
+    );
+  }, [selectedVaccineTypeId, immunizationPlans]);
+
+  // Reset immunization plan when vaccine type changes
+  useEffect(() => {
+    form.setValue("immunizationPlanId", "");
+  }, [selectedVaccineTypeId, form]);
+
+  function handleSubmit(data: FormData) {
     createMutation.mutate(
       {
         vaccineTypeId: data.vaccineTypeId,
+        ageCategoryId: data.immunizationPlanId,
         administeredOn: data.administeredOn,
         doseOrderClaimed: data.doseOrderClaimed,
       },
@@ -106,7 +127,7 @@ const AddImmunizationRecordDialog = ({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="vaccine-type">
-                    {t("dashboard.vaccineType")} <RequiredIndicator />
+                    {t("addVaccination.type")} <RequiredIndicator />
                   </FieldLabel>
                   <Select
                     name={field.name}
@@ -118,11 +139,11 @@ const AddImmunizationRecordDialog = ({
                       aria-invalid={fieldState.invalid}
                     >
                       <SelectValue
-                        placeholder={t("dashboard.selectVaccineType")}
+                        placeholder={t("addVaccination.type.placeholder")}
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {isLoading ? (
+                      {isLoadingVaccineTypes ? (
                         <div className="p-2 text-sm text-muted-foreground">
                           {t("dashboard.loading")}
                         </div>
@@ -143,17 +164,64 @@ const AddImmunizationRecordDialog = ({
             />
 
             <Controller
+              name="immunizationPlanId"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="immunization-plan">
+                    {t("addVaccination.plan")} <RequiredIndicator />
+                  </FieldLabel>
+                  <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={!selectedVaccineTypeId}
+                  >
+                    <SelectTrigger
+                      id="immunization-plan"
+                      aria-invalid={fieldState.invalid}
+                    >
+                      <SelectValue
+                        placeholder={t("addVaccination.plan.placeholder")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isLoadingPlans ? (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          {t("dashboard.loading")}
+                        </div>
+                      ) : filteredImmunizationPlans.length === 0 ? (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          {t("addVaccination.plan.empty")}
+                        </div>
+                      ) : (
+                        filteredImmunizationPlans.map((plan) => (
+                          <SelectItem key={plan.id} value={plan.id}>
+                            {plan.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
               name="administeredOn"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="administered-on">
-                    {t("dashboard.administeredOn")} <RequiredIndicator />
+                    {t("addVaccination.date")} <RequiredIndicator />
                   </FieldLabel>
                   <DatePicker
                     date={field.value}
                     onSelect={field.onChange}
-                    placeholder={t("dashboard.selectDate")}
+                    placeholder={t("addVaccination.date.placeholder")}
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
@@ -169,7 +237,7 @@ const AddImmunizationRecordDialog = ({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="dose-order">
-                    {t("dashboard.doseOrder")} <RequiredIndicator />
+                    {t("addVaccination.dose")} <RequiredIndicator />
                   </FieldLabel>
                   <Input
                     {...field}
@@ -177,7 +245,7 @@ const AddImmunizationRecordDialog = ({
                     type="number"
                     min="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("dashboard.optional")}
+                    placeholder={t("addVaccination.dose.placeholder")}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

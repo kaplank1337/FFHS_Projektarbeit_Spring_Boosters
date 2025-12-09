@@ -11,6 +11,7 @@ export interface ImmunizationRecordDto {
 
 export interface ImmunizationRecordCreateDto {
   vaccineTypeId: string;
+  ageCategoryId: string;
   administeredOn: Date;
   doseOrderClaimed: number;
 }

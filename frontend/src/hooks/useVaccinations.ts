@@ -6,6 +6,10 @@ import {
 } from "@/services/vaccinations.service";
 import { successToast, apiErrorToast } from "@/lib/toast-extension";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  DASHBOARD_STATS_QUERY_KEY,
+  PENDING_VACCINATIONS_QUERY_KEY,
+} from "./useDashboard";
 
 export const VACCINATIONS_QUERY_KEY = ["vaccinations"];
 
@@ -34,7 +38,7 @@ export const useCreateVaccination = () => {
       vaccinationsService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
       successToast(t("addVaccination.success"));
     },
     onError: (error) => {
@@ -57,7 +61,15 @@ export const useUpdateVaccination = () => {
     }) => vaccinationsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({
+        queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "overdue"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "due-soon"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "upcoming"],
+      });
       successToast(t("editVaccination.success"));
     },
     onError: (error) => {
@@ -74,7 +86,7 @@ export const useDeleteVaccination = () => {
     mutationFn: (id: string) => vaccinationsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
       successToast(t("deleteVaccination.success"));
     },
     onError: (error) => {

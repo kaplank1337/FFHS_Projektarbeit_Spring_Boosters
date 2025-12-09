@@ -113,11 +113,12 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Impfstoff auswählen",
     "addVaccination.plan": "Impfplan",
     "addVaccination.plan.placeholder": "Impfplan auswählen",
+    "addVaccination.plan.empty": "Kein Impfplan verfügbar",
     "addVaccination.date": "Verabreichungsdatum",
+    "addVaccination.date.placeholder": "Verabreichungsdatum auswählen",
     "addVaccination.dose": "Dosisnummer",
     "addVaccination.dose.placeholder": "z.B. 1, 2, 3",
     "addVaccination.button": "Impfung hinzufügen",
-    "addVaccination.saving": "Wird gespeichert...",
     "addVaccination.cancel": "Abbrechen",
     "addVaccination.success": "Impfung erfolgreich hinzugefügt",
 

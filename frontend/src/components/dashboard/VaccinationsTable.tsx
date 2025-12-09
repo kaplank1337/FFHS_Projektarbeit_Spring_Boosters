@@ -36,14 +36,14 @@ export function VaccinationsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">
+                <TableHead className="w-[100px] pl-6">
                   {t("dashboard.table.status")}
                 </TableHead>
                 <TableHead>{t("dashboard.table.vaccine")}</TableHead>
                 <TableHead>{t("dashboard.table.date")}</TableHead>
                 <TableHead>{t("dashboard.table.dose")}</TableHead>
                 <TableHead>{t("dashboard.table.created")}</TableHead>
-                <TableHead className="text-right">
+                <TableHead className="text-right pr-6">
                   {t("dashboard.table.actions")}
                 </TableHead>
               </TableRow>
@@ -51,7 +51,7 @@ export function VaccinationsTable({
             <TableBody>
               {[1, 2, 3, 4, 5].map((i) => (
                 <TableRow key={i}>
-                  <TableCell>
+                  <TableCell className="pl-6">
                     <Skeleton className="h-5 w-5 rounded-full" />
                   </TableCell>
                   <TableCell>
@@ -66,7 +66,7 @@ export function VaccinationsTable({
                   <TableCell>
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right pr-6">
                     <div className="flex justify-end gap-2">
                       <Skeleton className="h-8 w-8" />
                       <Skeleton className="h-8 w-8" />
@@ -100,14 +100,14 @@ export function VaccinationsTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">
+              <TableHead className="w-[100px] pl-6">
                 {t("dashboard.table.status")}
               </TableHead>
               <TableHead>{t("dashboard.table.vaccine")}</TableHead>
               <TableHead>{t("dashboard.table.date")}</TableHead>
               <TableHead>{t("dashboard.table.dose")}</TableHead>
               <TableHead>{t("dashboard.table.created")}</TableHead>
-              <TableHead className="text-right">
+              <TableHead className="text-right pr-6">
                 {t("dashboard.table.actions")}
               </TableHead>
             </TableRow>
@@ -119,15 +119,13 @@ export function VaccinationsTable({
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => onEdit(vaccination)}
               >
-                <TableCell>
+                <TableCell className="pl-6">
                   <Circle className="h-5 w-5 fill-success text-success" />
                 </TableCell>
                 <TableCell className="font-medium">
                   {vaccination.vaccineName || "-"}
                 </TableCell>
-                <TableCell>
-                  {formatDate(vaccination.administeredOn)}
-                </TableCell>
+                <TableCell>{formatDate(vaccination.administeredOn)}</TableCell>
                 <TableCell>
                   {vaccination.doseOrderClaimed
                     ? `Dose ${vaccination.doseOrderClaimed}`
@@ -136,7 +134,7 @@ export function VaccinationsTable({
                 <TableCell className="text-muted-foreground">
                   {formatDate(vaccination.createdAt)}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right pr-6">
                   <Button
                     variant="ghost"
                     size="sm"
