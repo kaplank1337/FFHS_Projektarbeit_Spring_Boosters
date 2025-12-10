@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { ImmunizationRecordDto } from "@/services/vaccinations.service";
+import type { ImmunizationRecordDto } from "@/api/vaccinations.service";
 
 interface VaccinationRowActionsProps {
   vaccination: ImmunizationRecordDto;

@@ -7,8 +7,8 @@ import { VaccinationTypesProvider } from "./contexts/VaccinationTypesContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 import Index from "./pages";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
+import Auth from "./pages/auth/Auth";
+import Dashboard from "./pages/dashboard/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({

@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import type { ApiError } from "./api-client";
+import type { ApiError } from "@/api/api-client";
 
 const successToast = (message?: string) => {
   toast("Super! Das hat funktioniert. 🎉", {

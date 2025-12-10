@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/field";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useUpdateVaccination } from "@/hooks/useVaccinations";
-import RequiredIndicator from "./form/required-indicator";
-import { LoadingButton } from "./form/loading-button";
-import type { ImmunizationRecordDto } from "@/services/vaccinations.service";
+import RequiredIndicator from "../../../components/form/required-indicator";
+import { LoadingButton } from "../../../components/form/loading-button";
+import type { ImmunizationRecordDto } from "@/api/vaccinations.service";
 
 interface EditImmunizationRecordDialogProps {
   vaccination: ImmunizationRecordDto;

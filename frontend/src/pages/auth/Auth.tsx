@@ -11,8 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import { Syringe } from "lucide-react";
-import { LoginForm } from "@/components/auth/LoginForm";
-import { RegisterForm } from "@/components/auth/RegisterForm";
+import { LoginForm } from "@/pages/auth/components/LoginForm";
+import { RegisterForm } from "@/pages/auth/components/RegisterForm";
 import {
   useVaccineTypes as useVaccineTypesQuery,
   useImmunizationPlans,

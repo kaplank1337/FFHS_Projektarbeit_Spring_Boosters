@@ -28,15 +28,15 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useVaccineTypes } from "@/hooks/useVaccineTypes";
 import { useCreateVaccination } from "@/hooks/useVaccinations";
 import { Plus } from "lucide-react";
-import RequiredIndicator from "./form/required-indicator";
-import { LoadingButton } from "./form/loading-button";
+import RequiredIndicator from "../../../components/form/required-indicator";
+import { LoadingButton } from "../../../components/form/loading-button";
 
 interface AddImmunizationRecordDialogProps {
   onSuccess?: () => void;
 }
 
 const formSchema = z.object({
-  vaccineTypeId: z.string().min(1, "validation.required"),
+  vaccineTypeId: z.string("validation.required"),
   administeredOn: z.date("validation.required").refine(
     (date) => {
       const selectedDate = new Date(date);

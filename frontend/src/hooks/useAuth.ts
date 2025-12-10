@@ -1,7 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
-import { authService, type LoginRequest, type RegisterRequest } from "@/services/auth.service";
 import { successToast, apiErrorToast } from "@/lib/toast-extension";
+import {
+  authService,
+  type LoginRequest,
+  type RegisterRequest,
+} from "@/api/auth.service";
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -27,7 +31,9 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: (data: RegisterRequest) => authService.register(data),
     onSuccess: () => {
-      successToast("Account erfolgreich erstellt! Du kannst dich jetzt anmelden.");
+      successToast(
+        "Account erfolgreich erstellt! Du kannst dich jetzt anmelden."
+      );
     },
     onError: (error) => {
       apiErrorToast(error);

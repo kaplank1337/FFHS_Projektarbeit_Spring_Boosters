@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatDate } from "@/lib/date-utils";
 import { VaccinationRowActions } from "./VaccinationRowActions";
-import type { ImmunizationRecordDto } from "@/services/vaccinations.service";
+import type { ImmunizationRecordDto } from "@/api/vaccinations.service";
 import { Circle } from "lucide-react";
 
 interface VaccinationsTableProps {
@@ -110,7 +110,7 @@ export function VaccinationsTable({
               <TableHead>{t("dashboard.table.date")}</TableHead>
               <TableHead>{t("dashboard.table.dose")}</TableHead>
               <TableHead>{t("dashboard.table.created")}</TableHead>
-              <TableHead className="w-[80px] text-right pr-6">
+              <TableHead className="w-20 text-right pr-6">
                 {t("dashboard.table.actions")}
               </TableHead>
             </TableRow>

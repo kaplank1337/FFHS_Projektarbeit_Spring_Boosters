@@ -3,7 +3,7 @@ import {
   vaccinationsService,
   type ImmunizationRecordCreateDto,
   type ImmunizationRecordUpdateDto,
-} from "@/services/vaccinations.service";
+} from "@/api/vaccinations.service";
 import { successToast, apiErrorToast } from "@/lib/toast-extension";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {

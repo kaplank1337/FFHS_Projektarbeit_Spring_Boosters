@@ -1,9 +1,9 @@
 import { CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { StatCard } from "./StatCard";
+import type { PendingPriority } from "@/api/dashboard.service";
+import type { DashboardStatsDto } from "@/api/dashboard.service";
 import { StatCardSkeleton } from "./StatCardSkeleton";
-import type { PendingPriority } from "@/services/dashboard.service";
-import type { DashboardStatsDto } from "@/services/dashboard.service";
 
 interface DashboardStatsCardsProps {
   stats?: DashboardStatsDto;

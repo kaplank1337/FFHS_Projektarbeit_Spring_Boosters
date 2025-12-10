@@ -3,7 +3,7 @@ import { useVaccineTypes, useImmunizationPlans } from "@/hooks/useVaccineTypes";
 import type {
   VaccineType,
   ImmunizationPlan,
-} from "@/services/vaccine-types.service";
+} from "@/api/vaccine-types.service";
 
 interface VaccinationTypesContextType {
   vaccinationTypes: VaccineType[];

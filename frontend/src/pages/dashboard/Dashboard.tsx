@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
-import AddImmunizationRecordDialog from "@/components/AddImmunizationRecordDialog";
-import EditImmunizationRecordDialog from "@/components/EditImmunizationRecordDialog";
-import { DashboardStatsCards } from "@/components/dashboard/DashboardStatsCards";
-import { VaccinationsTable } from "@/components/dashboard/VaccinationsTable";
+import AddImmunizationRecordDialog from "@/pages/dashboard/components/AddImmunizationRecordDialog";
+import EditImmunizationRecordDialog from "@/pages/dashboard/components/EditImmunizationRecordDialog";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,9 +34,11 @@ import {
   usePendingVaccinations,
 } from "@/hooks/useDashboard";
 import { useVaccinations, useDeleteVaccination } from "@/hooks/useVaccinations";
-import type { PendingPriority } from "@/services/dashboard.service";
-import type { ImmunizationRecordDto } from "@/services/vaccinations.service";
+import type { PendingPriority } from "@/api/dashboard.service";
+import type { ImmunizationRecordDto } from "@/api/vaccinations.service";
 import { formatDate } from "@/lib/date-utils";
+import { VaccinationsTable } from "./components/VaccinationsTable";
+import { DashboardStatsCards } from "./components/DashboardStatsCards";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);

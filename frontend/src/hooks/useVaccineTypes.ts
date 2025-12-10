@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { vaccineTypesService } from "@/services/vaccine-types.service";
+import { vaccineTypesService } from "@/api/vaccine-types.service";
 
 export const useVaccineTypes = () => {
   return useQuery({

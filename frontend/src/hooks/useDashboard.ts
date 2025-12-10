@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   dashboardService,
   type PendingPriority,
-} from "@/services/dashboard.service";
+} from "@/api/dashboard.service";
 
 export const DASHBOARD_STATS_QUERY_KEY = ["dashboard-stats"];
 export const PENDING_VACCINATIONS_QUERY_KEY = "pending-vaccinations";

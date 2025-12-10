@@ -12,7 +12,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useRegister } from "@/hooks/useAuth";
 import RequiredIndicator from "@/components/form/required-indicator";
 import { LoadingButton } from "@/components/form/loading-button";
-import { DatePicker } from "../ui/date-picker";
+import { DatePicker } from "../../../components/ui/date-picker";
 
 const formSchema = z.object({
   username: z.string("validation.required"),
