@@ -99,6 +99,8 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.pending.title": "Ausstehende Impfungen",
     "dashboard.pending.vaccine": "Impfstoff",
     "dashboard.pending.empty": "Keine ausstehenden Impfungen",
+    "dashboard.edit.action": "Bearbeiten",
+    "dashboard.delete.action": "Löschen",
     "dashboard.delete.title": "Impfung löschen",
     "dashboard.delete.description":
       "Möchten Sie diese Impfung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -237,6 +239,8 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.pending.title": "Pending Vaccinations",
     "dashboard.pending.vaccine": "Vaccine",
     "dashboard.pending.empty": "No pending vaccinations",
+    "dashboard.edit.action": "Edit",
+    "dashboard.delete.action": "Delete",
     "dashboard.delete.title": "Delete Vaccination",
     "dashboard.delete.description":
       "Are you sure you want to delete this vaccination? This action cannot be undone.",
@@ -360,6 +364,8 @@ const translations: Record<Language, Record<string, string>> = {
     "dashboard.table.dose": "Numéro de dose",
     "dashboard.table.created": "Créé le",
     "dashboard.table.actions": "Actions",
+    "dashboard.edit.action": "Modifier",
+    "dashboard.delete.action": "Supprimer",
     "dashboard.vaccinationDeleted": "Vaccination supprimée",
     "dashboard.pending.title": "Vaccinations en attente",
     "dashboard.pending.vaccine": "Vaccin",
