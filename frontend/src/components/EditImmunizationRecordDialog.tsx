@@ -31,12 +31,13 @@ interface EditImmunizationRecordDialogProps {
 }
 
 const formSchema = z.object({
-  vaccineName: z.string(),
   administeredOn: z.date("validation.required").refine(
     (date) => {
+      const selectedDate = new Date(date);
+      selectedDate.setHours(0, 0, 0, 0);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      return date <= today;
+      return selectedDate <= today;
     },
     { message: "validation.invalidDate" }
   ),
@@ -57,7 +58,6 @@ const EditImmunizationRecordDialog = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      vaccineName: vaccination.vaccineName,
       administeredOn: vaccination.administeredOn,
       doseOrderClaimed: vaccination.doseOrderClaimed,
     },
@@ -82,8 +82,8 @@ const EditImmunizationRecordDialog = ({
         id: vaccination.id,
         data: {
           id: vaccination.id,
-          administeredOn: data.administeredOn,
           doseOrderClaimed: data.doseOrderClaimed,
+          administeredOn: new Date(data.administeredOn.setHours(12, 0, 0, 0)),
         },
       },
       {
@@ -108,35 +108,27 @@ const EditImmunizationRecordDialog = ({
           onSubmit={form.handleSubmit(handleSubmit)}
         >
           <FieldGroup>
-            <Controller
-              name="vaccineName"
-              control={form.control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="vaccine-type-display">
-                    {t("dashboard.vaccineType")} <RequiredIndicator />
-                  </FieldLabel>
-                  <Input
-                    id="vaccine-type-display"
-                    value={field.value}
-                    disabled
-                  />
-                </Field>
-              )}
-            />
+            <Field>
+              <FieldLabel>{t("dashboard.vaccineType")}</FieldLabel>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 border border-muted rounded-md cursor-not-allowed">
+                <span className="text-sm font-medium text-foreground">
+                  {vaccination.vaccineName}
+                </span>
+              </div>
+            </Field>
 
             <Controller
               name="administeredOn"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="edit-administered-on">
-                    {t("dashboard.administeredOn")} <RequiredIndicator />
+                  <FieldLabel htmlFor="administered-on">
+                    {t("addVaccination.date")} <RequiredIndicator />
                   </FieldLabel>
                   <DatePicker
                     date={field.value}
                     onSelect={field.onChange}
-                    placeholder={t("dashboard.selectDate")}
+                    placeholder={t("addVaccination.date.placeholder")}
                     aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (

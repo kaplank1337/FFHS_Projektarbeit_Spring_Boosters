@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useVaccineTypes, useImmunizationPlans } from "@/hooks/useVaccineTypes";
+import { useVaccineTypes } from "@/hooks/useVaccineTypes";
 import { useCreateVaccination } from "@/hooks/useVaccinations";
 import { Plus } from "lucide-react";
 import RequiredIndicator from "./form/required-indicator";
@@ -37,13 +37,12 @@ interface AddImmunizationRecordDialogProps {
 
 const formSchema = z.object({
   vaccineTypeId: z.string().min(1, "validation.required"),
-  immunizationPlanId: z.string().min(1, "validation.required"),
   administeredOn: z.date("validation.required").refine(
     (date) => {
       const selectedDate = new Date(date);
-      selectedDate.setHours(0, 0, 0, 0);
+      selectedDate.setHours(12, 0, 0, 0);
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      today.setHours(12, 0, 0, 0);
       return selectedDate <= today;
     },
     { message: "validation.invalidDate" }
@@ -63,39 +62,22 @@ const AddImmunizationRecordDialog = ({
 
   const { data: vaccineTypes, isLoading: isLoadingVaccineTypes } =
     useVaccineTypes();
-  const { data: immunizationPlans, isLoading: isLoadingPlans } =
-    useImmunizationPlans();
   const createMutation = useCreateVaccination();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       vaccineTypeId: undefined,
-      immunizationPlanId: undefined,
       administeredOn: new Date(),
       doseOrderClaimed: undefined,
     },
   });
 
-  const selectedVaccineTypeId = form.watch("vaccineTypeId");
-  const filteredImmunizationPlans = useMemo(() => {
-    if (!selectedVaccineTypeId || !immunizationPlans) return [];
-    return immunizationPlans.filter(
-      (plan) => plan.vaccineTypeId === selectedVaccineTypeId
-    );
-  }, [selectedVaccineTypeId, immunizationPlans]);
-
-  // Reset immunization plan when vaccine type changes
-  useEffect(() => {
-    form.setValue("immunizationPlanId", "");
-  }, [selectedVaccineTypeId, form]);
-
   function handleSubmit(data: FormData) {
     createMutation.mutate(
       {
         vaccineTypeId: data.vaccineTypeId,
-        ageCategoryId: data.immunizationPlanId,
-        administeredOn: data.administeredOn,
+        administeredOn: new Date(data.administeredOn.setHours(12, 0, 0, 0)),
         doseOrderClaimed: data.doseOrderClaimed,
       },
       {
@@ -153,53 +135,6 @@ const AddImmunizationRecordDialog = ({
                         vaccineTypes?.map((type) => (
                           <SelectItem key={type.id} value={type.id}>
                             {type.name}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="immunizationPlanId"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="immunization-plan">
-                    {t("addVaccination.plan")} <RequiredIndicator />
-                  </FieldLabel>
-                  <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!selectedVaccineTypeId}
-                  >
-                    <SelectTrigger
-                      id="immunization-plan"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue
-                        placeholder={t("addVaccination.plan.placeholder")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {isLoadingPlans ? (
-                        <div className="p-2 text-sm text-muted-foreground">
-                          {t("dashboard.loading")}
-                        </div>
-                      ) : filteredImmunizationPlans.length === 0 ? (
-                        <div className="p-2 text-sm text-muted-foreground">
-                          {t("addVaccination.plan.empty")}
-                        </div>
-                      ) : (
-                        filteredImmunizationPlans.map((plan) => (
-                          <SelectItem key={plan.id} value={plan.id}>
-                            {plan.name}
                           </SelectItem>
                         ))
                       )}
