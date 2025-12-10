@@ -123,11 +123,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      <div className="container py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold">{t("dashboard.title")}</h1>
-            <p className="text-muted-foreground mt-2">
+      <div className="container py-8 space-y-10">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-bold tracking-tight">
+              {t("dashboard.title")}
+            </h1>
+            <p className="text-muted-foreground text-lg">
               {t("dashboard.subtitle")}
             </p>
           </div>
@@ -142,8 +145,8 @@ const Dashboard = () => {
         />
 
         {/* Vaccinations List */}
-        <div>
-          <h2 className="text-2xl font-bold mb-4">
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold tracking-tight">
             {t("dashboard.vaccinations")}
           </h2>
           <VaccinationsTable
