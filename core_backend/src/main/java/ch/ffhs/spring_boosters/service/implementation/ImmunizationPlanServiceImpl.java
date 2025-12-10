@@ -2,9 +2,9 @@ package ch.ffhs.spring_boosters.service.implementation;
 
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
-import ch.ffhs.spring_boosters.service.ImmunizationPlanService;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationPlanAlreadyExistsException;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationPlanNotFoundException;
+import ch.ffhs.spring_boosters.service.ImmunizationPlanService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,14 +1,14 @@
 package ch.ffhs.spring_boosters.service.implementation;
 
 import ch.ffhs.spring_boosters.controller.entity.AgeCategory;
-import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
+import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.repository.AgeCategoryRepository;
-import ch.ffhs.spring_boosters.repository.ImmunizationRecordRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
+import ch.ffhs.spring_boosters.repository.ImmunizationRecordRepository;
 import ch.ffhs.spring_boosters.repository.UserRepository;
-import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
+import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +54,6 @@ public class ImmunizationRecordServiceImpl implements ImmunizationRecordService 
     public ImmunizationRecord updateImmunizationRecord(UUID id, ImmunizationRecord immunizationRecord) throws ImmunizationRecordNotFoundException {
         ImmunizationRecord existingRecord = getImmunizationRecordById(immunizationRecord.getId());
 
-        existingRecord.setVaccineTypeId(immunizationRecord.getVaccineTypeId());
         existingRecord.setAdministeredOn(immunizationRecord.getAdministeredOn());
         existingRecord.setDoseOrderClaimed(immunizationRecord.getDoseOrderClaimed());
 

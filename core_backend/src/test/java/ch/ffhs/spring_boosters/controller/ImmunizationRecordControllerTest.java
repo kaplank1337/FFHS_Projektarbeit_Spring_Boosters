@@ -85,8 +85,8 @@ class ImmunizationRecordControllerTest {
         return new ImmunizationRecordCreateDto(vaccineTypeId, administeredOn, doseOrder);
     }
 
-    private ImmunizationRecordUpdateDto sampleUpdateDto(UUID userId, UUID vaccineTypeId, LocalDate administeredOn, Integer doseOrder) {
-        return new ImmunizationRecordUpdateDto(userId, vaccineTypeId, administeredOn, doseOrder);
+    private ImmunizationRecordUpdateDto sampleUpdateDto(LocalDate administeredOn, Integer doseOrder) {
+        return new ImmunizationRecordUpdateDto(administeredOn, doseOrder);
     }
 
     @Test
@@ -148,13 +148,13 @@ class ImmunizationRecordControllerTest {
         LocalDate date = LocalDate.now();
         String token = "Bearer testToken";
 
-        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(userId, vt, date, 2);
+        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(date, 2);
         ImmunizationRecord entityFromDto = sampleEntity(null, userId, vt, UUID.randomUUID(), date, 2);
         ImmunizationRecord updatedEntity = sampleEntity(id, userId, vt, UUID.randomUUID(), date, 2);
         ImmunizationRecordDto responseDto = sampleDto(id, date, 2);
 
         when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
-        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), eq(userId))).thenReturn(entityFromDto);
+        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), eq(userId), any(UUID.class))).thenReturn(entityFromDto);
         when(immunizationRecordService.updateImmunizationRecord(eq(id), eq(entityFromDto))).thenReturn(updatedEntity);
         when(immunizationRecordMapper.toDto(updatedEntity)).thenReturn(responseDto);
 
@@ -171,11 +171,11 @@ class ImmunizationRecordControllerTest {
         UUID id = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
         String token = "Bearer testToken";
-        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(userId, UUID.randomUUID(), LocalDate.now(), 1);
+        ImmunizationRecordUpdateDto updateDto = sampleUpdateDto(LocalDate.now(), 1);
         ImmunizationRecord entityFromDto = sampleEntity(null, userId, UUID.randomUUID(), UUID.randomUUID(), LocalDate.now(), 1);
 
         when(jwtTokenReader.getUserId("testToken")).thenReturn(userId.toString());
-        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), eq(userId))).thenReturn(entityFromDto);
+        when(immunizationRecordMapper.fromUpdateDto(any(ImmunizationRecordUpdateDto.class), eq(userId), any(UUID.class))).thenReturn(entityFromDto);
         when(immunizationRecordService.updateImmunizationRecord(eq(id), eq(entityFromDto)))
                 .thenThrow(new ImmunizationRecordNotFoundException("Not found"));
 

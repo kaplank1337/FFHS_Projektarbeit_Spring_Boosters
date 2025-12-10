@@ -2,6 +2,9 @@ package ch.ffhs.spring_boosters.controller.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,6 +14,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "immunization_record", schema = "spring_boosters")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class ImmunizationRecord {
 
     @Id

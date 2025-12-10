@@ -70,18 +70,15 @@ public class ImmunizationRecordMapper {
         return record;
     }
 
-    public ImmunizationRecord fromUpdateDto(ImmunizationRecordUpdateDto dto, UUID userId) {
+    public ImmunizationRecord fromUpdateDto(ImmunizationRecordUpdateDto dto, UUID userId, UUID id) {
         if (dto == null) {
             return null;
         }
-        ImmunizationRecord record = new ImmunizationRecord(
-                userId,
-                dto.id(),
-                dto.vaccineTypeId(),
-                dto.administeredOn(),
-                dto.doseOrderClaimed()
-        );
-        record.setDoseOrderClaimed(dto.doseOrderClaimed());
-        return record;
+        return ImmunizationRecord.builder()
+                .id(id)
+                .userId(userId)
+                .administeredOn(dto.administeredOn())
+                .doseOrderClaimed(dto.doseOrderClaimed())
+                .build();
     }
 }

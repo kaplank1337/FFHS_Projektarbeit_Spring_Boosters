@@ -1,6 +1,5 @@
 package ch.ffhs.spring_boosters.repository;
 
-import ch.ffhs.spring_boosters.controller.entity.AgeCategory;
 import ch.ffhs.spring_boosters.controller.entity.ImmunizationPlan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

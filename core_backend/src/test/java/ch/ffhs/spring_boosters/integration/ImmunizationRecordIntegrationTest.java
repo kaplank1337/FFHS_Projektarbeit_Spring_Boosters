@@ -12,10 +12,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -221,10 +221,10 @@ public class ImmunizationRecordIntegrationTest {
         }
         Assertions.assertTrue(found, "Created record should be in list");
 
-        ImmunizationRecordUpdateDto upd = new ImmunizationRecordUpdateDto(user, vt, administeredOn.plusDays(1), 2);
+        ImmunizationRecordUpdateDto upd = new ImmunizationRecordUpdateDto(administeredOn.plusDays(1), 2);
         HttpEntity<ImmunizationRecordUpdateDto> updateRequest = new HttpEntity<>(upd, headers);
         ResponseEntity<ImmunizationRecordDto> updResp = restTemplate.exchange("/api/v1/immunization-records/" + id, HttpMethod.PATCH, updateRequest, ImmunizationRecordDto.class);
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, updResp.getStatusCode(), "Update should return 200 OK");
+        Assertions.assertEquals(HttpStatus.OK, updResp.getStatusCode(), "Update should return 200 OK");
     }
 
     private HttpHeaders authorizationHeader(String bearer) {
@@ -357,7 +357,7 @@ public class ImmunizationRecordIntegrationTest {
         Assertions.assertNotNull(r1, "First record should be created");
         Assertions.assertNotNull(r2, "Second record should be created");
 
-        ImmunizationRecordUpdateDto upd = new ImmunizationRecordUpdateDto(user, vt, LocalDate.of(2021,5,1), 2);
+        ImmunizationRecordUpdateDto upd = new ImmunizationRecordUpdateDto(LocalDate.of(2021,5,1), 2);
         ResponseEntity<Map> resp = restTemplate.exchange("/api/v1/immunization-records/" + r2.id(), HttpMethod.PATCH, new HttpEntity<>(upd, jsonHeaders()), Map.class);
         Assertions.assertTrue(resp.getStatusCode().is2xxSuccessful() || resp.getStatusCode().is4xxClientError(),
             "Status should be 2xx or 4xx");

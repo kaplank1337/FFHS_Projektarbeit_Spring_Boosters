@@ -1,13 +1,11 @@
 package ch.ffhs.spring_boosters.controller;
 
 import ch.ffhs.spring_boosters.config.JwtTokenReader;
-import ch.ffhs.spring_boosters.controller.config.StringToPriorityRequestDtoConverter;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationRecordScheduleSummaryDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationSchedulRecordSortedByPriorityDto;
 import ch.ffhs.spring_boosters.controller.dto.ImmunizationScheduleDto;
 import ch.ffhs.spring_boosters.controller.dto.PriorityRequestDto;
 import ch.ffhs.spring_boosters.service.Exception.UserNotFoundException;
-import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
 import ch.ffhs.spring_boosters.service.ImmunizationScheduleService;
 import ch.ffhs.spring_boosters.service.UserService;
 import ch.ffhs.spring_boosters.service.implementation.enumerator.PriorityEnum;

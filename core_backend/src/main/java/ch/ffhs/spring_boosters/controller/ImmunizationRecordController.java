@@ -6,12 +6,6 @@ import ch.ffhs.spring_boosters.controller.entity.ImmunizationRecord;
 import ch.ffhs.spring_boosters.controller.mapper.ImmunizationRecordMapper;
 import ch.ffhs.spring_boosters.service.Exception.ImmunizationRecordNotFoundException;
 import ch.ffhs.spring_boosters.service.ImmunizationRecordService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -66,7 +60,7 @@ public class ImmunizationRecordController {
         @PathVariable UUID id,
         @Valid @RequestBody ImmunizationRecordUpdateDto updateDto,
         @RequestHeader("Authorization") String authToken) throws ImmunizationRecordNotFoundException {
-        ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromUpdateDto(updateDto, getUserIdFromToken(authToken));
+        ImmunizationRecord immunizationRecord = immunizationRecordMapper.fromUpdateDto(updateDto, getUserIdFromToken(authToken), id);
         ImmunizationRecord updatedImmunizationRecord = immunizationRecordService.updateImmunizationRecord(id, immunizationRecord);
         ImmunizationRecordDto immunizationRecordDto = immunizationRecordMapper.toDto(updatedImmunizationRecord);
         return ResponseEntity.ok(immunizationRecordDto);

@@ -306,8 +306,6 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "id" : "{{immunizationRecordId1}}",
-  "vaccineTypeId": "{{vaccineTypeId1}}",
   "administeredOn": "2005-01-20",
   "doseOrderClaimed": 1
 }
