@@ -75,7 +75,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                 {...field}
                 id="signup-username"
                 type="text"
-                placeholder="johndoe"
+                placeholder="neil.nasa"
                 aria-invalid={fieldState.invalid}
                 autoComplete="username"
               />
@@ -97,7 +97,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                   {...field}
                   id="signup-firstname"
                   type="text"
-                  placeholder="John"
+                  placeholder="Neil"
                   aria-invalid={fieldState.invalid}
                   autoComplete="given-name"
                 />
@@ -120,7 +120,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                   {...field}
                   id="signup-lastname"
                   type="text"
-                  placeholder="Doe"
+                  placeholder="Armstrong"
                   aria-invalid={fieldState.invalid}
                   autoComplete="family-name"
                 />
@@ -163,7 +163,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
                 {...field}
                 id="signup-email"
                 type="email"
-                placeholder="bruce.wayne@example.com"
+                placeholder="neil.armstrong@nasa.gov"
                 aria-invalid={fieldState.invalid}
                 autoComplete="email"
               />

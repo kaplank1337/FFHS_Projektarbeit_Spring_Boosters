@@ -64,7 +64,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 {...field}
                 id="signin-username"
                 type="text"
-                placeholder="bruceWayne"
+                placeholder="neil.nasa"
                 aria-invalid={fieldState.invalid}
                 autoComplete="username"
               />

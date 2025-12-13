@@ -59,6 +59,7 @@ export function DatePicker({
           selected={date}
           onSelect={onSelect}
           locale={locale}
+          captionLayout="dropdown"
         />
       </PopoverContent>
     </Popover>
