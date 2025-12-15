@@ -39,10 +39,10 @@ export const useCreateVaccination = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
-      successToast(t("addVaccination.success"));
+      successToast(t, t("addVaccination.success"));
     },
     onError: (error) => {
-      apiErrorToast(error);
+      apiErrorToast(t, error);
     },
   });
 };
@@ -70,10 +70,10 @@ export const useUpdateVaccination = () => {
       queryClient.invalidateQueries({
         queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "upcoming"],
       });
-      successToast(t("editVaccination.success"));
+      successToast(t, t("editVaccination.success"));
     },
     onError: (error) => {
-      apiErrorToast(error);
+      apiErrorToast(t, error);
     },
   });
 };
@@ -87,10 +87,10 @@ export const useDeleteVaccination = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
-      successToast(t("deleteVaccination.success"));
+      successToast(t, t("deleteVaccination.success"));
     },
     onError: (error) => {
-      apiErrorToast(error);
+      apiErrorToast(t, error);
     },
   });
 };

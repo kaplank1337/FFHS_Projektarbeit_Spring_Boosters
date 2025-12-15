@@ -149,6 +149,12 @@ const translations: Record<Language, Record<string, string>> = {
     "validation.invalidDate": "Datum muss in der Vergangenheit liegen",
     "validation.invalidDoseNumber": "Ungültige Dosisnummer",
     "validation.positiveNumber": "Muss eine positive Zahl sein",
+
+    // Toast messages
+    "toast.success.title": "Super! Das hat funktioniert. 🎉",
+    "toast.success.description": "Du bist on fire! 🔥",
+    "toast.error.title": "Uups! Es ist ein Fehler aufgetreten.",
+    "toast.error.unknown": "Ein unbekannter Fehler ist aufgetreten",
   },
   en: {
     // Landing page
@@ -254,12 +260,15 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Select a vaccine",
     "addVaccination.plan": "Immunization Plan",
     "addVaccination.plan.placeholder": "Select an immunization plan",
+    "addVaccination.plan.empty": "No immunization plan available",
     "addVaccination.date": "Date Administered",
+    "addVaccination.date.placeholder": "Select date administered",
     "addVaccination.dose": "Dose Number",
     "addVaccination.dose.placeholder": "e.g. 1, 2, 3",
     "addVaccination.button": "Add Vaccination",
     "addVaccination.saving": "Saving...",
     "addVaccination.cancel": "Cancel",
+    "addVaccination.success": "Vaccination successfully added",
 
     // Edit vaccination dialog
     "editVaccination.title": "Edit Vaccination",
@@ -277,6 +286,20 @@ const translations: Record<Language, Record<string, string>> = {
     "editVaccination.error.notAuthDesc": "Please sign in.",
     "editVaccination.error.failed": "Error updating",
     "editVaccination.error.failedDesc": "Could not update vaccination record.",
+
+    "deleteVaccination.success": "Vaccination successfully deleted",
+
+    // Validation
+    "validation.required": "Required field",
+    "validation.invalidDate": "Date must be in the past",
+    "validation.invalidDoseNumber": "Invalid dose number",
+    "validation.positiveNumber": "Must be a positive number",
+
+    // Toast messages
+    "toast.success.title": "Great! That worked. 🎉",
+    "toast.success.description": "You're on fire! 🔥",
+    "toast.error.title": "Oops! An error occurred.",
+    "toast.error.unknown": "An unknown error occurred",
   },
   fr: {
     // Landing page
@@ -384,12 +407,15 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Sélectionner un vaccin",
     "addVaccination.plan": "Plan de vaccination",
     "addVaccination.plan.placeholder": "Sélectionner un plan",
+    "addVaccination.plan.empty": "Aucun plan de vaccination disponible",
     "addVaccination.date": "Date d'administration",
+    "addVaccination.date.placeholder": "Sélectionner la date d'administration",
     "addVaccination.dose": "Numéro de dose",
     "addVaccination.dose.placeholder": "ex. 1, 2, 3",
     "addVaccination.button": "Ajouter la vaccination",
     "addVaccination.saving": "Enregistrement...",
     "addVaccination.cancel": "Annuler",
+    "addVaccination.success": "Vaccination ajoutée avec succès",
 
     // Edit vaccination dialog
     "editVaccination.title": "Modifier la vaccination",
@@ -408,6 +434,20 @@ const translations: Record<Language, Record<string, string>> = {
     "editVaccination.error.failed": "Erreur de mise à jour",
     "editVaccination.error.failedDesc":
       "Impossible de mettre à jour la vaccination.",
+
+    "deleteVaccination.success": "Vaccination supprimée avec succès",
+
+    // Validation
+    "validation.required": "Champ obligatoire",
+    "validation.invalidDate": "La date doit être dans le passé",
+    "validation.invalidDoseNumber": "Numéro de dose invalide",
+    "validation.positiveNumber": "Doit être un nombre positif",
+
+    // Toast messages
+    "toast.success.title": "Super ! Ça a marché. 🎉",
+    "toast.success.description": "Vous êtes en feu ! 🔥",
+    "toast.error.title": "Oups ! Une erreur s'est produite.",
+    "toast.error.unknown": "Une erreur inconnue s'est produite",
   },
   it: {
     // Landing page
@@ -512,7 +552,9 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Seleziona un vaccino",
     "addVaccination.plan": "Piano di immunizzazione",
     "addVaccination.plan.placeholder": "Seleziona un piano di immunizzazione",
+    "addVaccination.plan.empty": "Nessun piano di immunizzazione disponibile",
     "addVaccination.date": "Data somministrazione",
+    "addVaccination.date.placeholder": "Seleziona la data di somministrazione",
     "addVaccination.dose": "Numero dose",
     "addVaccination.dose.placeholder": "es. 1, 2, 3",
     "addVaccination.button": "Aggiungi vaccinazione",
@@ -545,6 +587,12 @@ const translations: Record<Language, Record<string, string>> = {
     "validation.invalidDate": "La data deve essere nel passato",
     "validation.invalidDoseNumber": "Numero dose non valido",
     "validation.positiveNumber": "Deve essere un numero positivo",
+
+    // Toast messages
+    "toast.success.title": "Fantastico! Ha funzionato. 🎉",
+    "toast.success.description": "Sei in fiamme! 🔥",
+    "toast.error.title": "Ops! Si è verificato un errore.",
+    "toast.error.unknown": "Si è verificato un errore sconosciuto",
   },
 };
 

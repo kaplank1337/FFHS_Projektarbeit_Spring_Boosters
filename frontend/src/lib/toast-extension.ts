@@ -1,25 +1,27 @@
 import { toast } from "sonner";
 import type { ApiError } from "@/api/api-client";
 
-const successToast = (message?: string) => {
-  toast("Super! Das hat funktioniert. 🎉", {
-    description: message || "Du bist on fire! 🔥",
+type TranslationFunction = (key: string) => string;
+
+const successToast = (t: TranslationFunction, message?: string) => {
+  toast(t("toast.success.title"), {
+    description: message || t("toast.success.description"),
     duration: 2000,
   });
 };
 
-const errorToast = (message: string) => {
-  toast.error("Uups! Es ist ein Fehler aufgetreten.", {
+const errorToast = (t: TranslationFunction, message: string) => {
+  toast.error(t("toast.error.title"), {
     description: message,
     duration: 4000,
   });
 };
 
-const apiErrorToast = (error: unknown) => {
+const apiErrorToast = (t: TranslationFunction, error: unknown) => {
   const apiError = error as ApiError;
-  const message = apiError?.message || "Ein unbekannter Fehler ist aufgetreten";
+  const message = apiError?.message || t("toast.error.unknown");
 
-  toast.error("Uups! Es ist ein Fehler aufgetreten.", {
+  toast.error(t("toast.error.title"), {
     description: message,
     duration: 4000,
   });
