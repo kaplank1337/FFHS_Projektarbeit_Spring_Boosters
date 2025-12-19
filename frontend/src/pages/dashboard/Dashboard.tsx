@@ -67,7 +67,7 @@ const Dashboard = () => {
   }, [navigate]);
 
   const checkUser = () => {
-    const token = localStorage.getItem("auth_token");
+    const token = sessionStorage.getItem("auth_token");
     if (token) {
       setUser({ token });
     } else {

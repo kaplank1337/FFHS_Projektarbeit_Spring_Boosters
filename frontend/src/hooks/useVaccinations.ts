@@ -17,7 +17,7 @@ export const useVaccinations = () => {
   return useQuery({
     queryKey: VACCINATIONS_QUERY_KEY,
     queryFn: () => vaccinationsService.getAll(),
-    enabled: !!localStorage.getItem("auth_token"),
+    enabled: !!sessionStorage.getItem("auth_token"),
   });
 };
 
@@ -25,7 +25,7 @@ export const useVaccination = (id: string) => {
   return useQuery({
     queryKey: [...VACCINATIONS_QUERY_KEY, id],
     queryFn: () => vaccinationsService.getById(id),
-    enabled: !!id && !!localStorage.getItem("auth_token"),
+    enabled: !!id && !!sessionStorage.getItem("auth_token"),
   });
 };
 
