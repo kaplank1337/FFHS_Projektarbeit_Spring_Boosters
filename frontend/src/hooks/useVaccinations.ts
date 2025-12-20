@@ -4,7 +4,7 @@ import {
   type ImmunizationRecordCreateDto,
   type ImmunizationRecordUpdateDto,
 } from "@/api/vaccinations.service";
-import { successToast, apiErrorToast } from "@/lib/toast-extension";
+import { successToast, apiErrorToast, errorToast } from "@/lib/toast-extension";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   DASHBOARD_STATS_QUERY_KEY,
@@ -42,6 +42,18 @@ export const useCreateVaccination = () => {
       successToast(t, t("addVaccination.success"));
     },
     onError: (error) => {
+      const apiError = error as any;
+      const msg: string = (apiError?.message || "").toString();
+
+      // Robust detection: look for keywords indicating missing plan (German/English)
+      const missingPlanPattern = /immunizationplan|no immunization plan|no matching immunizationplan|kein passender immunizationplan|kein Impfplan|vaccineTypeId/i;
+
+      if (missingPlanPattern.test(msg)) {
+        // Show user-friendly message without the generic "Uups" title
+        errorToast(t, t("addVaccination.plan.empty"), false);
+        return;
+      }
+
       apiErrorToast(t, error);
     },
   });

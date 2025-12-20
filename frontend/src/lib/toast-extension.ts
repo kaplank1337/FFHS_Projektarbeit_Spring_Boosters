@@ -10,8 +10,21 @@ const successToast = (t: TranslationFunction, message?: string) => {
   });
 };
 
-const errorToast = (t: TranslationFunction, message: string) => {
-  toast.error(t("toast.error.title"), {
+const errorToast = (
+  t: TranslationFunction,
+  message: string,
+  showTitle = true
+) => {
+  if (showTitle) {
+    toast.error(t("toast.error.title"), {
+      description: message,
+      duration: 4000,
+    });
+    return;
+  }
+
+  // Show only description without the generic title
+  toast.error(undefined as any, {
     description: message,
     duration: 4000,
   });
