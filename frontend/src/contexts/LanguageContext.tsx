@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type Language = "de" | "en" | "fr";
+export type Language = "de" | "en" | "fr" | "it";
 
 interface LanguageContextType {
   language: Language;
@@ -149,6 +149,12 @@ const translations: Record<Language, Record<string, string>> = {
     "validation.invalidDate": "Datum muss in der Vergangenheit liegen",
     "validation.invalidDoseNumber": "Ungültige Dosisnummer",
     "validation.positiveNumber": "Muss eine positive Zahl sein",
+
+    // Toast messages
+    "toast.success.title": "Super! Das hat funktioniert. 🎉",
+    "toast.success.description": "Du bist on fire! 🔥",
+    "toast.error.title": "Uups! Es ist ein Fehler aufgetreten.",
+    "toast.error.unknown": "Ein unbekannter Fehler ist aufgetreten",
   },
   en: {
     // Landing page
@@ -254,12 +260,15 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Select a vaccine",
     "addVaccination.plan": "Immunization Plan",
     "addVaccination.plan.placeholder": "Select an immunization plan",
+    "addVaccination.plan.empty": "No immunization plan available",
     "addVaccination.date": "Date Administered",
+    "addVaccination.date.placeholder": "Select date administered",
     "addVaccination.dose": "Dose Number",
     "addVaccination.dose.placeholder": "e.g. 1, 2, 3",
     "addVaccination.button": "Add Vaccination",
     "addVaccination.saving": "Saving...",
     "addVaccination.cancel": "Cancel",
+    "addVaccination.success": "Vaccination successfully added",
 
     // Edit vaccination dialog
     "editVaccination.title": "Edit Vaccination",
@@ -277,6 +286,20 @@ const translations: Record<Language, Record<string, string>> = {
     "editVaccination.error.notAuthDesc": "Please sign in.",
     "editVaccination.error.failed": "Error updating",
     "editVaccination.error.failedDesc": "Could not update vaccination record.",
+
+    "deleteVaccination.success": "Vaccination successfully deleted",
+
+    // Validation
+    "validation.required": "Required field",
+    "validation.invalidDate": "Date must be in the past",
+    "validation.invalidDoseNumber": "Invalid dose number",
+    "validation.positiveNumber": "Must be a positive number",
+
+    // Toast messages
+    "toast.success.title": "Great! That worked. 🎉",
+    "toast.success.description": "You're on fire! 🔥",
+    "toast.error.title": "Oops! An error occurred.",
+    "toast.error.unknown": "An unknown error occurred",
   },
   fr: {
     // Landing page
@@ -384,12 +407,15 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Sélectionner un vaccin",
     "addVaccination.plan": "Plan de vaccination",
     "addVaccination.plan.placeholder": "Sélectionner un plan",
+    "addVaccination.plan.empty": "Aucun plan de vaccination disponible",
     "addVaccination.date": "Date d'administration",
+    "addVaccination.date.placeholder": "Sélectionner la date d'administration",
     "addVaccination.dose": "Numéro de dose",
     "addVaccination.dose.placeholder": "ex. 1, 2, 3",
     "addVaccination.button": "Ajouter la vaccination",
     "addVaccination.saving": "Enregistrement...",
     "addVaccination.cancel": "Annuler",
+    "addVaccination.success": "Vaccination ajoutée avec succès",
 
     // Edit vaccination dialog
     "editVaccination.title": "Modifier la vaccination",
@@ -408,6 +434,165 @@ const translations: Record<Language, Record<string, string>> = {
     "editVaccination.error.failed": "Erreur de mise à jour",
     "editVaccination.error.failedDesc":
       "Impossible de mettre à jour la vaccination.",
+
+    "deleteVaccination.success": "Vaccination supprimée avec succès",
+
+    // Validation
+    "validation.required": "Champ obligatoire",
+    "validation.invalidDate": "La date doit être dans le passé",
+    "validation.invalidDoseNumber": "Numéro de dose invalide",
+    "validation.positiveNumber": "Doit être un nombre positif",
+
+    // Toast messages
+    "toast.success.title": "Super ! Ça a marché. 🎉",
+    "toast.success.description": "Vous êtes en feu ! 🔥",
+    "toast.error.title": "Oups ! Une erreur s'est produite.",
+    "toast.error.unknown": "Une erreur inconnue s'est produite",
+  },
+  it: {
+    // Landing page
+    "hero.title.part1": "Le tue vaccinazioni,",
+    "hero.title.part2": "Semplificate",
+    "hero.description":
+      "Prendi il controllo dei tuoi registri vaccinali con Spring Boosters. Monitora, gestisci e non perdere mai più un richiamo importante.",
+    "hero.getStarted": "Inizia",
+    "hero.signUp": "Registrati",
+
+    // Features
+    "features.title": "Tutto ciò che serve per restare protetti",
+    "features.subtitle": "Gestione completa delle vaccinazioni a portata di mano",
+    "features.track.title": "Monitora le vaccinazioni",
+    "features.track.description":
+      "Registra tutte le tue vaccinazioni con date e note per una cronologia completa.",
+    "features.reminders.title": "Promemoria intelligenti",
+    "features.reminders.description":
+      "Ricevi notifiche puntuali per i richiami in arrivo, così non perdi mai una dose.",
+    "features.status.title": "Panoramica dello stato",
+    "features.status.description":
+      "La dashboard mostra a colpo d'occhio quali vaccinazioni sono aggiornate, in scadenza o in ritardo.",
+    "features.database.title": "Database principale",
+    "features.database.description":
+      "Precaricato con le vaccinazioni comuni e i relativi piani di richiamo raccomandati.",
+
+    // Footer
+    "footer.copyright":
+      "© 2025 Spring Boosters. La tua salute, i tuoi dati, il tuo controllo.",
+
+    // Header
+    "header.dashboard": "Dashboard",
+    "header.signOut": "Disconnetti",
+    "header.signIn": "Accedi",
+
+    // Auth page
+    "auth.welcome": "Benvenuto su Spring Boosters",
+    "auth.subtitle": "Gestisci i tuoi registri vaccinali in modo sicuro",
+    "auth.signin": "Accedi",
+    "auth.signup": "Registrati",
+    "auth.signin.title": "Accedi",
+    "auth.signin.description": "Inserisci le tue credenziali per accedere al tuo account",
+    "auth.username": "Nome utente",
+    "auth.password": "Password",
+    "auth.signin.button": "Accedi",
+    "auth.signin.loading": "Accesso in corso...",
+    "auth.signup.title": "Crea account",
+    "auth.signup.description": "Inizia con il monitoraggio delle tue vaccinazioni",
+    "auth.firstName": "Nome",
+    "auth.lastName": "Cognome",
+    "auth.birthDate": "Data di nascita",
+    "auth.email": "Email",
+    "auth.signup.button": "Registrati",
+    "auth.signup.loading": "Creazione account...",
+
+    // Dashboard
+    "dashboard.title": "Pannello Vaccinazioni",
+    "dashboard.subtitle": "Monitora e gestisci i tuoi registri vaccinali",
+    "dashboard.addVaccination": "Aggiungi vaccinazione",
+    "dashboard.vaccineType": "Tipo di vaccino",
+    "dashboard.selectVaccineType": "Seleziona il tipo di vaccino",
+    "dashboard.administeredOn": "Somministrato il",
+    "dashboard.doseOrder": "Numero dose",
+    "dashboard.optional": "Opzionale",
+    "dashboard.cancel": "Annulla",
+    "dashboard.save": "Salva",
+    "dashboard.saving": "Salvataggio...",
+    "dashboard.editVaccination": "Modifica vaccinazione",
+    "header.logout": "Esci",
+    "dashboard.upcoming": "In arrivo",
+    "dashboard.upcoming.desc": "Scadenza in 90 giorni",
+    "dashboard.dueSoon": "Prossima scadenza",
+    "dashboard.dueSoon.desc": "Scadenza in 30 giorni",
+    "dashboard.overdue": "Scaduta",
+    "dashboard.overdue.desc": "Richiede attenzione",
+    "dashboard.vaccinations": "Le tue vaccinazioni",
+    "dashboard.loading": "Caricamento vaccinazioni...",
+    "dashboard.empty": "Nessuna vaccinazione registrata.",
+    "dashboard.empty.hint": 'Clicca su "Aggiungi vaccinazione" per iniziare.',
+    "dashboard.table.status": "Stato",
+    "dashboard.table.vaccine": "Vaccino",
+    "dashboard.table.date": "Data somministrazione",
+    "dashboard.table.dose": "Numero dose",
+    "dashboard.table.created": "Creato il",
+    "dashboard.table.actions": "Azioni",
+    "dashboard.vaccinationDeleted": "Vaccinazione eliminata",
+    "dashboard.pending.title": "Vaccinazioni in attesa",
+    "dashboard.pending.vaccine": "Vaccino",
+    "dashboard.pending.empty": "Nessuna vaccinazione in attesa",
+    "dashboard.edit.action": "Modifica",
+    "dashboard.delete.action": "Elimina",
+    "dashboard.delete.title": "Elimina vaccinazione",
+    "dashboard.delete.description":
+      "Sei sicuro di voler eliminare questa vaccinazione? Questa azione non può essere annullata.",
+    "dashboard.delete.cancel": "Annulla",
+    "dashboard.delete.confirm": "Elimina",
+
+    // Add vaccination dialog
+    "addVaccination.title": "Aggiungi vaccinazione",
+    "addVaccination.description": "Aggiungi una nuova vaccinazione ai tuoi registri",
+    "addVaccination.type": "Tipo di vaccinazione",
+    "addVaccination.type.placeholder": "Seleziona un vaccino",
+    "addVaccination.plan": "Piano di immunizzazione",
+    "addVaccination.plan.placeholder": "Seleziona un piano di immunizzazione",
+    "addVaccination.plan.empty": "Nessun piano di immunizzazione disponibile",
+    "addVaccination.date": "Data somministrazione",
+    "addVaccination.date.placeholder": "Seleziona la data di somministrazione",
+    "addVaccination.dose": "Numero dose",
+    "addVaccination.dose.placeholder": "es. 1, 2, 3",
+    "addVaccination.button": "Aggiungi vaccinazione",
+    "addVaccination.saving": "Salvataggio...",
+    "addVaccination.cancel": "Annulla",
+    "addVaccination.success": "Vaccinazione aggiunta con successo",
+
+    // Edit vaccination dialog
+    "editVaccination.title": "Modifica vaccinazione",
+    "editVaccination.vaccineName": "Nome vaccino",
+    "editVaccination.save": "Salva",
+    "editVaccination.saving": "Salvataggio...",
+    "editVaccination.success": "Vaccinazione aggiornata",
+    "editVaccination.error.missingInfo": "Informazioni mancanti",
+    "editVaccination.error.missingInfoDesc":
+      "Per favore compila tutti i campi obbligatori.",
+    "editVaccination.error.invalidDose": "Numero dose non valido",
+    "editVaccination.error.invalidDoseDesc":
+      "Il numero della dose deve essere un intero positivo.",
+    "editVaccination.error.notAuth": "Non autenticato",
+    "editVaccination.error.notAuthDesc": "Per favore effettua l'accesso.",
+    "editVaccination.error.failed": "Errore durante l'aggiornamento",
+    "editVaccination.error.failedDesc":
+      "Impossibile aggiornare la vaccinazione.",
+
+    "deleteVaccination.success": "Vaccinazione eliminata con successo",
+
+    // Validation
+    "validation.required": "Campo obbligatorio",
+    "validation.invalidDate": "La data deve essere nel passato",
+    "validation.invalidDoseNumber": "Numero dose non valido",
+    "validation.positiveNumber": "Deve essere un numero positivo",
+
+    // Toast messages
+    "toast.success.title": "Fantastico! Ha funzionato. 🎉",
+    "toast.success.description": "Sei in fiamme! 🔥",
+    "toast.error.title": "Ops! Si è verificato un errore.",
+    "toast.error.unknown": "Si è verificato un errore sconosciuto",
   },
 };
 

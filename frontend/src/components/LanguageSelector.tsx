@@ -12,6 +12,7 @@ const languageOptions = [
   { code: "de" as Language, label: "Deutsch", flag: "🇩🇪" },
   { code: "en" as Language, label: "English", flag: "🇬🇧" },
   { code: "fr" as Language, label: "Français", flag: "🇫🇷" },
+  { code: "it" as Language, label: "Italiano", flag: "🇮🇹" },
 ];
 
 const LanguageSelector = () => {

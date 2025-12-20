@@ -11,7 +11,7 @@ const Index = () => {
     window.location.href = path;
   };
 
-  const token = localStorage.getItem("auth_token");
+  const token = sessionStorage.getItem("auth_token");
   if (token) {
     navigate("/dashboard");
   }

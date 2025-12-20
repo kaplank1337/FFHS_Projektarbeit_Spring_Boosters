@@ -34,18 +34,18 @@ export const authService = {
   },
 
   logout: () => {
-    localStorage.removeItem("auth_token");
+    sessionStorage.removeItem("auth_token");
   },
 
   getToken: (): string | null => {
-    return localStorage.getItem("auth_token");
+    return sessionStorage.getItem("auth_token");
   },
 
   setToken: (token: string) => {
-    localStorage.setItem("auth_token", token);
+    sessionStorage.setItem("auth_token", token);
   },
 
   isAuthenticated: (): boolean => {
-    return !!localStorage.getItem("auth_token");
+    return !!sessionStorage.getItem("auth_token");
   },
 };

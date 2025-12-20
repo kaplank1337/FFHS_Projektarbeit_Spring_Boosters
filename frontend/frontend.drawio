@@ -1,0 +1,194 @@
+<mxfile host="65bd71144e">
+    <diagram name="React Query Architecture" id="react-query-context">
+        <mxGraphModel dx="716" dy="779" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="React Query Frontend Architektur" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="384.5" y="40" width="400" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="user" value="Benutzer" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="320" width="60" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="components-layer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;fontSize=14;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="220" y="180" width="280" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="components-label" value="React Components" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="280" y="190" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth-component" value="Auth Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="240" y="240" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dashboard-component" value="Dashboard Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="240" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="hooks-layer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="230" y="330" width="260" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="hooks-label" value="Custom Hooks (React Query)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="250" y="340" width="220" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="hook-auth" value="useLogin&#xa;useRegister" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" parent="1" vertex="1">
+                    <mxGeometry x="245" y="380" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="hook-vaccinations" value="useVaccinations&#xa;useCreateVaccination" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" parent="1" vertex="1">
+                    <mxGeometry x="375" y="380" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="hook-dashboard" value="useDashboard&#xa;useStatistics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" parent="1" vertex="1">
+                    <mxGeometry x="245" y="470" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="hook-types" value="useVaccineTypes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" parent="1" vertex="1">
+                    <mxGeometry x="375" y="470" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="query-client" value="Query Client&#xa;(Cache &amp; State Management)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="570" y="330" width="180" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="service-layer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="570" y="450" width="180" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="service-label" value="API Services" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="600" y="460" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="service-auth" value="authService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fad9d5;strokeColor=#ae4132;" parent="1" vertex="1">
+                    <mxGeometry x="585" y="500" width="150" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="service-vaccinations" value="vaccinationsService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fad9d5;strokeColor=#ae4132;" parent="1" vertex="1">
+                    <mxGeometry x="585" y="560" width="150" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="service-dashboard" value="dashboardService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fad9d5;strokeColor=#ae4132;" parent="1" vertex="1">
+                    <mxGeometry x="585" y="620" width="150" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="api-client" value="API Client&#xa;(HTTP + Auth)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="820" y="515" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="backend" value="Backend API&#xa;(Spring Boot)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="1040" y="360" width="100" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-user-auth" value="interagiert" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;" parent="1" source="user" target="auth-component" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-auth-hook" value="verwendet" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;fontSize=11;" parent="1" source="auth-component" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="260" y="380" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="290" y="335"/>
+                            <mxPoint x="260" y="335"/>
+                            <mxPoint x="260" y="380"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-dashboard-hooks" value="verwendet" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;fontSize=11;" parent="1" source="dashboard-component" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="450" y="380" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-hooks-qc-1" value="useQuery/&#xa;useMutation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;dashed=1;" parent="1" edge="1">
+                    <mxGeometry x="-0.5139" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                        <mxPoint x="294" y="430" as="sourcePoint"/>
+                        <mxPoint x="569" y="350" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="294" y="450"/>
+                            <mxPoint x="529" y="450"/>
+                            <mxPoint x="529" y="350"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-hooks-qc-2" value="useQuery/&#xa;useMutation" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;dashed=1;" parent="1" source="hook-vaccinations" target="query-client" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="520" y="405"/>
+                            <mxPoint x="520" y="310"/>
+                            <mxPoint x="615" y="310"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-hooks-qc-3" value="useQuery" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;dashed=1;" parent="1" source="hook-dashboard" target="query-client" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="295" y="540"/>
+                            <mxPoint x="550" y="540"/>
+                            <mxPoint x="550" y="390"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-qc-service-1" value="ruft auf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;" parent="1" source="query-client" target="service-layer" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-service-api-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="service-auth" target="api-client" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-service-api-2" value="verwendet" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;" parent="1" source="service-vaccinations" target="api-client" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow-service-api-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;strokeWidth=2;" parent="1" source="service-dashboard" target="api-client" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-api-backend" value="HTTP Requests&#xa;(GET/POST/PATCH/DELETE)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=3;fontSize=11;strokeColor=#0066CC;" parent="1" source="api-client" target="backend" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="localstorage" value="SessionStorage&lt;br&gt;(Auth Token)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="820" y="350" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow-api-storage" value="speichert/&#xa;liest Token" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=2;fontSize=11;dashed=1;" parent="1" source="api-client" target="localstorage" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="620" width="280" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-title" value="Datenfluss-Legende" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="270" y="630" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-1" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="240" y="670" as="sourcePoint"/>
+                        <mxPoint x="290" y="670" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend-1-text" value="Komponenten-Beziehung" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="660" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-2" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;dashed=1;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="240" y="700" as="sourcePoint"/>
+                        <mxPoint x="290" y="700" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend-2-text" value="React Query Hooks" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="690" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-3" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#0066CC;" parent="1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="240" y="730" as="sourcePoint"/>
+                        <mxPoint x="290" y="730" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend-3-text" value="HTTP API Calls" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="720" width="180" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="features-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="820" y="640" width="300" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="features-title" value="React Query Features" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="870" y="650" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="features-list" value="✓ Automatisches Caching (5 Min. staleTime)&#xa;✓ Query Invalidation nach Mutations&#xa;✓ Optimistic Updates&#xa;✓ Error &amp; Loading States&#xa;✓ Token-basierte Authentifizierung" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="835" y="680" width="270" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="useQuery" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fontSize=11;dashed=1;" edge="1" parent="1" source="hook-types" target="query-client">
+                    <mxGeometry x="-0.5909" y="5" relative="1" as="geometry">
+                        <mxPoint x="305" y="520" as="sourcePoint"/>
+                        <mxPoint x="580" y="400" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="540" y="495"/>
+                            <mxPoint x="540" y="370"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

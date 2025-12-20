@@ -6,9 +6,11 @@ import {
   type LoginRequest,
   type RegisterRequest,
 } from "@/api/auth.service";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return useMutation({
     mutationFn: (credentials: LoginRequest) => authService.login(credentials),
@@ -18,25 +20,28 @@ export const useLogin = () => {
         authService.setToken(token);
         navigate("/dashboard");
       } else {
-        apiErrorToast({ message: "Kein Token vom Server erhalten" });
+        apiErrorToast(t, { message: "Kein Token vom Server erhalten" });
       }
     },
     onError: (error) => {
-      apiErrorToast(error);
+      apiErrorToast(t, error);
     },
   });
 };
 
 export const useRegister = () => {
+  const { t } = useLanguage();
+
   return useMutation({
     mutationFn: (data: RegisterRequest) => authService.register(data),
     onSuccess: () => {
       successToast(
+        t,
         "Account erfolgreich erstellt! Du kannst dich jetzt anmelden."
       );
     },
     onError: (error) => {
-      apiErrorToast(error);
+      apiErrorToast(t, error);
     },
   });
 };
