@@ -150,7 +150,7 @@ SELECT
     a.age_id
 FROM vaccine_refs v, age_refs a
 WHERE v.vaccine_name = 'DTPa-IPV-Hib-HepB (6-fach)'
-AND a.age_name IN ('Säuglinge (2-11 Monate)', 'Kleinkinder (1-2 Jahre)')
+AND a.age_name IN ('Saeuglinge (2-11 Monate)', 'Kleinkinder (1-2 Jahre)')
 
 UNION ALL
 
