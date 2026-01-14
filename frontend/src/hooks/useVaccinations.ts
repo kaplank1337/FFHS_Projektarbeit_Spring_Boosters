@@ -36,11 +36,21 @@ export const useCreateVaccination = () => {
   return useMutation({
     mutationFn: (data: ImmunizationRecordCreateDto) =>
       vaccinationsService.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
-      successToast(t, t("addVaccination.success"));
-    },
+      onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
+          queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
+          queryClient.invalidateQueries({
+              queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "overdue"],
+          });
+          queryClient.invalidateQueries({
+              queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "due-soon"],
+          });
+          queryClient.invalidateQueries({
+              queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "upcoming"],
+          });
+
+          successToast(t, t("addVaccination.success"));
+      },
     onError: (error) => {
       const apiError = error as any;
       const msg: string = (apiError?.message || "").toString();
@@ -73,6 +83,7 @@ export const useUpdateVaccination = () => {
     }) => vaccinationsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VACCINATIONS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_QUERY_KEY });
       queryClient.invalidateQueries({
         queryKey: [PENDING_VACCINATIONS_QUERY_KEY, "overdue"],
       });

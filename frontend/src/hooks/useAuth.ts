@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { successToast, apiErrorToast } from "@/lib/toast-extension";
 import {
   authService,
@@ -47,10 +47,13 @@ export const useRegister = () => {
 };
 
 export const useLogout = () => {
-  const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
 
-  return () => {
-    authService.logout();
-    navigate("/auth");
-  };
+    return () => {
+        authService.logout();
+
+        queryClient.invalidateQueries();
+        navigate("/auth");
+    };
 };
