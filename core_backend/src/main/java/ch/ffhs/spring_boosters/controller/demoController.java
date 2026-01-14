@@ -25,10 +25,8 @@ public class demoController {
 
     @GetMapping("/execute")
     public ResponseEntity<String> demo(@RequestHeader("Authorization") String authToken) throws UserNotFoundException {
-        try {
             User user = userService.findById(getUserIdFromToken(authToken));
             reminderService.executeReminder(user);
-        }
 
         return ResponseEntity.ok("Reminder service executed");
     }
