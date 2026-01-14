@@ -232,6 +232,10 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
 
         int daysUntil = nextDueAgeDays - currentAgeDays;
 
+        if (daysUntil < 0) {
+            return "Überfällig";
+        }
+
         // Noch <= 30 Tage -> Termin vereinbaren
         if (daysUntil <= 30) {
             return "Termin vereinbaren";

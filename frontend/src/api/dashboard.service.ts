@@ -29,6 +29,6 @@ export const dashboardService = {
   },
 
   triggerReminder: async (): Promise<void> => {
-    await apiClient.get("/api/v1/reminderserivce/execute");
+    await apiClient.get("/api/v1/reminderservice/execute");
   },
 };

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("reminderservice")
+@RequestMapping("/api/v1/reminderservice")
 @RequiredArgsConstructor
 public class demoController {
 
