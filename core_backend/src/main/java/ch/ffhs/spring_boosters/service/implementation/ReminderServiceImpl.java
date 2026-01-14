@@ -76,6 +76,27 @@ public class ReminderServiceImpl implements ReminderService {
         }
     }
 
+    @Override
+    public void executeReminder(User user) throws UserNotFoundException {
+        var schedule = immunizationScheduleService.getPendingImmunizations(user.getId());
+        if (schedule == null || schedule.getPendingImmunizations() == null
+                || schedule.getPendingImmunizations().isEmpty()) {
+            log.info("Keine ausstehenden Impfungen fuer User {} ({}) gefunden",
+                    user.getId(), user.getEmail());
+            return;}
+
+        NotificationEmailRequestDto emailRequest = mapToEmailRequest(user, schedule);
+
+        try {
+            restTemplate.postForEntity(notificationServiceUrl, emailRequest, Void.class);
+            log.info("Reminder-E-Mail fuer User {} ({}) gesendet",
+                    user.getId(), user.getEmail());
+        } catch (Exception ex) {
+            log.error("Fehler beim Senden der Reminder-E-Mail fuer User {}: {}",
+                    user.getId(), ex.getMessage(), ex);
+        }
+    }
+
     private NotificationEmailRequestDto mapToEmailRequest(User user, ImmunizationScheduleDto schedule) {
 
         String subject = "Impf-Erinnerung \u2013 ausstehende Impfungen";
