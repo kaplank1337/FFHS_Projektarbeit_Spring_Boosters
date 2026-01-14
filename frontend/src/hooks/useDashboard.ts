@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   dashboardService,
   type PendingPriority,
 } from "@/api/dashboard.service";
+import { toast } from "sonner";
 
 export const DASHBOARD_STATS_QUERY_KEY = ["dashboard-stats"];
 export const PENDING_VACCINATIONS_QUERY_KEY = "pending-vaccinations";
@@ -21,4 +22,18 @@ export const usePendingVaccinations = (priority: PendingPriority | null) => {
     queryFn: () => dashboardService.getPendingByPriority(priority!),
     enabled: !!priority && !!sessionStorage.getItem("auth_token"),
   });
+};
+
+export const useNotificationTrigger = () => {
+  const mutation = useMutation({
+    mutationFn: () => dashboardService.triggerReminder(),
+    onSuccess: () => {
+      toast.success("Notifications triggered successfully");
+    },
+    onError: () => {
+      toast.error("Failed to trigger notifications");
+    },
+  });
+
+  return () => mutation.mutate();
 };

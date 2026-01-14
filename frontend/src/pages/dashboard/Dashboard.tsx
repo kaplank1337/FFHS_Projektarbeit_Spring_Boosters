@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import {
   useDashboardStats,
+  useNotificationTrigger,
   usePendingVaccinations,
 } from "@/hooks/useDashboard";
 import { useVaccinations, useDeleteVaccination } from "@/hooks/useVaccinations";
@@ -39,6 +40,8 @@ import type { ImmunizationRecordDto } from "@/api/vaccinations.service";
 import { formatDate } from "@/lib/date-utils";
 import { VaccinationsTable } from "./components/VaccinationsTable";
 import { DashboardStatsCards } from "./components/DashboardStatsCards";
+import { Button } from "@/components/ui/button";
+import { BellRing } from "lucide-react";
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -61,6 +64,7 @@ const Dashboard = () => {
   const { data: pendingVaccinations, isLoading: loadingPending } =
     usePendingVaccinations(pendingPriority);
   const deleteMutation = useDeleteVaccination();
+  const triggerNotification = useNotificationTrigger();
 
   useEffect(() => {
     checkUser();
@@ -135,7 +139,13 @@ const Dashboard = () => {
               {t("dashboard.subtitle")}
             </p>
           </div>
-          <AddImmunizationRecordDialog />
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={triggerNotification}>
+              <BellRing className="h-4 w-4 mr-2" />
+              {t("dashboard.demo.button")}
+            </Button>
+            <AddImmunizationRecordDialog />
+          </div>
         </div>
 
         {/* Stats Cards */}

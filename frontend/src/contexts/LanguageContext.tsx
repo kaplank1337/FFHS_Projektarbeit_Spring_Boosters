@@ -106,6 +106,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Möchten Sie diese Impfung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "dashboard.delete.cancel": "Abbrechen",
     "dashboard.delete.confirm": "Löschen",
+    "dashboard.demo.button": "Erinnere mich",
 
     // Add vaccination dialog
     "addVaccination.title": "Impfung hinzufügen",
@@ -115,7 +116,8 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Impfstoff auswählen",
     "addVaccination.plan": "Impfplan",
     "addVaccination.plan.placeholder": "Impfplan auswählen",
-    "addVaccination.plan.empty": "Für dich liegt für diesen Impfstoff kein Impfplan vor.",
+    "addVaccination.plan.empty":
+      "Für dich liegt für diesen Impfstoff kein Impfplan vor.",
     "addVaccination.date": "Verabreichungsdatum",
     "addVaccination.date.placeholder": "Verabreichungsdatum auswählen",
     "addVaccination.dose": "Dosisnummer",
@@ -252,6 +254,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Are you sure you want to delete this vaccination? This action cannot be undone.",
     "dashboard.delete.cancel": "Cancel",
     "dashboard.delete.confirm": "Delete",
+    "dashboard.demo.button": "Remind me",
 
     // Add vaccination dialog
     "addVaccination.title": "Add Vaccination",
@@ -260,7 +263,8 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Select a vaccine",
     "addVaccination.plan": "Immunization Plan",
     "addVaccination.plan.placeholder": "Select an immunization plan",
-    "addVaccination.plan.empty": "There is no immunization plan for this vaccine for you.",
+    "addVaccination.plan.empty":
+      "There is no immunization plan for this vaccine for you.",
     "addVaccination.date": "Date Administered",
     "addVaccination.date.placeholder": "Select date administered",
     "addVaccination.dose": "Dose Number",
@@ -398,6 +402,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Êtes-vous sûr de vouloir supprimer cette vaccination ? Cette action est irréversible.",
     "dashboard.delete.cancel": "Annuler",
     "dashboard.delete.confirm": "Supprimer",
+    "dashboard.demo.button": "Rappelle-moi",
 
     // Add vaccination dialog
     "addVaccination.title": "Ajouter une vaccination",
@@ -407,7 +412,8 @@ const translations: Record<Language, Record<string, string>> = {
     "addVaccination.type.placeholder": "Sélectionner un vaccin",
     "addVaccination.plan": "Plan de vaccination",
     "addVaccination.plan.placeholder": "Sélectionner un plan",
-    "addVaccination.plan.empty": "Pour vous, il n'existe pas de plan de vaccination pour ce vaccin.",
+    "addVaccination.plan.empty":
+      "Pour vous, il n'existe pas de plan de vaccination pour ce vaccin.",
     "addVaccination.date": "Date d'administration",
     "addVaccination.date.placeholder": "Sélectionner la date d'administration",
     "addVaccination.dose": "Numéro de dose",
@@ -460,7 +466,8 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Features
     "features.title": "Tutto ciò che serve per restare protetti",
-    "features.subtitle": "Gestione completa delle vaccinazioni a portata di mano",
+    "features.subtitle":
+      "Gestione completa delle vaccinazioni a portata di mano",
     "features.track.title": "Monitora le vaccinazioni",
     "features.track.description":
       "Registra tutte le tue vaccinazioni con date e note per una cronologia completa.",
@@ -489,13 +496,15 @@ const translations: Record<Language, Record<string, string>> = {
     "auth.signin": "Accedi",
     "auth.signup": "Registrati",
     "auth.signin.title": "Accedi",
-    "auth.signin.description": "Inserisci le tue credenziali per accedere al tuo account",
+    "auth.signin.description":
+      "Inserisci le tue credenziali per accedere al tuo account",
     "auth.username": "Nome utente",
     "auth.password": "Password",
     "auth.signin.button": "Accedi",
     "auth.signin.loading": "Accesso in corso...",
     "auth.signup.title": "Crea account",
-    "auth.signup.description": "Inizia con il monitoraggio delle tue vaccinazioni",
+    "auth.signup.description":
+      "Inizia con il monitoraggio delle tue vaccinazioni",
     "auth.firstName": "Nome",
     "auth.lastName": "Cognome",
     "auth.birthDate": "Data di nascita",
@@ -544,15 +553,18 @@ const translations: Record<Language, Record<string, string>> = {
       "Sei sicuro di voler eliminare questa vaccinazione? Questa azione non può essere annullata.",
     "dashboard.delete.cancel": "Annulla",
     "dashboard.delete.confirm": "Elimina",
+    "dashboard.demo.button": "Ricordami",
 
     // Add vaccination dialog
     "addVaccination.title": "Aggiungi vaccinazione",
-    "addVaccination.description": "Aggiungi una nuova vaccinazione ai tuoi registri",
+    "addVaccination.description":
+      "Aggiungi una nuova vaccinazione ai tuoi registri",
     "addVaccination.type": "Tipo di vaccinazione",
     "addVaccination.type.placeholder": "Seleziona un vaccino",
     "addVaccination.plan": "Piano di immunizzazione",
     "addVaccination.plan.placeholder": "Seleziona un piano di immunizzazione",
-    "addVaccination.plan.empty": "Per te non esiste un piano di immunizzazione per questo vaccino.",
+    "addVaccination.plan.empty":
+      "Per te non esiste un piano di immunizzazione per questo vaccino.",
     "addVaccination.date": "Data somministrazione",
     "addVaccination.date.placeholder": "Seleziona la data di somministrazione",
     "addVaccination.dose": "Numero dose",

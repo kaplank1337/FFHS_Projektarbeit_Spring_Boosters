@@ -27,4 +27,8 @@ export const dashboardService = {
       `/api/v1/immunization-schedule/pending/${priority}`
     );
   },
+
+  triggerReminder: async (): Promise<void> => {
+    await apiClient.get("/api/v1/reminderserivce/execute");
+  },
 };
