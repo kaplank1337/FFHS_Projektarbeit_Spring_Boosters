@@ -1,5 +1,6 @@
 package ch.ffhs.authentification_service.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,9 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Value("${cors.allowed-origins:http://localhost:3000}")
+    private String allowedOrigins;
 
     @Bean
     public MapReactiveUserDetailsService userDetailsService(PasswordEncoder encoder) {
@@ -63,14 +67,21 @@ public class SecurityConfig {
                 .build();
     }
 
-    //TODO: CORS nur für bestimmte Origins erlauben - aktuell nur zum Testen
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
+
+        String[] origins = allowedOrigins.split(",");
+        for (String origin : origins) {
+            config.addAllowedOrigin(origin.trim());
+        }
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+
+        // Expose Authorization header for JWT
+        config.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
