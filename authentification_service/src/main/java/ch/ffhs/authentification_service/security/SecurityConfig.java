@@ -70,17 +70,11 @@ public class SecurityConfig {
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
+
         config.setAllowCredentials(true);
-
-        String[] origins = allowedOrigins.split(",");
-        for (String origin : origins) {
-            config.addAllowedOrigin(origin.trim());
-        }
-
+        config.addAllowedOriginPattern("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-
-        // Expose Authorization header for JWT
         config.addExposedHeader("Authorization");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
