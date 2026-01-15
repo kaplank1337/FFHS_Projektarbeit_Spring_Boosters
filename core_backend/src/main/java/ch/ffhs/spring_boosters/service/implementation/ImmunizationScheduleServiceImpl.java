@@ -5,6 +5,7 @@ import ch.ffhs.spring_boosters.controller.dto.ImmunizationScheduleDto;
 import ch.ffhs.spring_boosters.controller.dto.PendingImmunizationDto;
 import ch.ffhs.spring_boosters.controller.entity.*;
 import ch.ffhs.spring_boosters.repository.AgeCategoryRepository;
+import ch.ffhs.spring_boosters.repository.FollowUpRuleRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationPlanRepository;
 import ch.ffhs.spring_boosters.repository.ImmunizationRecordRepository;
 import ch.ffhs.spring_boosters.repository.UserRepository;
@@ -28,6 +29,7 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
     private final ImmunizationPlanRepository immunizationPlanRepository;
     private final ImmunizationRecordRepository immunizationRecordRepository;
     private final AgeCategoryRepository ageCategoryRepository;
+    private final FollowUpRuleRepository followUpRuleRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -104,6 +106,21 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
 
             VaccineType vaccineType = plan.getVaccineType();
 
+            List<ImmunizationRecord> planRecords = existingRecords.stream()
+                    .filter(r -> plan.getId().equals(r.getImmunizationPlanId()))
+                    .toList();
+
+            // Finde das Datum der letzten Impfung für diesen Plan
+            LocalDate lastDoseDate = planRecords.stream()
+                    .map(ImmunizationRecord::getAdministeredOn)
+                    .filter(Objects::nonNull)
+                    .max(LocalDate::compareTo)
+                    .orElse(null);
+
+            // Berechne Fälligkeit und Priorität mit verbesserter Logik
+            String priority = determinePriority(ageCategory, plan, currentAgeDays, completedDoses, lastDoseDate, birthDate);
+            LocalDate calculatedDueDate = calculateDueDate(ageCategory, plan, completedDoses, lastDoseDate, birthDate);
+
             PendingImmunizationDto pending = PendingImmunizationDto.builder()
                     .immunizationPlanId(plan.getId())
                     .immunizationPlanName(plan.getName())
@@ -117,11 +134,9 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
                     .recommendedDoses(requiredDoses)
                     .completedDoses((int) completedDoses)
                     .missingDoses(requiredDoses - (int) completedDoses)
-                    .isOverdue(isOverdue(ageCategory, currentAgeDays))
-                    .priority(determinePriority(ageCategory, currentAgeDays, completedDoses, requiredDoses))
-                    .dueDate(ageCategory != null && ageCategory.getAgeMinDays() != null
-                            ? birthDate.plusDays(ageCategory.getAgeMinDays())
-                            : null)
+                    .isOverdue("Überfällig".equals(priority))
+                    .priority(priority)
+                    .dueDate(calculatedDueDate)
                     .build();
 
             pendingImmunizations.add(pending);
@@ -189,7 +204,7 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
         }
 
         // In aktueller Kategorie oder kürzlich überschritten (Grace Period: 365 Tage)
-        return currentAgeDays <= category.getAgeMaxDays() + 365;
+        return currentAgeDays <= category.getAgeMaxDays();
     }
 
     private boolean isOverdue(AgeCategory category, int currentAgeDays) {
@@ -209,45 +224,63 @@ public class ImmunizationScheduleServiceImpl implements ImmunizationScheduleServ
         }
     }
 
-    private String determinePriority(AgeCategory category, int currentAgeDays, long completedDoses, int requiredDoses) {
-        // Überfällig
-        if (isOverdue(category, currentAgeDays)) {
-            return "Überfällig";
-        }
-
-        // Ermittle Tage bis zur nächsten fälligen Dosis (vereinfachte Annahme)
-        Integer nextDueAgeDays = null;
-        if (category != null) {
-            if (completedDoses == 0) {
-                nextDueAgeDays = category.getAgeMinDays();
-            } else {
-                // Wenn bereits Dosen vorhanden: wir verwenden das Min-Alter als nächstes Ziel (vereinfachung)
-                nextDueAgeDays = category.getAgeMinDays();
+    private String determinePriority(
+            AgeCategory category,
+            ImmunizationPlan plan,
+            int currentAgeDays,
+            long completedDoses,
+            LocalDate lastDoseDate,
+            LocalDate birthDate
+    ) {
+        // Fall 1: Noch gar keine Impfung -> Standardlogik basierend auf Alter
+        if (completedDoses == 0) {
+            if (isOverdue(category, currentAgeDays)) {
+                return "Überfällig";
             }
-        }
-
-        if (nextDueAgeDays == null) {
-            return "Bald fällig"; // Fallback
-        }
-
-        int daysUntil = nextDueAgeDays - currentAgeDays;
-
-        if (daysUntil < 0) {
-            return "Überfällig";
-        }
-
-        // Noch <= 30 Tage -> Termin vereinbaren
-        if (daysUntil <= 30) {
-            return "Termin vereinbaren";
-        }
-
-        // 31 - 90 Tage -> Bald fällig
-        if (daysUntil <= 90) {
+            if (category != null && category.getAgeMinDays() != null) {
+                int daysUntilMinAge = category.getAgeMinDays() - currentAgeDays;
+                if (daysUntilMinAge <= 30) return "Termin vereinbaren";
+                if (daysUntilMinAge <= 90) return "Bald fällig";
+            }
             return "Bald fällig";
         }
 
-        // Standardmäßig "Bald fällig" (sollte durch isAgeCategoryRelevant bereits eingegrenzt sein)
-        return "Bald fällig";
+        // Fall 2: Folgeimpfungen -> Logik basierend auf Intervall zur letzten Dosis
+        if (lastDoseDate == null) {
+            return "Bald fällig";
+        }
+
+        long intervalDays = getIntervalDays(plan, completedDoses);
+        LocalDate dueDate = lastDoseDate.plusDays(intervalDays);
+        long daysUntilDue = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
+
+        if (daysUntilDue < 0) {
+            return "Überfällig";
+        } else if (daysUntilDue <= 30) {
+            return "Termin vereinbaren";
+        } else if (daysUntilDue <= 90) {
+            return "Bald fällig";
+        } else {
+            return "Bald fällig";
+        }
+    }
+
+    private LocalDate calculateDueDate(AgeCategory category, ImmunizationPlan plan, long completedDoses, LocalDate lastDoseDate, LocalDate birthDate) {
+        if (completedDoses == 0) {
+            return (category != null && category.getAgeMinDays() != null)
+                    ? birthDate.plusDays(category.getAgeMinDays())
+                    : null;
+        } else {
+            long daysToNextDose = getIntervalDays(plan, completedDoses);
+            return (lastDoseDate != null) ? lastDoseDate.plusDays(daysToNextDose) : null;
+        }
+    }
+
+    private long getIntervalDays(ImmunizationPlan plan, long completedDoses) {
+        // Versuche, eine Regel aus der Datenbank zu laden
+        return followUpRuleRepository.findByFromPlanIdAndMinCompletedDoses(plan.getId(), (int) completedDoses)
+                .map(rule -> (long) rule.getMinIntervalDaysSinceLast())
+                .orElse(28L); // Fallback: 28 Tage (4 Wochen), wenn keine Regel existiert
     }
 
     private int getPriorityOrder(String priority) {
