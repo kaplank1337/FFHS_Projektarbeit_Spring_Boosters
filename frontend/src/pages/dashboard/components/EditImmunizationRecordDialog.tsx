@@ -152,7 +152,7 @@ const EditImmunizationRecordDialog = ({
                     type="number"
                     min="1"
                     aria-invalid={fieldState.invalid}
-                    placeholder={t("dashboard.optional")}
+                    placeholder={t("addVaccination.dose.placeholder")}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
